@@ -1,1 +1,1 @@
-# go-meteor-cms1
+# go-meteor-cms
