@@ -1,0 +1,15 @@
+type (
+	LoginReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	LoginResp {
+		Token string `json:"token"`
+	}
+)
+
+service cms-api {
+	@handler login
+	post /admin/login (LoginReq) returns (LoginResp)
+}
+

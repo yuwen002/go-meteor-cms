@@ -1,0 +1,7 @@
+Name: cms-api
+Host: 0.0.0.0
+Port: 8888
+
+Auth:
+  AccessSecret: "8x!A%D*G-KaPdSgVkYp3s6v9y$B?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2"   # 用于签发 Token
+  AccessExpire: 86400             # Token 有效期，单位秒
