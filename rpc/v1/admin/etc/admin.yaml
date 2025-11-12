@@ -1,0 +1,11 @@
+Name: admin.rpc
+ListenOn: 0.0.0.0:9000
+Mode: dev
+
+MySQL:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=true
+# Running without etcd for development
+# Etcd:
+#   Hosts:
+#   - 127.0.0.1:2379
+#   Key: admin.rpc
