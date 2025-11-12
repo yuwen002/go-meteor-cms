@@ -4,6 +4,7 @@ import (
 	"context"
 	"go-meteor-cms/ent/adminuser"
 	"go-meteor-cms/internal/util"
+	"time"
 
 	"go-meteor-cms/rpc/v1/admin/admin"
 	"go-meteor-cms/rpc/v1/admin/internal/svc"
@@ -42,9 +43,19 @@ func (l *LoginLogic) Login(in *admin.LoginReq) (*admin.LoginResp, error) {
 		return &admin.LoginResp{Code: 1, Msg: "密码错误"}, nil
 	}
 
+	token, err := util.GenerateToken(u.ID, u.Username)
+	if err != nil {
+		return &admin.LoginResp{Code: 500, Msg: "生成 Token 失败"}, nil
+	}
+
+	// 登录成功后更新最后登录时间
+	_ = l.svcCtx.EntClient.AdminUser.UpdateOneID(u.ID).
+		SetLastLoginAt(time.Now()).
+		Exec(l.ctx)
+
 	return &admin.LoginResp{
 		Code:  0,
 		Msg:   "登录成功",
-		Token: "mock-token-abc123",
+		Token: token,
 	}, nil
 }

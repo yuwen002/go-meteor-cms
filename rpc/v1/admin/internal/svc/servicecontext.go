@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	_ "github.com/go-sql-driver/mysql"
 	"go-meteor-cms/ent"
 	"go-meteor-cms/rpc/v1/admin/internal/config"
 	"log"

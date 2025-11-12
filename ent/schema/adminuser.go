@@ -26,13 +26,8 @@ func (AdminUser) Fields() []ent.Field {
 		field.Int("id").
 			Comment("自增主键ID").
 			Unique().
-			Positive(),
-		//Immutable().
-		//Annotations(
-		//	&entsql.Annotation{
-		//		Incremental: func(b bool) *bool { return &b }(true),
-		//	},
-		//),
+			Positive().
+			Immutable(),
 
 		field.String("username").
 			Comment("用户名").
