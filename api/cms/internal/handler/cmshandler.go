@@ -14,14 +14,14 @@ import (
 
 func CmsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.HelloReq
+		var req types.LoginReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
 		l := logic.NewCmsLogic(r.Context(), svcCtx)
-		resp, err := l.Cms(&req)
+		resp, err := l.Cms()
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

@@ -26,9 +26,12 @@ func NewCmsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CmsLogic {
 	}
 }
 
-func (l *CmsLogic) Cms(req *types.HelloReq) (resp *types.HelloResp, err error) {
-	// todo: add your logic here and delete this line
-	return &types.HelloResp{
-		Message: "Hello " + req.Name,
+// Cms handles the CMS business logic
+// You can implement your custom logic here
+func (l *CmsLogic) Cms() (resp *types.LoginResp, err error) {
+	// TODO: Implement your business logic here
+	// This is a placeholder implementation
+	return &types.LoginResp{
+		Token: "your-jwt-token-here",
 	}, nil
 }
