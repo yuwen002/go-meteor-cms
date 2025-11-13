@@ -2,11 +2,11 @@ package seed
 
 import (
 	"context"
-	"go-meteor-cms/internal/util"
 	"time"
 
-	"go-meteor-cms/ent"
-	"go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 )
 
 func InitSeed(ctx context.Context, client *ent.Client) {
@@ -22,7 +22,7 @@ func initAdmin(ctx context.Context, client *ent.Client) {
 		return
 	}
 
-	password, err := util.HashPassword("123456")
+	password, err := utils.HashPassword("123456")
 	if err != nil {
 		panic("生成密码哈希失败: " + err.Error())
 	}
@@ -31,6 +31,7 @@ func initAdmin(ctx context.Context, client *ent.Client) {
 		SetUsername("admin").
 		SetPasswordHash(password).
 		SetCreatedAt(time.Now()).
+		SetIsSuper(true).
 		Save(ctx)
 	if err != nil {
 		panic("创建管理员用户失败: " + err.Error())

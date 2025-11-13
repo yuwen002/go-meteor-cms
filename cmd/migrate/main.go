@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"go-meteor-cms/internal/seed"
 	"log"
 
-	"go-meteor-cms/ent"
-
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/internal/seed"
 )
 
 func main() {
