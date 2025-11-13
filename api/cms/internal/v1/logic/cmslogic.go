@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/internal/svc"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/types"
+	"github.com/yuwen002/go-meteor-cms/api/cms/internal/v1/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

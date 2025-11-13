@@ -6,9 +6,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/internal/svc"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/types"
+	"github.com/yuwen002/go-meteor-cms/api/cms/internal/v1/logic"
+	"github.com/yuwen002/go-meteor-cms/api/cms/internal/v1/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 

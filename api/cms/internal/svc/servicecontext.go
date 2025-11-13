@@ -4,6 +4,7 @@
 package svc
 
 import (
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/yuwen002/go-meteor-cms/api/cms/internal/config"
 	"github.com/yuwen002/go-meteor-cms/ent"
 )
@@ -14,12 +15,12 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	client, err := ent.Open(c., "root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&loc=Local")
+	client, err := ent.Open(c.Database.Driver, c.Database.Source)
 	if err != nil {
 		panic(err)
 	}
 	return &ServiceContext{
-		Config: c,
+		Config:    c,
 		EntClient: client,
 	}
 }

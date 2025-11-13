@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/internal/config"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/handler"
 	"github.com/yuwen002/go-meteor-cms/api/cms/internal/svc"
+	"github.com/yuwen002/go-meteor-cms/api/cms/internal/v1/handler"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
