@@ -17,7 +17,7 @@ type AdminUser struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 自增主键ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 用户名
 	Username string `json:"username,omitempty"`
 	// 密码哈希值
@@ -74,7 +74,7 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case adminuser.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])

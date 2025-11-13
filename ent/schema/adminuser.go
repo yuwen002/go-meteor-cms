@@ -23,7 +23,7 @@ func (AdminUser) Annotations() []schema.Annotation {
 // Fields of the AdminUser.
 func (AdminUser) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Comment("自增主键ID").
 			Unique().
 			Positive().

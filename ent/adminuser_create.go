@@ -145,7 +145,7 @@ func (_c *AdminUserCreate) SetNillableUpdatedAt(v *time.Time) *AdminUserCreate {
 }
 
 // SetID sets the "id" field.
-func (_c *AdminUserCreate) SetID(v int) *AdminUserCreate {
+func (_c *AdminUserCreate) SetID(v int64) *AdminUserCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -254,7 +254,7 @@ func (_c *AdminUserCreate) sqlSave(ctx context.Context) (*AdminUser, error) {
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -264,7 +264,7 @@ func (_c *AdminUserCreate) sqlSave(ctx context.Context) (*AdminUser, error) {
 func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	var (
 		_node = &AdminUser{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(adminuser.Table, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(adminuser.Table, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
@@ -360,7 +360,7 @@ func (_c *AdminUserCreateBulk) Save(ctx context.Context) ([]*AdminUser, error) {
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

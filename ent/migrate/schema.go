@@ -10,7 +10,7 @@ import (
 var (
 	// AdminUsersColumns holds the columns for the "admin_users" table.
 	AdminUsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, Comment: "自增主键ID"},
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键ID"},
 		{Name: "username", Type: field.TypeString, Unique: true, Comment: "用户名"},
 		{Name: "password_hash", Type: field.TypeString, Comment: "密码哈希值"},
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Comment: "昵称"},

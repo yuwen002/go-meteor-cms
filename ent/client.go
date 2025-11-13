@@ -257,7 +257,7 @@ func (c *AdminUserClient) UpdateOne(_m *AdminUser) *AdminUserUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AdminUserClient) UpdateOneID(id int) *AdminUserUpdateOne {
+func (c *AdminUserClient) UpdateOneID(id int64) *AdminUserUpdateOne {
 	mutation := newAdminUserMutation(c.config, OpUpdateOne, withAdminUserID(id))
 	return &AdminUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -274,7 +274,7 @@ func (c *AdminUserClient) DeleteOne(_m *AdminUser) *AdminUserDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AdminUserClient) DeleteOneID(id int) *AdminUserDeleteOne {
+func (c *AdminUserClient) DeleteOneID(id int64) *AdminUserDeleteOne {
 	builder := c.Delete().Where(adminuser.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -291,12 +291,12 @@ func (c *AdminUserClient) Query() *AdminUserQuery {
 }
 
 // Get returns a AdminUser entity by its id.
-func (c *AdminUserClient) Get(ctx context.Context, id int) (*AdminUser, error) {
+func (c *AdminUserClient) Get(ctx context.Context, id int64) (*AdminUser, error) {
 	return c.Query().Where(adminuser.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AdminUserClient) GetX(ctx context.Context, id int) *AdminUser {
+func (c *AdminUserClient) GetX(ctx context.Context, id int64) *AdminUser {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
