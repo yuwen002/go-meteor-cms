@@ -44,6 +44,7 @@ func (AdminUser) Fields() []ent.Field {
 
 		field.String("email").
 			Comment("邮箱").
+			Unique().
 			Optional(),
 
 		field.String("phone").

@@ -14,7 +14,7 @@ var (
 		{Name: "username", Type: field.TypeString, Unique: true, Comment: "用户名"},
 		{Name: "password_hash", Type: field.TypeString, Comment: "密码哈希值"},
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Comment: "昵称"},
-		{Name: "email", Type: field.TypeString, Nullable: true, Comment: "邮箱"},
+		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true, Comment: "邮箱"},
 		{Name: "phone", Type: field.TypeString, Nullable: true, Comment: "手机号"},
 		{Name: "is_super", Type: field.TypeBool, Comment: "是否超级管理员", Default: false},
 		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},

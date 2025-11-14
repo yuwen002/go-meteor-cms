@@ -1,18 +1,32 @@
 type (
-	LoginReq {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	LoginResp {
-		Token string `json:"token"`
-	}
-	ForgotPasswordReq {
-		Username string `json:"username"`
-	}
-	ForgotPasswordResp {
-		Status  int    `json:"status"`
-		Message string `json:"message"`
-	}
+    // 登录接口
+    LoginReq {
+        Username string `json:"username" validate:"required"` // 必填
+        Password string `json:"password" validate:"required"` // 必填
+    }
+    LoginResp {
+        Token string `json:"token"` // 登录成功返回 token
+    }
+
+        // 忘记密码接口
+    ForgotPasswordReq {
+        Username string `json:"username" validate:"required"` // 必填
+    }
+    ForgotPasswordResp {
+        Status  int    `json:"status"`  // 状态码（0 成功，1 失败）
+        Message string `json:"message"` // 返回提示
+    }
+
+        // 注册管理员接口
+    RegisterReq {
+        Username string `json:"username" validate:"required"`               // 必填
+        Password string `json:"password" validate:"required,min=6"`         // 必填，最少 6 位
+        Email    string `json:"email" validate:"required,email"`            // 必填，格式必须是 email
+        Nickname string `json:"nickname"`                                   // 选填
+    }
+    RegisterResp {
+        Message string `json:"message"` // 注册成功提示
+    }
 )
 
 service cms-api {
@@ -21,5 +35,8 @@ service cms-api {
 
 	@handler forgotPassword
 	post /admin/forgot-password (ForgotPasswordReq) returns (ForgotPasswordResp)
+
+	@handler registerAdmin
+	post /admin/register (RegisterReq) returns (RegisterResp)
 }
 

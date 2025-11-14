@@ -25,6 +25,7 @@ type RegisterReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
+	Nickname string `json:"nickname"`
 }
 
 type RegisterResp struct {
