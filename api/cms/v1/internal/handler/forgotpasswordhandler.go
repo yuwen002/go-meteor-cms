@@ -4,11 +4,13 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -16,16 +18,22 @@ func forgotPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.ForgotPasswordReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
+			common.Fail(w, 40000, "参数错误")
 			return
 		}
 
 		l := logic.NewForgotPasswordLogic(r.Context(), svcCtx)
 		resp, err := l.ForgotPassword(&req)
 		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			var be *common.BizError
+			if errors.As(err, &be) {
+				common.Fail(w, be.Code, be.Msg)
+				return
+			}
+			common.Fail(w, 50000, "系统错误，请稍后重试")
+			return
 		}
+
+		common.Ok(w, resp)
 	}
 }

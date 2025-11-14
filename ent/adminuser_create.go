@@ -144,6 +144,34 @@ func (_c *AdminUserCreate) SetNillableUpdatedAt(v *time.Time) *AdminUserCreate {
 	return _c
 }
 
+// SetResetToken sets the "reset_token" field.
+func (_c *AdminUserCreate) SetResetToken(v string) *AdminUserCreate {
+	_c.mutation.SetResetToken(v)
+	return _c
+}
+
+// SetNillableResetToken sets the "reset_token" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableResetToken(v *string) *AdminUserCreate {
+	if v != nil {
+		_c.SetResetToken(*v)
+	}
+	return _c
+}
+
+// SetResetExpire sets the "reset_expire" field.
+func (_c *AdminUserCreate) SetResetExpire(v time.Time) *AdminUserCreate {
+	_c.mutation.SetResetExpire(v)
+	return _c
+}
+
+// SetNillableResetExpire sets the "reset_expire" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableResetExpire(v *time.Time) *AdminUserCreate {
+	if v != nil {
+		_c.SetResetExpire(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *AdminUserCreate) SetID(v int64) *AdminUserCreate {
 	_c.mutation.SetID(v)
@@ -309,6 +337,14 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.ResetToken(); ok {
+		_spec.SetField(adminuser.FieldResetToken, field.TypeString, value)
+		_node.ResetToken = &value
+	}
+	if value, ok := _c.mutation.ResetExpire(); ok {
+		_spec.SetField(adminuser.FieldResetExpire, field.TypeTime, value)
+		_node.ResetExpire = &value
 	}
 	return _node, _spec
 }

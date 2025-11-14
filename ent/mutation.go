@@ -43,6 +43,8 @@ type AdminUserMutation struct {
 	last_login_at *time.Time
 	created_at    *time.Time
 	updated_at    *time.Time
+	reset_token   *string
+	reset_expire  *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*AdminUser, error)
@@ -565,6 +567,104 @@ func (m *AdminUserMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetResetToken sets the "reset_token" field.
+func (m *AdminUserMutation) SetResetToken(s string) {
+	m.reset_token = &s
+}
+
+// ResetToken returns the value of the "reset_token" field in the mutation.
+func (m *AdminUserMutation) ResetToken() (r string, exists bool) {
+	v := m.reset_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResetToken returns the old "reset_token" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldResetToken(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResetToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResetToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResetToken: %w", err)
+	}
+	return oldValue.ResetToken, nil
+}
+
+// ClearResetToken clears the value of the "reset_token" field.
+func (m *AdminUserMutation) ClearResetToken() {
+	m.reset_token = nil
+	m.clearedFields[adminuser.FieldResetToken] = struct{}{}
+}
+
+// ResetTokenCleared returns if the "reset_token" field was cleared in this mutation.
+func (m *AdminUserMutation) ResetTokenCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldResetToken]
+	return ok
+}
+
+// ResetResetToken resets all changes to the "reset_token" field.
+func (m *AdminUserMutation) ResetResetToken() {
+	m.reset_token = nil
+	delete(m.clearedFields, adminuser.FieldResetToken)
+}
+
+// SetResetExpire sets the "reset_expire" field.
+func (m *AdminUserMutation) SetResetExpire(t time.Time) {
+	m.reset_expire = &t
+}
+
+// ResetExpire returns the value of the "reset_expire" field in the mutation.
+func (m *AdminUserMutation) ResetExpire() (r time.Time, exists bool) {
+	v := m.reset_expire
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResetExpire returns the old "reset_expire" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldResetExpire(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResetExpire is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResetExpire requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResetExpire: %w", err)
+	}
+	return oldValue.ResetExpire, nil
+}
+
+// ClearResetExpire clears the value of the "reset_expire" field.
+func (m *AdminUserMutation) ClearResetExpire() {
+	m.reset_expire = nil
+	m.clearedFields[adminuser.FieldResetExpire] = struct{}{}
+}
+
+// ResetExpireCleared returns if the "reset_expire" field was cleared in this mutation.
+func (m *AdminUserMutation) ResetExpireCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldResetExpire]
+	return ok
+}
+
+// ResetResetExpire resets all changes to the "reset_expire" field.
+func (m *AdminUserMutation) ResetResetExpire() {
+	m.reset_expire = nil
+	delete(m.clearedFields, adminuser.FieldResetExpire)
+}
+
 // Where appends a list predicates to the AdminUserMutation builder.
 func (m *AdminUserMutation) Where(ps ...predicate.AdminUser) {
 	m.predicates = append(m.predicates, ps...)
@@ -599,7 +699,7 @@ func (m *AdminUserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminUserMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.username != nil {
 		fields = append(fields, adminuser.FieldUsername)
 	}
@@ -630,6 +730,12 @@ func (m *AdminUserMutation) Fields() []string {
 	if m.updated_at != nil {
 		fields = append(fields, adminuser.FieldUpdatedAt)
 	}
+	if m.reset_token != nil {
+		fields = append(fields, adminuser.FieldResetToken)
+	}
+	if m.reset_expire != nil {
+		fields = append(fields, adminuser.FieldResetExpire)
+	}
 	return fields
 }
 
@@ -658,6 +764,10 @@ func (m *AdminUserMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case adminuser.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case adminuser.FieldResetToken:
+		return m.ResetToken()
+	case adminuser.FieldResetExpire:
+		return m.ResetExpire()
 	}
 	return nil, false
 }
@@ -687,6 +797,10 @@ func (m *AdminUserMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldCreatedAt(ctx)
 	case adminuser.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case adminuser.FieldResetToken:
+		return m.OldResetToken(ctx)
+	case adminuser.FieldResetExpire:
+		return m.OldResetExpire(ctx)
 	}
 	return nil, fmt.Errorf("unknown AdminUser field %s", name)
 }
@@ -766,6 +880,20 @@ func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case adminuser.FieldResetToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResetToken(v)
+		return nil
+	case adminuser.FieldResetExpire:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResetExpire(v)
+		return nil
 	}
 	return fmt.Errorf("unknown AdminUser field %s", name)
 }
@@ -808,6 +936,12 @@ func (m *AdminUserMutation) ClearedFields() []string {
 	if m.FieldCleared(adminuser.FieldLastLoginAt) {
 		fields = append(fields, adminuser.FieldLastLoginAt)
 	}
+	if m.FieldCleared(adminuser.FieldResetToken) {
+		fields = append(fields, adminuser.FieldResetToken)
+	}
+	if m.FieldCleared(adminuser.FieldResetExpire) {
+		fields = append(fields, adminuser.FieldResetExpire)
+	}
 	return fields
 }
 
@@ -833,6 +967,12 @@ func (m *AdminUserMutation) ClearField(name string) error {
 		return nil
 	case adminuser.FieldLastLoginAt:
 		m.ClearLastLoginAt()
+		return nil
+	case adminuser.FieldResetToken:
+		m.ClearResetToken()
+		return nil
+	case adminuser.FieldResetExpire:
+		m.ClearResetExpire()
 		return nil
 	}
 	return fmt.Errorf("unknown AdminUser nullable field %s", name)
@@ -871,6 +1011,12 @@ func (m *AdminUserMutation) ResetField(name string) error {
 		return nil
 	case adminuser.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case adminuser.FieldResetToken:
+		m.ResetResetToken()
+		return nil
+	case adminuser.FieldResetExpire:
+		m.ResetResetExpire()
 		return nil
 	}
 	return fmt.Errorf("unknown AdminUser field %s", name)

@@ -21,6 +21,8 @@ var (
 		{Name: "last_login_at", Type: field.TypeTime, Nullable: true, Comment: "最后登录时间"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "reset_token", Type: field.TypeString, Nullable: true, Comment: "密码重置令牌"},
+		{Name: "reset_expire", Type: field.TypeTime, Nullable: true, Comment: "密码重置令牌过期时间"},
 	}
 	// AdminUsersTable holds the schema information for the "admin_users" table.
 	AdminUsersTable = &schema.Table{

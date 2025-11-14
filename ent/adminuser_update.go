@@ -184,6 +184,46 @@ func (_u *AdminUserUpdate) SetUpdatedAt(v time.Time) *AdminUserUpdate {
 	return _u
 }
 
+// SetResetToken sets the "reset_token" field.
+func (_u *AdminUserUpdate) SetResetToken(v string) *AdminUserUpdate {
+	_u.mutation.SetResetToken(v)
+	return _u
+}
+
+// SetNillableResetToken sets the "reset_token" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableResetToken(v *string) *AdminUserUpdate {
+	if v != nil {
+		_u.SetResetToken(*v)
+	}
+	return _u
+}
+
+// ClearResetToken clears the value of the "reset_token" field.
+func (_u *AdminUserUpdate) ClearResetToken() *AdminUserUpdate {
+	_u.mutation.ClearResetToken()
+	return _u
+}
+
+// SetResetExpire sets the "reset_expire" field.
+func (_u *AdminUserUpdate) SetResetExpire(v time.Time) *AdminUserUpdate {
+	_u.mutation.SetResetExpire(v)
+	return _u
+}
+
+// SetNillableResetExpire sets the "reset_expire" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableResetExpire(v *time.Time) *AdminUserUpdate {
+	if v != nil {
+		_u.SetResetExpire(*v)
+	}
+	return _u
+}
+
+// ClearResetExpire clears the value of the "reset_expire" field.
+func (_u *AdminUserUpdate) ClearResetExpire() *AdminUserUpdate {
+	_u.mutation.ClearResetExpire()
+	return _u
+}
+
 // Mutation returns the AdminUserMutation object of the builder.
 func (_u *AdminUserUpdate) Mutation() *AdminUserMutation {
 	return _u.mutation
@@ -293,6 +333,18 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.ResetToken(); ok {
+		_spec.SetField(adminuser.FieldResetToken, field.TypeString, value)
+	}
+	if _u.mutation.ResetTokenCleared() {
+		_spec.ClearField(adminuser.FieldResetToken, field.TypeString)
+	}
+	if value, ok := _u.mutation.ResetExpire(); ok {
+		_spec.SetField(adminuser.FieldResetExpire, field.TypeTime, value)
+	}
+	if _u.mutation.ResetExpireCleared() {
+		_spec.ClearField(adminuser.FieldResetExpire, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -470,6 +522,46 @@ func (_u *AdminUserUpdateOne) SetUpdatedAt(v time.Time) *AdminUserUpdateOne {
 	return _u
 }
 
+// SetResetToken sets the "reset_token" field.
+func (_u *AdminUserUpdateOne) SetResetToken(v string) *AdminUserUpdateOne {
+	_u.mutation.SetResetToken(v)
+	return _u
+}
+
+// SetNillableResetToken sets the "reset_token" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableResetToken(v *string) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetResetToken(*v)
+	}
+	return _u
+}
+
+// ClearResetToken clears the value of the "reset_token" field.
+func (_u *AdminUserUpdateOne) ClearResetToken() *AdminUserUpdateOne {
+	_u.mutation.ClearResetToken()
+	return _u
+}
+
+// SetResetExpire sets the "reset_expire" field.
+func (_u *AdminUserUpdateOne) SetResetExpire(v time.Time) *AdminUserUpdateOne {
+	_u.mutation.SetResetExpire(v)
+	return _u
+}
+
+// SetNillableResetExpire sets the "reset_expire" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableResetExpire(v *time.Time) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetResetExpire(*v)
+	}
+	return _u
+}
+
+// ClearResetExpire clears the value of the "reset_expire" field.
+func (_u *AdminUserUpdateOne) ClearResetExpire() *AdminUserUpdateOne {
+	_u.mutation.ClearResetExpire()
+	return _u
+}
+
 // Mutation returns the AdminUserMutation object of the builder.
 func (_u *AdminUserUpdateOne) Mutation() *AdminUserMutation {
 	return _u.mutation
@@ -609,6 +701,18 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.ResetToken(); ok {
+		_spec.SetField(adminuser.FieldResetToken, field.TypeString, value)
+	}
+	if _u.mutation.ResetTokenCleared() {
+		_spec.ClearField(adminuser.FieldResetToken, field.TypeString)
+	}
+	if value, ok := _u.mutation.ResetExpire(); ok {
+		_spec.SetField(adminuser.FieldResetExpire, field.TypeTime, value)
+	}
+	if _u.mutation.ResetExpireCleared() {
+		_spec.ClearField(adminuser.FieldResetExpire, field.TypeTime)
 	}
 	_node = &AdminUser{config: _u.config}
 	_spec.Assign = _node.assignValues

@@ -3,6 +3,8 @@
 
 package types
 
+
+
 type ForgotPasswordReq struct {
 	Username string `json:"username"`
 }

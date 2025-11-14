@@ -104,6 +104,16 @@ func UpdatedAt(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// ResetToken applies equality check predicate on the "reset_token" field. It's identical to ResetTokenEQ.
+func ResetToken(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldResetToken, v))
+}
+
+// ResetExpire applies equality check predicate on the "reset_expire" field. It's identical to ResetExpireEQ.
+func ResetExpire(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldResetExpire, v))
+}
+
 // UsernameEQ applies the EQ predicate on the "username" field.
 func UsernameEQ(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldUsername, v))
@@ -607,6 +617,131 @@ func UpdatedAtLT(v time.Time) predicate.AdminUser {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// ResetTokenEQ applies the EQ predicate on the "reset_token" field.
+func ResetTokenEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldResetToken, v))
+}
+
+// ResetTokenNEQ applies the NEQ predicate on the "reset_token" field.
+func ResetTokenNEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldResetToken, v))
+}
+
+// ResetTokenIn applies the In predicate on the "reset_token" field.
+func ResetTokenIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldResetToken, vs...))
+}
+
+// ResetTokenNotIn applies the NotIn predicate on the "reset_token" field.
+func ResetTokenNotIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldResetToken, vs...))
+}
+
+// ResetTokenGT applies the GT predicate on the "reset_token" field.
+func ResetTokenGT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldResetToken, v))
+}
+
+// ResetTokenGTE applies the GTE predicate on the "reset_token" field.
+func ResetTokenGTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldResetToken, v))
+}
+
+// ResetTokenLT applies the LT predicate on the "reset_token" field.
+func ResetTokenLT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldResetToken, v))
+}
+
+// ResetTokenLTE applies the LTE predicate on the "reset_token" field.
+func ResetTokenLTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldResetToken, v))
+}
+
+// ResetTokenContains applies the Contains predicate on the "reset_token" field.
+func ResetTokenContains(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContains(FieldResetToken, v))
+}
+
+// ResetTokenHasPrefix applies the HasPrefix predicate on the "reset_token" field.
+func ResetTokenHasPrefix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasPrefix(FieldResetToken, v))
+}
+
+// ResetTokenHasSuffix applies the HasSuffix predicate on the "reset_token" field.
+func ResetTokenHasSuffix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasSuffix(FieldResetToken, v))
+}
+
+// ResetTokenIsNil applies the IsNil predicate on the "reset_token" field.
+func ResetTokenIsNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIsNull(FieldResetToken))
+}
+
+// ResetTokenNotNil applies the NotNil predicate on the "reset_token" field.
+func ResetTokenNotNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotNull(FieldResetToken))
+}
+
+// ResetTokenEqualFold applies the EqualFold predicate on the "reset_token" field.
+func ResetTokenEqualFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEqualFold(FieldResetToken, v))
+}
+
+// ResetTokenContainsFold applies the ContainsFold predicate on the "reset_token" field.
+func ResetTokenContainsFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContainsFold(FieldResetToken, v))
+}
+
+// ResetExpireEQ applies the EQ predicate on the "reset_expire" field.
+func ResetExpireEQ(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldResetExpire, v))
+}
+
+// ResetExpireNEQ applies the NEQ predicate on the "reset_expire" field.
+func ResetExpireNEQ(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldResetExpire, v))
+}
+
+// ResetExpireIn applies the In predicate on the "reset_expire" field.
+func ResetExpireIn(vs ...time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldResetExpire, vs...))
+}
+
+// ResetExpireNotIn applies the NotIn predicate on the "reset_expire" field.
+func ResetExpireNotIn(vs ...time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldResetExpire, vs...))
+}
+
+// ResetExpireGT applies the GT predicate on the "reset_expire" field.
+func ResetExpireGT(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldResetExpire, v))
+}
+
+// ResetExpireGTE applies the GTE predicate on the "reset_expire" field.
+func ResetExpireGTE(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldResetExpire, v))
+}
+
+// ResetExpireLT applies the LT predicate on the "reset_expire" field.
+func ResetExpireLT(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldResetExpire, v))
+}
+
+// ResetExpireLTE applies the LTE predicate on the "reset_expire" field.
+func ResetExpireLTE(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldResetExpire, v))
+}
+
+// ResetExpireIsNil applies the IsNil predicate on the "reset_expire" field.
+func ResetExpireIsNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIsNull(FieldResetExpire))
+}
+
+// ResetExpireNotNil applies the NotNil predicate on the "reset_expire" field.
+func ResetExpireNotNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotNull(FieldResetExpire))
 }
 
 // And groups predicates with the AND operator between them.

@@ -37,7 +37,11 @@ type AdminUser struct {
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 密码重置令牌
+	ResetToken *string `json:"reset_token,omitempty"`
+	// 密码重置令牌过期时间
+	ResetExpire  *time.Time `json:"reset_expire,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -50,9 +54,9 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case adminuser.FieldID:
 			values[i] = new(sql.NullInt64)
-		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone:
+		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone, adminuser.FieldResetToken:
 			values[i] = new(sql.NullString)
-		case adminuser.FieldLastLoginAt, adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt:
+		case adminuser.FieldLastLoginAt, adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt, adminuser.FieldResetExpire:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -136,6 +140,20 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
+		case adminuser.FieldResetToken:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field reset_token", values[i])
+			} else if value.Valid {
+				_m.ResetToken = new(string)
+				*_m.ResetToken = value.String
+			}
+		case adminuser.FieldResetExpire:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field reset_expire", values[i])
+			} else if value.Valid {
+				_m.ResetExpire = new(time.Time)
+				*_m.ResetExpire = value.Time
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -203,6 +221,16 @@ func (_m *AdminUser) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.ResetToken; v != nil {
+		builder.WriteString("reset_token=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.ResetExpire; v != nil {
+		builder.WriteString("reset_expire=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

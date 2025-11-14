@@ -33,6 +33,10 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldResetToken holds the string denoting the reset_token field in the database.
+	FieldResetToken = "reset_token"
+	// FieldResetExpire holds the string denoting the reset_expire field in the database.
+	FieldResetExpire = "reset_expire"
 	// Table holds the table name of the adminuser in the database.
 	Table = "admin_users"
 )
@@ -50,6 +54,8 @@ var Columns = []string{
 	FieldLastLoginAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldResetToken,
+	FieldResetExpire,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -137,4 +143,14 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByResetToken orders the results by the reset_token field.
+func ByResetToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResetToken, opts...).ToFunc()
+}
+
+// ByResetExpire orders the results by the reset_expire field.
+func ByResetExpire(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResetExpire, opts...).ToFunc()
 }

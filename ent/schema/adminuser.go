@@ -71,6 +71,16 @@ func (AdminUser) Fields() []ent.Field {
 			Comment("更新时间").
 			Default(time.Now).
 			UpdateDefault(time.Now),
+
+		field.String("reset_token").
+			Comment("密码重置令牌").
+			Optional().
+			Nillable(),
+
+		field.Time("reset_expire").
+			Comment("密码重置令牌过期时间").
+			Optional().
+			Nillable(),
 	}
 }
 
