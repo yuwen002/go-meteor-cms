@@ -73,14 +73,20 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	}
 
 	go func() {
+		// 创建一个新的上下文，设置超时时间
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
 		// 更新最后登录时间为当前时间
 		now := time.Now()
 		_, err = l.svcCtx.EntClient.AdminUser.UpdateOneID(user.ID).
 			SetLastLoginAt(now).
-			Save(l.ctx)
+			Save(ctx)
 		if err != nil {
-			// 记录错误但不中断登录流程
-			logx.WithContext(l.ctx).Errorf("更新最后登录时间失败: %v", err)
+			// 记录更详细的错误信息
+			logx.WithContext(ctx).Errorf("更新用户ID: %d， 最后登录时间失败: %v", user.ID, err)
+		} else {
+			logx.WithContext(ctx).Infof("用户ID: %d， 最后登录时间已更新: %v", user.ID, now)
 		}
 	}()
 

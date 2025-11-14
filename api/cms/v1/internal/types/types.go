@@ -4,30 +4,30 @@
 package types
 
 type ForgotPasswordReq struct {
-	Username string `json:"username"`
+	Username string `json:"username" validate:"required"` // 必填
 }
 
 type ForgotPasswordResp struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
+	Status  int    `json:"status"`  // 状态码（0 成功，1 失败）
+	Message string `json:"message"` // 返回提示
 }
 
 type LoginReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required"` // 必填
+	Password string `json:"password" validate:"required"` // 必填
 }
 
 type LoginResp struct {
-	Token string `json:"token"`
+	Token string `json:"token"` // 登录成功返回 token
 }
 
 type RegisterReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Nickname string `json:"nickname"`
+	Username string `json:"username" validate:"required"`       // 必填
+	Password string `json:"password" validate:"required,min=6"` // 必填，最少 6 位
+	Email    string `json:"email" validate:"required,email"`    // 必填，格式必须是 email
+	Nickname string `json:"nickname"`                           // 选填
 }
 
 type RegisterResp struct {
-	Message string `json:"message"`
+	Message string `json:"message"` // 注册成功提示
 }
