@@ -5,7 +5,7 @@ package svc
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/config"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/config"
 	"github.com/yuwen002/go-meteor-cms/ent"
 )
 

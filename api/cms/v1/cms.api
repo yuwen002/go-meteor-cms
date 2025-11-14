@@ -6,10 +6,19 @@ type (
 	LoginResp {
 		Token string `json:"token"`
 	}
+	ForgotPasswordReq {
+		Username string `json:"username"`
+	}
+	ForgotPasswordResp {
+		Message string `json:"message"`
+	}
 )
 
 service cms-api {
 	@handler login
 	post /admin/login (LoginReq) returns (LoginResp)
+
+	@handler forgotPassword
+	post /admin/forgot-password (ForgotPasswordReq) returns (ForgotPasswordResp)
 }
 

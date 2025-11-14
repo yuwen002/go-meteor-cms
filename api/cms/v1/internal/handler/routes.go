@@ -6,7 +6,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/svc"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -14,6 +14,11 @@ import (
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/admin/forgot-password",
+				Handler: forgotPasswordHandler(serverCtx),
+			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/admin/login",

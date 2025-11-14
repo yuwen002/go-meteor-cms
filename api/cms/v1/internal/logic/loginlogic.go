@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/svc"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/v1/types"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"

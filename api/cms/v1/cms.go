@@ -7,9 +7,9 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/config"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/svc"
-	"github.com/yuwen002/go-meteor-cms/api/cms/internal/v1/handler"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/config"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/handler"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
