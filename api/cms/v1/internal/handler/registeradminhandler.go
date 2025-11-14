@@ -19,27 +19,44 @@ func registerAdminHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.RegisterReq
 		if err := httpx.Parse(r, &req); err != nil {
-			// 判断是否是 validator.ValidationErrors
+			common.Fail(w, 40000, "参数错误")
+			return
+		}
+
+		var fieldChName = map[string]string{
+			"Username":     "用户名",
+			"PasswordHash": "密码",
+			"Email":        "邮箱",
+		}
+
+		var validate = validator.New()
+		if err := validate.Struct(req); err != nil {
 			var errs validator.ValidationErrors
 			if errors.As(err, &errs) {
-				// 拼接提示信息
-				msg := ""
-				for _, e := range errs {
-					switch e.Tag() {
-					case "required":
-						msg = e.Field() + "不能为空"
-					case "min":
-						msg = e.Field() + "长度不能少于" + e.Param() + "位"
-					case "email":
-						msg = e.Field() + "格式不正确"
-					default:
-						msg = "参数错误"
-					}
-					break // 只返回第一个错误
+				e := errs[0] // 只取第一个错误
+
+				field := e.Field()
+				cnName := fieldChName[field]
+				if cnName == "" {
+					cnName = field // 没映射就用原始名字
 				}
+
+				msg := ""
+				switch e.Tag() {
+				case "required":
+					msg = cnName + "不能为空"
+				case "min":
+					msg = cnName + "长度不能少于" + e.Param() + "位"
+				case "email":
+					msg = cnName + "格式不正确"
+				default:
+					msg = "参数错误"
+				}
+
 				common.Fail(w, 40000, msg)
 				return
 			}
+
 			common.Fail(w, 40000, "参数错误")
 			return
 		}
