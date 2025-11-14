@@ -3,13 +3,12 @@
 
 package types
 
-
-
 type ForgotPasswordReq struct {
 	Username string `json:"username"`
 }
 
 type ForgotPasswordResp struct {
+	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
 
@@ -20,4 +19,14 @@ type LoginReq struct {
 
 type LoginResp struct {
 	Token string `json:"token"`
+}
+
+type RegisterReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+type RegisterResp struct {
+	Message string `json:"message"`
 }
