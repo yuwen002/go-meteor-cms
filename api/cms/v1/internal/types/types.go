@@ -31,3 +31,8 @@ type RegisterReq struct {
 type RegisterResp struct {
 	Message string `json:"message"` // 注册成功提示
 }
+
+type TestTokenResp struct {
+	Message string                 `json:"message"`
+	Claims  map[string]interface{} `json:"claims"`
+}

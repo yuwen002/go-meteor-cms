@@ -38,3 +38,18 @@ service cms-api {
 	post /admin/register (RegisterReq) returns (RegisterResp)
 }
 
+type (
+	TestTokenResp {
+		Message string                 `json:"message"`
+		Claims  map[string]interface{} `json:"claims"`
+	}
+)
+
+@server (
+	middleware: JwtMiddleware
+)
+service cms-api {
+	@handler testToken
+	get /admin/test-token returns (TestTokenResp)
+}
+
