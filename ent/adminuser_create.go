@@ -74,6 +74,20 @@ func (_c *AdminUserCreate) SetNillablePhone(v *string) *AdminUserCreate {
 	return _c
 }
 
+// SetAvatar sets the "avatar" field.
+func (_c *AdminUserCreate) SetAvatar(v string) *AdminUserCreate {
+	_c.mutation.SetAvatar(v)
+	return _c
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableAvatar(v *string) *AdminUserCreate {
+	if v != nil {
+		_c.SetAvatar(*v)
+	}
+	return _c
+}
+
 // SetIsSuper sets the "is_super" field.
 func (_c *AdminUserCreate) SetIsSuper(v bool) *AdminUserCreate {
 	_c.mutation.SetIsSuper(v)
@@ -213,6 +227,10 @@ func (_c *AdminUserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *AdminUserCreate) defaults() {
+	if _, ok := _c.mutation.Avatar(); !ok {
+		v := adminuser.DefaultAvatar
+		_c.mutation.SetAvatar(v)
+	}
 	if _, ok := _c.mutation.IsSuper(); !ok {
 		v := adminuser.DefaultIsSuper
 		_c.mutation.SetIsSuper(v)
@@ -248,6 +266,9 @@ func (_c *AdminUserCreate) check() error {
 		if err := adminuser.PasswordHashValidator(v); err != nil {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "AdminUser.password_hash": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.Avatar(); !ok {
+		return &ValidationError{Name: "avatar", err: errors.New(`ent: missing required field "AdminUser.avatar"`)}
 	}
 	if _, ok := _c.mutation.IsSuper(); !ok {
 		return &ValidationError{Name: "is_super", err: errors.New(`ent: missing required field "AdminUser.is_super"`)}
@@ -317,6 +338,10 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Phone(); ok {
 		_spec.SetField(adminuser.FieldPhone, field.TypeString, value)
 		_node.Phone = value
+	}
+	if value, ok := _c.mutation.Avatar(); ok {
+		_spec.SetField(adminuser.FieldAvatar, field.TypeString, value)
+		_node.Avatar = value
 	}
 	if value, ok := _c.mutation.IsSuper(); ok {
 		_spec.SetField(adminuser.FieldIsSuper, field.TypeBool, value)

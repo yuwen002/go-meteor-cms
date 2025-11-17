@@ -28,6 +28,8 @@ type AdminUser struct {
 	Email string `json:"email,omitempty"`
 	// 手机号
 	Phone string `json:"phone,omitempty"`
+	// 头像 URL
+	Avatar string `json:"avatar,omitempty"`
 	// 是否超级管理员
 	IsSuper bool `json:"is_super,omitempty"`
 	// 是否启用
@@ -54,7 +56,7 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case adminuser.FieldID:
 			values[i] = new(sql.NullInt64)
-		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone, adminuser.FieldResetToken:
+		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone, adminuser.FieldAvatar, adminuser.FieldResetToken:
 			values[i] = new(sql.NullString)
 		case adminuser.FieldLastLoginAt, adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt, adminuser.FieldResetExpire:
 			values[i] = new(sql.NullTime)
@@ -108,6 +110,12 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field phone", values[i])
 			} else if value.Valid {
 				_m.Phone = value.String
+			}
+		case adminuser.FieldAvatar:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field avatar", values[i])
+			} else if value.Valid {
+				_m.Avatar = value.String
 			}
 		case adminuser.FieldIsSuper:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -204,6 +212,9 @@ func (_m *AdminUser) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("phone=")
 	builder.WriteString(_m.Phone)
+	builder.WriteString(", ")
+	builder.WriteString("avatar=")
+	builder.WriteString(_m.Avatar)
 	builder.WriteString(", ")
 	builder.WriteString("is_super=")
 	builder.WriteString(fmt.Sprintf("%v", _m.IsSuper))

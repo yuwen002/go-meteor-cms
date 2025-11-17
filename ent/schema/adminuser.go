@@ -51,6 +51,10 @@ func (AdminUser) Fields() []ent.Field {
 			Comment("手机号").
 			Optional(),
 
+		field.String("avatar").
+			Comment("头像 URL").
+			Default("/uploads/avatars/meteor-default.jpg"),
+
 		field.Bool("is_super").
 			Default(false).
 			Comment("是否超级管理员"),

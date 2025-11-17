@@ -23,6 +23,8 @@ const (
 	FieldEmail = "email"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
+	// FieldAvatar holds the string denoting the avatar field in the database.
+	FieldAvatar = "avatar"
 	// FieldIsSuper holds the string denoting the is_super field in the database.
 	FieldIsSuper = "is_super"
 	// FieldIsActive holds the string denoting the is_active field in the database.
@@ -49,6 +51,7 @@ var Columns = []string{
 	FieldNickname,
 	FieldEmail,
 	FieldPhone,
+	FieldAvatar,
 	FieldIsSuper,
 	FieldIsActive,
 	FieldLastLoginAt,
@@ -73,6 +76,8 @@ var (
 	UsernameValidator func(string) error
 	// PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	PasswordHashValidator func(string) error
+	// DefaultAvatar holds the default value on creation for the "avatar" field.
+	DefaultAvatar string
 	// DefaultIsSuper holds the default value on creation for the "is_super" field.
 	DefaultIsSuper bool
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
@@ -118,6 +123,11 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByPhone orders the results by the phone field.
 func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
+}
+
+// ByAvatar orders the results by the avatar field.
+func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
 }
 
 // ByIsSuper orders the results by the is_super field.

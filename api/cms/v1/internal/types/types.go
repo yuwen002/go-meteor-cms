@@ -24,8 +24,10 @@ type AdminListReq struct {
 }
 
 type AdminListResp struct {
-	Total int64       `json:"total"`
-	List  []AdminItem `json:"list"`
+	Total    int64       `json:"total"`
+	Page     int         `json:"page"`
+	PageSize int         `json:"page_size"`
+	List     []AdminItem `json:"list"`
 }
 
 type ForgotPasswordReq struct {

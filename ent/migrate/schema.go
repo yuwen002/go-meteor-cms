@@ -16,6 +16,7 @@ var (
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Comment: "昵称"},
 		{Name: "email", Type: field.TypeString, Unique: true, Nullable: true, Comment: "邮箱"},
 		{Name: "phone", Type: field.TypeString, Nullable: true, Comment: "手机号"},
+		{Name: "avatar", Type: field.TypeString, Comment: "头像 URL", Default: "/uploads/avatars/meteor-default.jpg"},
 		{Name: "is_super", Type: field.TypeBool, Comment: "是否超级管理员", Default: false},
 		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
 		{Name: "last_login_at", Type: field.TypeTime, Nullable: true, Comment: "最后登录时间"},

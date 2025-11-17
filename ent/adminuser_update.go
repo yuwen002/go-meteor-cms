@@ -116,6 +116,20 @@ func (_u *AdminUserUpdate) ClearPhone() *AdminUserUpdate {
 	return _u
 }
 
+// SetAvatar sets the "avatar" field.
+func (_u *AdminUserUpdate) SetAvatar(v string) *AdminUserUpdate {
+	_u.mutation.SetAvatar(v)
+	return _u
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableAvatar(v *string) *AdminUserUpdate {
+	if v != nil {
+		_u.SetAvatar(*v)
+	}
+	return _u
+}
+
 // SetIsSuper sets the "is_super" field.
 func (_u *AdminUserUpdate) SetIsSuper(v bool) *AdminUserUpdate {
 	_u.mutation.SetIsSuper(v)
@@ -316,6 +330,9 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.PhoneCleared() {
 		_spec.ClearField(adminuser.FieldPhone, field.TypeString)
 	}
+	if value, ok := _u.mutation.Avatar(); ok {
+		_spec.SetField(adminuser.FieldAvatar, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.IsSuper(); ok {
 		_spec.SetField(adminuser.FieldIsSuper, field.TypeBool, value)
 	}
@@ -451,6 +468,20 @@ func (_u *AdminUserUpdateOne) SetNillablePhone(v *string) *AdminUserUpdateOne {
 // ClearPhone clears the value of the "phone" field.
 func (_u *AdminUserUpdateOne) ClearPhone() *AdminUserUpdateOne {
 	_u.mutation.ClearPhone()
+	return _u
+}
+
+// SetAvatar sets the "avatar" field.
+func (_u *AdminUserUpdateOne) SetAvatar(v string) *AdminUserUpdateOne {
+	_u.mutation.SetAvatar(v)
+	return _u
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableAvatar(v *string) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetAvatar(*v)
+	}
 	return _u
 }
 
@@ -683,6 +714,9 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 	}
 	if _u.mutation.PhoneCleared() {
 		_spec.ClearField(adminuser.FieldPhone, field.TypeString)
+	}
+	if value, ok := _u.mutation.Avatar(); ok {
+		_spec.SetField(adminuser.FieldAvatar, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.IsSuper(); ok {
 		_spec.SetField(adminuser.FieldIsSuper, field.TypeBool, value)

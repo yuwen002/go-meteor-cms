@@ -43,6 +43,30 @@ type (
 		Message string                 `json:"message"`
 		Claims  map[string]interface{} `json:"claims"`
 	}
+	AdminItem {
+		Id          int64  `json:"id"`
+		Username    string `json:"username"`
+		Nickname    string `json:"nickname"`
+		Email       string `json:"email"`
+		Phone       string `json:"phone"`
+		Avatar      string `json:"avatar"`
+		IsSuper     bool   `json:"isSuper"`
+		IsActive    bool   `json:"isActive"`
+		LastLoginAt string `json:"last_login_at"`
+		CreatedAt   string `json:"createdAt"`
+	}
+	AdminListReq {
+		Page     int    `form:"page"` // 页码
+		PageSize int    `form:"page_size"` // 每页数量
+		Keyword  string `form:"keyword,optional"` // 搜索关键词（用户名/昵称/邮箱）
+		Active   int    `form:"active,optional"` // 可选：过滤启用状态
+	}
+	AdminListResp {
+		Total    int64       `json:"total"`
+		Page     int         `json:"page"`
+		PageSize int         `json:"page_size"`
+		List     []AdminItem `json:"list"`
+	}
 )
 
 @server (
@@ -51,5 +75,8 @@ type (
 service cms-api {
 	@handler testToken
 	get /admin/test-token returns (TestTokenResp)
+
+	@handler adminList
+	get /admin/admin-users (AdminListReq) returns (AdminListResp)
 }
 

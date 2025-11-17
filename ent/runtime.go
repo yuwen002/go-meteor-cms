@@ -23,20 +23,24 @@ func init() {
 	adminuserDescPasswordHash := adminuserFields[2].Descriptor()
 	// adminuser.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	adminuser.PasswordHashValidator = adminuserDescPasswordHash.Validators[0].(func(string) error)
+	// adminuserDescAvatar is the schema descriptor for avatar field.
+	adminuserDescAvatar := adminuserFields[6].Descriptor()
+	// adminuser.DefaultAvatar holds the default value on creation for the avatar field.
+	adminuser.DefaultAvatar = adminuserDescAvatar.Default.(string)
 	// adminuserDescIsSuper is the schema descriptor for is_super field.
-	adminuserDescIsSuper := adminuserFields[6].Descriptor()
+	adminuserDescIsSuper := adminuserFields[7].Descriptor()
 	// adminuser.DefaultIsSuper holds the default value on creation for the is_super field.
 	adminuser.DefaultIsSuper = adminuserDescIsSuper.Default.(bool)
 	// adminuserDescIsActive is the schema descriptor for is_active field.
-	adminuserDescIsActive := adminuserFields[7].Descriptor()
+	adminuserDescIsActive := adminuserFields[8].Descriptor()
 	// adminuser.DefaultIsActive holds the default value on creation for the is_active field.
 	adminuser.DefaultIsActive = adminuserDescIsActive.Default.(bool)
 	// adminuserDescCreatedAt is the schema descriptor for created_at field.
-	adminuserDescCreatedAt := adminuserFields[9].Descriptor()
+	adminuserDescCreatedAt := adminuserFields[10].Descriptor()
 	// adminuser.DefaultCreatedAt holds the default value on creation for the created_at field.
 	adminuser.DefaultCreatedAt = adminuserDescCreatedAt.Default.(func() time.Time)
 	// adminuserDescUpdatedAt is the schema descriptor for updated_at field.
-	adminuserDescUpdatedAt := adminuserFields[10].Descriptor()
+	adminuserDescUpdatedAt := adminuserFields[11].Descriptor()
 	// adminuser.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	adminuser.DefaultUpdatedAt = adminuserDescUpdatedAt.Default.(func() time.Time)
 	// adminuser.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

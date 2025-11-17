@@ -79,6 +79,11 @@ func Phone(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldPhone, v))
 }
 
+// Avatar applies equality check predicate on the "avatar" field. It's identical to AvatarEQ.
+func Avatar(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldAvatar, v))
+}
+
 // IsSuper applies equality check predicate on the "is_super" field. It's identical to IsSuperEQ.
 func IsSuper(v bool) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldIsSuper, v))
@@ -467,6 +472,71 @@ func PhoneEqualFold(v string) predicate.AdminUser {
 // PhoneContainsFold applies the ContainsFold predicate on the "phone" field.
 func PhoneContainsFold(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldContainsFold(FieldPhone, v))
+}
+
+// AvatarEQ applies the EQ predicate on the "avatar" field.
+func AvatarEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldAvatar, v))
+}
+
+// AvatarNEQ applies the NEQ predicate on the "avatar" field.
+func AvatarNEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldAvatar, v))
+}
+
+// AvatarIn applies the In predicate on the "avatar" field.
+func AvatarIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldAvatar, vs...))
+}
+
+// AvatarNotIn applies the NotIn predicate on the "avatar" field.
+func AvatarNotIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldAvatar, vs...))
+}
+
+// AvatarGT applies the GT predicate on the "avatar" field.
+func AvatarGT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldAvatar, v))
+}
+
+// AvatarGTE applies the GTE predicate on the "avatar" field.
+func AvatarGTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldAvatar, v))
+}
+
+// AvatarLT applies the LT predicate on the "avatar" field.
+func AvatarLT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldAvatar, v))
+}
+
+// AvatarLTE applies the LTE predicate on the "avatar" field.
+func AvatarLTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldAvatar, v))
+}
+
+// AvatarContains applies the Contains predicate on the "avatar" field.
+func AvatarContains(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContains(FieldAvatar, v))
+}
+
+// AvatarHasPrefix applies the HasPrefix predicate on the "avatar" field.
+func AvatarHasPrefix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasPrefix(FieldAvatar, v))
+}
+
+// AvatarHasSuffix applies the HasSuffix predicate on the "avatar" field.
+func AvatarHasSuffix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasSuffix(FieldAvatar, v))
+}
+
+// AvatarEqualFold applies the EqualFold predicate on the "avatar" field.
+func AvatarEqualFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEqualFold(FieldAvatar, v))
+}
+
+// AvatarContainsFold applies the ContainsFold predicate on the "avatar" field.
+func AvatarContainsFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContainsFold(FieldAvatar, v))
 }
 
 // IsSuperEQ applies the EQ predicate on the "is_super" field.
