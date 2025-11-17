@@ -41,6 +41,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/admin/test-token",
 					Handler: testTokenHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/users",
+					Handler: adminListHandler(serverCtx),
+				},
 			}...,
 		),
 	)

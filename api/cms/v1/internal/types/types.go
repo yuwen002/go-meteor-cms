@@ -3,6 +3,31 @@
 
 package types
 
+type AdminItem struct {
+	Id          int64  `json:"id"`
+	Username    string `json:"username"`
+	Nickname    string `json:"nickname"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
+	Avatar      string `json:"avatar"`
+	IsSuper     bool   `json:"isSuper"`
+	IsActive    bool   `json:"isActive"`
+	LastLoginAt string `json:"last_login_at"`
+	CreatedAt   string `json:"createdAt"`
+}
+
+type AdminListReq struct {
+	Page     int    `form:"page"`             // 页码
+	PageSize int    `form:"page_size"`        // 每页数量
+	Keyword  string `form:"keyword,optional"` // 搜索关键词（用户名/昵称/邮箱）
+	Active   int    `form:"active,optional"`  // 可选：过滤启用状态
+}
+
+type AdminListResp struct {
+	Total int64       `json:"total"`
+	List  []AdminItem `json:"list"`
+}
+
 type ForgotPasswordReq struct {
 	Username string `json:"username" validate:"required"` // 必填
 }
