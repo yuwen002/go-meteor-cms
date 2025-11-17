@@ -10,6 +10,8 @@
 - ✅ 管理员登录认证
 - 🔑 JWT Token 认证
 - 🔐 密码重置功能
+- 📝 管理员注册功能
+- 🔍 Token 验证测试接口
 - 🚀 高性能 API 服务
 - 📦 使用 Ent 作为 ORM
 - 🛡️ 统一的错误处理
@@ -23,6 +25,7 @@
 - **数据库**: MySQL (通过 [Ent ORM](https://entgo.io/) v0.14.5 支持)
 - **认证**: JWT (github.com/golang-jwt/jwt/v5 v5.3.0)
 - **密码加密**: bcrypt (golang.org/x/crypto)
+- **参数验证**: go-playground/validator
 - **API 规范**: RESTful API
 - **依赖管理**: Go Modules (Go 1.25.3)
 
@@ -137,6 +140,53 @@ go run api/cms/v1/cms.go
        "data": {
          "status": 1,
          "message": "密码重置邮件已发送"
+       }
+     }
+     ```
+
+3. **管理员注册**
+   - URL: `POST /admin/register`
+   - 参数:
+     ```json
+     {
+       "username": "newadmin",
+       "password": "password123",
+       "email": "newadmin@example.com",
+       "nickname": "新管理员"
+     }
+     ```
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "message": "管理员注册成功"
+       }
+     }
+     ```
+
+### 需要认证的接口
+
+以下接口需要在请求头中添加 Authorization:
+
+```
+Authorization: Bearer <token>
+```
+
+1. **Token 验证测试**
+   - URL: `GET /admin/test-token`
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "message": "Token OK",
+         "claims": {
+           "user_id": 1,
+           "username": "admin"
+         }
        }
      }
      ```
