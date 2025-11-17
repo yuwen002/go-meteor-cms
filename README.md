@@ -11,6 +11,7 @@
 - 🔑 JWT Token 认证
 - 🔐 密码重置功能
 - 📝 管理员注册功能
+- 📋 管理员列表功能
 - 🔍 Token 验证测试接口
 - 🚀 高性能 API 服务
 - 📦 使用 Ent 作为 ORM
@@ -187,6 +188,40 @@ Authorization: Bearer <token>
            "user_id": 1,
            "username": "admin"
          }
+       }
+     }
+     ```
+
+2. **获取管理员列表**
+   - URL: `GET /admin/users`
+   - 查询参数:
+     - `page`: 页码（必填）
+     - `page_size`: 每页数量（必填）
+     - `keyword`: 搜索关键词（用户名/昵称/邮箱，选填）
+     - `active`: 启用状态过滤（1-启用，2-禁用，选填）
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "total": 10,
+         "page": 1,
+         "page_size": 10,
+         "list": [
+           {
+             "id": 1,
+             "username": "admin",
+             "nickname": "管理员",
+             "email": "admin@example.com",
+             "phone": "13800138000",
+             "avatar": "/uploads/avatars/meteor-default.jpg",
+             "isSuper": true,
+             "isActive": true,
+             "last_login_at": "2023-01-01T12:00:00Z",
+             "createdAt": "2023-01-01T12:00:00Z"
+           }
+         ]
        }
      }
      ```
