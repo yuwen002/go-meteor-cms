@@ -67,6 +67,16 @@ type (
 		PageSize int         `json:"page_size"`
 		List     []AdminItem `json:"list"`
 	}
+	ChangeMyPasswordReq {
+		OldPassword string `json:"oldPassword"`
+		NewPassword string `json:"newPassword"`
+	}
+	ResetAdminPasswordReq {
+		NewPassword string `json:"newPassword"`
+	}
+	CommonResp {
+		Message string `json:"message"`
+	}
 )
 
 @server (
@@ -78,5 +88,13 @@ service cms-api {
 
 	@handler adminList
 	get /admin/admin-users (AdminListReq) returns (AdminListResp)
+
+	// 管理员修改自己的密码
+	@handler changeMyPassword
+	put /admin/change-password (ChangeMyPasswordReq) returns (CommonResp)
+
+	// 管理员重置其他管理员的密码
+	@handler resetAdminPassword
+	put /admin/users/:id/reset-password (ResetAdminPasswordReq) returns (CommonResp)
 }
 

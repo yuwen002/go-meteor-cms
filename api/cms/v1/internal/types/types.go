@@ -30,6 +30,15 @@ type AdminListResp struct {
 	List     []AdminItem `json:"list"`
 }
 
+type ChangeMyPasswordReq struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
+type CommonResp struct {
+	Message string `json:"message"`
+}
+
 type ForgotPasswordReq struct {
 	Username string `json:"username" validate:"required"` // 必填
 }
@@ -57,6 +66,10 @@ type RegisterReq struct {
 
 type RegisterResp struct {
 	Message string `json:"message"` // 注册成功提示
+}
+
+type ResetAdminPasswordReq struct {
+	NewPassword string `json:"newPassword"`
 }
 
 type TestTokenResp struct {

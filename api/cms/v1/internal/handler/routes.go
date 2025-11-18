@@ -38,13 +38,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
+					Path:    "/admin/admin-users",
+					Handler: adminListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/change-password",
+					Handler: changeMyPasswordHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
 					Path:    "/admin/test-token",
 					Handler: testTokenHandler(serverCtx),
 				},
 				{
-					Method:  http.MethodGet,
-					Path:    "/admin/users",
-					Handler: adminListHandler(serverCtx),
+					Method:  http.MethodPut,
+					Path:    "/admin/users/:id/reset-password",
+					Handler: resetAdminPasswordHandler(serverCtx),
 				},
 			}...,
 		),
