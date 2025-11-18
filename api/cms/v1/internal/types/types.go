@@ -69,6 +69,7 @@ type RegisterResp struct {
 }
 
 type ResetAdminPasswordReq struct {
+	ID          int64  `json:"id"`
 	NewPassword string `json:"newPassword"`
 }
 
