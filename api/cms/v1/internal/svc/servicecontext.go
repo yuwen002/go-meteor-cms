@@ -19,7 +19,11 @@ type ServiceContext struct {
 
 func NewServiceContext(c config.Config) *ServiceContext {
 
-	client, err := ent.Open(c.Database.Driver, c.Database.Source)
+	client, err := ent.Open(
+		c.Database.Driver,
+		c.Database.Source,
+		ent.Debug(),
+	)
 	if err != nil {
 		panic(err)
 	}

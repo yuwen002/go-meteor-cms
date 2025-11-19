@@ -15,7 +15,10 @@ import (
 import "errors"
 
 var (
-	ErrUnauthorized = errors.New("用户名或密码错误")
+	ErrUnauthorized      = errors.New("用户名或密码错误")
+	ErrAccountInactive   = errors.New("账号未激活，请联系管理员")
+	ErrInvalidCaptcha    = errors.New("验证码错误")
+	ErrMissingCaptcha    = errors.New("请填写验证码")
 )
 
 type LoginLogic struct {
@@ -33,7 +36,17 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
-	// 查数据库用户
+	// 验证验证码
+	if req.Captcha == "" || req.CaptchaID == "" {
+		return nil, ErrMissingCaptcha
+	}
+
+	// 验证验证码
+	if !utils.VerifyCaptcha(req.CaptchaID, req.Captcha) {
+		return nil, ErrInvalidCaptcha
+	}
+
+	// 查询数据库用户
 	user, err := l.svcCtx.EntClient.AdminUser.
 		Query().
 		Where(adminuser.UsernameEQ(req.Username)).
@@ -52,21 +65,20 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	}
 
 	// 检查用户账号是否激活
-	// 如果账号未激活，返回未授权错误
-	if user.IsActive == false {
-		return nil, ErrUnauthorized
+	if !user.IsActive {
+		return nil, ErrAccountInactive
 	}
 
 	// 签发 JWT
 	tokenStr, err := utils.GenerateToken(l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire, map[string]interface{}{
-		"userId":    user.ID,           // 用户ID
-		"username":  user.Username,     // 用户名
-		"nickname":  user.Nickname,     // 用户昵称
-		"email":     user.Email,        // 邮箱
-		"phone":     user.Phone,        // 手机号
-		"isSuper":   user.IsSuper,      // 是否超级管理员
-		"isActive":  user.IsActive,     // 是否激活
-		"loginTime": time.Now().Unix(), // 登录时间戳
+		"user_id":    user.ID,           // 用户ID
+		"username":   user.Username,     // 用户名
+		"nickname":   user.Nickname,     // 用户昵称
+		"email":      user.Email,        // 邮箱
+		"phone":      user.Phone,        // 手机号
+		"is_super":   user.IsSuper,      // 是否超级管理员
+		"is_active":  user.IsActive,     // 是否激活
+		"login_time": time.Now().Unix(), // 登录时间戳
 	})
 	if err != nil {
 		return nil, err

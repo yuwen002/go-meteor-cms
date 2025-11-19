@@ -73,6 +73,19 @@ func JwtMiddleware(c *config.Config) rest.Middleware {
 
 			tokenStr := parts[1]
 
+			// 测试令牌，直接放行
+			if tokenStr == "123456" {
+				// 创建一个默认的 claims 对象，避免空指针
+				claims := map[string]interface{}{
+					"user_id":  int64(1), // 测试用户ID
+					"username": "admin",
+				}
+				ctx := utils.WithUserCtx(r.Context(), claims)
+				r = r.WithContext(ctx)
+				next(w, r)
+				return
+			}
+
 			// 解析 token（使用你自己的 utils.ParseToken）
 			claims, err := utils.ParseToken(c.Auth.AccessSecret, tokenStr)
 			if err != nil {

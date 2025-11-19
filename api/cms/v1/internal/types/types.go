@@ -30,9 +30,14 @@ type AdminListResp struct {
 	List     []AdminItem `json:"list"`
 }
 
+type CaptchaResp struct {
+	CaptchaID     string `json:"captcha_id"`     // 验证码ID
+	CaptchaBase64 string `json:"captcha_base64"` // 验证码图片base64
+}
+
 type ChangeMyPasswordReq struct {
-	OldPassword string `json:"oldPassword"`
-	NewPassword string `json:"newPassword"`
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
 }
 
 type CommonResp struct {
@@ -49,8 +54,10 @@ type ForgotPasswordResp struct {
 }
 
 type LoginReq struct {
-	Username string `json:"username" validate:"required"` // 必填
-	Password string `json:"password" validate:"required"` // 必填
+	Username  string `json:"username" validate:"required"`   // 必填
+	Password  string `json:"password" validate:"required"`   // 必填
+	CaptchaID string `json:"captcha_id" validate:"required"` // 验证码ID
+	Captcha   string `json:"captcha" validate:"required"`    // 验证码
 }
 
 type LoginResp struct {
@@ -70,7 +77,7 @@ type RegisterResp struct {
 
 type ResetAdminPasswordReq struct {
 	ID          int64  `json:"id"`
-	NewPassword string `json:"newPassword"`
+	NewPassword string `json:"new_password"`
 }
 
 type TestTokenResp struct {

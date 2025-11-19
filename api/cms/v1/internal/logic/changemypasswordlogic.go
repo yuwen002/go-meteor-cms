@@ -34,8 +34,7 @@ func (l *ChangeMyPasswordLogic) ChangeMyPassword(req *types.ChangeMyPasswordReq)
 	if claims == nil {
 		return nil, common.NewBizError(401, "未登录")
 	}
-
-	userID, ok := claims["id"].(int64)
+	userID, ok := claims["user_id"].(int64)
 	if !ok {
 		return nil, common.NewBizError(400, "用户ID格式错误")
 	}
