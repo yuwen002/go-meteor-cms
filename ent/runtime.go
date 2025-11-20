@@ -88,33 +88,37 @@ func init() {
 	// adminrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminrole.UpdateDefaultUpdatedAt = adminroleDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// adminroleDescName is the schema descriptor for name field.
-	adminroleDescName := adminroleFields[0].Descriptor()
+	adminroleDescName := adminroleFields[1].Descriptor()
 	// adminrole.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	adminrole.NameValidator = adminroleDescName.Validators[0].(func(string) error)
 	// adminroleDescCode is the schema descriptor for code field.
-	adminroleDescCode := adminroleFields[1].Descriptor()
+	adminroleDescCode := adminroleFields[2].Descriptor()
 	// adminrole.CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	adminrole.CodeValidator = adminroleDescCode.Validators[0].(func(string) error)
 	// adminroleDescDesc is the schema descriptor for desc field.
-	adminroleDescDesc := adminroleFields[2].Descriptor()
+	adminroleDescDesc := adminroleFields[3].Descriptor()
 	// adminrole.DefaultDesc holds the default value on creation for the desc field.
 	adminrole.DefaultDesc = adminroleDescDesc.Default.(string)
 	// adminroleDescDataScope is the schema descriptor for data_scope field.
-	adminroleDescDataScope := adminroleFields[3].Descriptor()
+	adminroleDescDataScope := adminroleFields[4].Descriptor()
 	// adminrole.DefaultDataScope holds the default value on creation for the data_scope field.
 	adminrole.DefaultDataScope = adminroleDescDataScope.Default.(int)
 	// adminroleDescIsSystem is the schema descriptor for is_system field.
-	adminroleDescIsSystem := adminroleFields[4].Descriptor()
+	adminroleDescIsSystem := adminroleFields[5].Descriptor()
 	// adminrole.DefaultIsSystem holds the default value on creation for the is_system field.
 	adminrole.DefaultIsSystem = adminroleDescIsSystem.Default.(bool)
 	// adminroleDescIsActive is the schema descriptor for is_active field.
-	adminroleDescIsActive := adminroleFields[5].Descriptor()
+	adminroleDescIsActive := adminroleFields[6].Descriptor()
 	// adminrole.DefaultIsActive holds the default value on creation for the is_active field.
 	adminrole.DefaultIsActive = adminroleDescIsActive.Default.(bool)
 	// adminroleDescSort is the schema descriptor for sort field.
-	adminroleDescSort := adminroleFields[6].Descriptor()
+	adminroleDescSort := adminroleFields[7].Descriptor()
 	// adminrole.DefaultSort holds the default value on creation for the sort field.
 	adminrole.DefaultSort = adminroleDescSort.Default.(int)
+	// adminroleDescID is the schema descriptor for id field.
+	adminroleDescID := adminroleFields[0].Descriptor()
+	// adminrole.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	adminrole.IDValidator = adminroleDescID.Validators[0].(func(int64) error)
 	adminrolepermissionMixin := schema.AdminRolePermission{}.Mixin()
 	adminrolepermissionMixinFields0 := adminrolepermissionMixin[0].Fields()
 	_ = adminrolepermissionMixinFields0

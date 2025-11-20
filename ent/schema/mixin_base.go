@@ -13,7 +13,6 @@ type BaseMixin struct {
 	ent.Mixin
 }
 
-// 公共字段
 func (BaseMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("created_at").
@@ -54,12 +53,10 @@ func (BaseMixin) Policies() []ent.Policy {
 	return nil
 }
 
-// 某些 Ent 版本（特别是 2024+）使用 Policy()
 func (BaseMixin) Policy() ent.Policy {
 	return nil
 }
 
-// 2024+ 新版本：拦截器
 func (BaseMixin) Interceptors() []ent.Interceptor {
 	return nil
 }

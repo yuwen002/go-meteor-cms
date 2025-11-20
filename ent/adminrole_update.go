@@ -246,7 +246,7 @@ func (_u *AdminRoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(adminrole.Table, adminrole.Columns, sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(adminrole.Table, adminrole.Columns, sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -547,7 +547,7 @@ func (_u *AdminRoleUpdateOne) sqlSave(ctx context.Context) (_node *AdminRole, er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(adminrole.Table, adminrole.Columns, sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(adminrole.Table, adminrole.Columns, sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AdminRole.id" for update`)}

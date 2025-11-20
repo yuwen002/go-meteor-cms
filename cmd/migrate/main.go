@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/yuwen002/go-meteor-cms/ent"
@@ -36,5 +37,10 @@ func main() {
 
 	log.Println("🎉 数据库迁移完成！所有表结构已同步。")
 
-	seed.InitSeed(ctx, client)
+	err = seed.InitSeed(ctx, client)
+	if err != nil {
+		log.Printf("❌ 初始化数据失败: %v\n", err)
+		os.Exit(1)
+	}
+	log.Println("✅ 数据初始化完成！")
 }

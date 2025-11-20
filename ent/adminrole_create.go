@@ -144,6 +144,12 @@ func (_c *AdminRoleCreate) SetNillableSort(v *int) *AdminRoleCreate {
 	return _c
 }
 
+// SetID sets the "id" field.
+func (_c *AdminRoleCreate) SetID(v int64) *AdminRoleCreate {
+	_c.mutation.SetID(v)
+	return _c
+}
+
 // Mutation returns the AdminRoleMutation object of the builder.
 func (_c *AdminRoleCreate) Mutation() *AdminRoleMutation {
 	return _c.mutation
@@ -245,6 +251,11 @@ func (_c *AdminRoleCreate) check() error {
 	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "AdminRole.sort"`)}
 	}
+	if v, ok := _c.mutation.ID(); ok {
+		if err := adminrole.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "AdminRole.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -259,8 +270,10 @@ func (_c *AdminRoleCreate) sqlSave(ctx context.Context) (*AdminRole, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -269,8 +282,12 @@ func (_c *AdminRoleCreate) sqlSave(ctx context.Context) (*AdminRole, error) {
 func (_c *AdminRoleCreate) createSpec() (*AdminRole, *sqlgraph.CreateSpec) {
 	var (
 		_node = &AdminRole{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(adminrole.Table, sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(adminrole.Table, sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(adminrole.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -359,9 +376,9 @@ func (_c *AdminRoleCreateBulk) Save(ctx context.Context) ([]*AdminRole, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -83,6 +83,8 @@ var (
 	DefaultIsActive bool
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort int
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the AdminRole queries.

@@ -30,6 +30,11 @@ func (AdminRole) Annotations() []schema.Annotation {
 
 func (AdminRole) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int64("id").
+			Comment("主键ID，自增").
+			Immutable().
+			Positive(),
+
 		field.String("name").
 			NotEmpty().
 			Unique().
