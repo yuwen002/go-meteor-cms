@@ -88,6 +88,14 @@ type (
 		ID          int64  `json:"id"`
 		NewPassword string `json:"new_password"`
 	}
+	CreateAdminReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Nickname string `json:"nickname"`
+		Phone    string `json:"phone"`
+		IsActive bool   `json:"is_active"`
+		IsSuper  bool   `json:"is_super"`
+	}
 	CommonResp {
 		Message string `json:"message"`
 	}
@@ -110,5 +118,8 @@ service cms-api {
 	// 管理员重置其他管理员的密码
 	@handler resetAdminPassword
 	put /admin/users/:id/reset-password (ResetAdminPasswordReq) returns (CommonResp)
+
+	@handler adminCreate
+	post /admin/users/create (CreateAdminReq) returns (CommonResp)
 }
 

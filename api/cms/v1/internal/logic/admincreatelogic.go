@@ -5,7 +5,6 @@ package logic
 
 import (
 	"context"
-	"errors"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
@@ -50,7 +49,7 @@ func (l *AdminCreateLogic) AdminCreate(req *types.CreateAdminReq) (resp *types.C
 	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logx.Errorf("密码加密失败: %v", err)
-		return nil, common.NewBizError(common.ErrInternalServer)
+		return nil, common.NewBizError(common.ErrAdminPasswordHashFail)
 	}
 
 	// 创建用户
@@ -59,12 +58,13 @@ func (l *AdminCreateLogic) AdminCreate(req *types.CreateAdminReq) (resp *types.C
 		SetUsername(req.Username).
 		SetPasswordHash(string(hashed)).
 		SetNickname(req.Nickname).
-		SetIsSuper(req.Role).
+		SetIsSuper(req.IsSuper).
+		SetIsActive(req.IsActive).
 		Save(l.ctx)
 
 	if err != nil {
 		logx.Errorf("创建管理员失败: %v", err)
-		return nil, common.NewBizError(common.ErrInternalServer)
+		return nil, common.NewBizError(common.ErrAdminCreateFailed)
 	}
 
 	return &types.CommonResp{Message: "创建成功"}, nil

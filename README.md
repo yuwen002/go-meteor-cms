@@ -19,6 +19,9 @@
 - 📊 结构化的日志记录
 - 🗄️ 数据库自动迁移
 - 🌱 初始化数据种子
+- 🖼️ 图形验证码功能
+- 🔐 管理员密码修改功能
+- 🔁 管理员密码重置功能
 
 ## 技术栈
 
@@ -27,6 +30,7 @@
 - **认证**: JWT (github.com/golang-jwt/jwt/v5 v5.3.0)
 - **密码加密**: bcrypt (golang.org/x/crypto)
 - **参数验证**: go-playground/validator
+- **图形验证码**: base64Captcha (github.com/mojocn/base64Captcha)
 - **API 规范**: RESTful API
 - **依赖管理**: Go Modules (Go 1.25.3)
 
@@ -103,15 +107,31 @@ go run api/cms/v1/cms.go
 
 启动服务后，默认访问地址：`http://localhost:8888`
 
-### 管理员接口
+### 公共接口
 
-1. **管理员登录**
+1. **获取验证码**
+   - URL: `GET /api/captcha`
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "captcha_id": "验证码ID",
+         "captcha_base64": "验证码图片base64编码"
+       }
+     }
+     ```
+
+2. **管理员登录**
    - URL: `POST /admin/login`
    - 参数:
      ```json
      {
        "username": "admin",
-       "password": "123456"
+       "password": "123456",
+       "captcha_id": "验证码ID",
+       "captcha": "验证码"
      }
      ```
    - 响应:
@@ -125,7 +145,7 @@ go run api/cms/v1/cms.go
      }
      ```
 
-2. **忘记密码**
+3. **忘记密码**
    - URL: `POST /admin/forgot-password`
    - 参数:
      ```json
@@ -139,13 +159,12 @@ go run api/cms/v1/cms.go
        "code": 0,
        "msg": "success",
        "data": {
-         "status": 1,
-         "message": "密码重置邮件已发送"
+         "message": "重置密码邮件已发送，请检查邮箱"
        }
      }
      ```
 
-3. **管理员注册**
+4. **管理员注册**
    - URL: `POST /admin/register`
    - 参数:
      ```json
@@ -193,7 +212,7 @@ Authorization: Bearer <token>
      ```
 
 2. **获取管理员列表**
-   - URL: `GET /admin/users`
+   - URL: `GET /admin/admin-users`
    - 查询参数:
      - `page`: 页码（必填）
      - `page_size`: 每页数量（必填）
@@ -222,6 +241,46 @@ Authorization: Bearer <token>
              "createdAt": "2023-01-01T12:00:00Z"
            }
          ]
+       }
+     }
+     ```
+
+3. **修改自己的密码**
+   - URL: `PUT /admin/change-password`
+   - 参数:
+     ```json
+     {
+       "old_password": "oldpassword",
+       "new_password": "newpassword"
+     }
+     ```
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "message": "密码修改成功"
+       }
+     }
+     ```
+
+4. **重置其他管理员的密码** (需要超级管理员权限)
+   - URL: `PUT /admin/users/:id/reset-password`
+   - 参数:
+     ```json
+     {
+       "id": 2,
+       "new_password": "newpassword"
+     }
+     ```
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "message": "密码已重置"
        }
      }
      ```

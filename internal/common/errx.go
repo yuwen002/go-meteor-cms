@@ -1,7 +1,5 @@
 package common
 
-package common
-
 // BizError 业务错误结构体
 type BizError struct {
 	Code int    // 错误码

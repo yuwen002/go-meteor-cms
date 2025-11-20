@@ -65,7 +65,8 @@ func (l *AdminListLogic) AdminList(req *types.AdminListReq) (resp *types.AdminLi
 	// 总数
 	total, err := query.Count(l.ctx)
 	if err != nil {
-		return nil, common.NewBizError(50001, "获取管理员总数失败")
+		l.Logger.Errorf("获取管理员总数失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminCountFailed)
 	}
 
 	// 分页数据
@@ -75,7 +76,8 @@ func (l *AdminListLogic) AdminList(req *types.AdminListReq) (resp *types.AdminLi
 		Limit(pageSize).
 		All(l.ctx)
 	if err != nil {
-		return nil, common.NewBizError(50002, "获取管理员列表失败")
+		l.Logger.Errorf("获取管理员列表失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminListFailed)
 	}
 
 	// 转换结构

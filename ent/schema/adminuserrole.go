@@ -40,8 +40,8 @@ func (AdminUserRole) Fields() []ent.Field {
 
 		// 复合唯一
 		field.Uint8("dummy"). // ent 不允许无字段表，所以加个占位字段
-			Comment("占位字段，无实际意义").
-			Default(0),
+					Comment("占位字段，无实际意义").
+					Default(0),
 	}
 }
 

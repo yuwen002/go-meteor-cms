@@ -32,26 +32,32 @@ func NewChangeMyPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 func (l *ChangeMyPasswordLogic) ChangeMyPassword(req *types.ChangeMyPasswordReq) (resp *types.CommonResp, err error) {
 	claims := utils.GetUserFromCtx(l.ctx)
 	if claims == nil {
-		return nil, common.NewBizError(401, "未登录")
+		return nil, common.NewBizError(common.ErrUnauthorized)
 	}
+
 	userID, ok := claims["user_id"].(int64)
 	if !ok {
-		return nil, common.NewBizError(400, "用户ID格式错误")
+		return nil, common.NewBizError(common.ErrUserIDFormat)
 	}
 
 	// 查询当前用户
 	user, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, userID)
 	if err != nil {
-		return nil, common.NewBizError(404, "用户不存在")
+		l.Logger.Errorf("获取用户信息失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminUserNotFound)
 	}
 
 	// 验证旧密码
-	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.OldPassword)) != nil {
-		return nil, common.NewBizError(400, "旧密码错误")
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.OldPassword)); err != nil {
+		return nil, common.NewBizError(common.ErrAdminPasswordIncorrect)
 	}
 
 	// 设置新密码
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		l.Logger.Errorf("密码加密失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminPasswordHashFail)
+	}
 
 	_, err = l.svcCtx.EntClient.AdminUser.
 		UpdateOneID(userID).
@@ -59,7 +65,8 @@ func (l *ChangeMyPasswordLogic) ChangeMyPassword(req *types.ChangeMyPasswordReq)
 		Save(l.ctx)
 
 	if err != nil {
-		return nil, common.NewBizError(500, "密码更新失败")
+		l.Logger.Errorf("更新密码失败: %v", err)
+		return nil, common.NewBizError(common.ErrPasswordUpdateFailed)
 	}
 
 	return &types.CommonResp{Message: "密码修改成功"}, nil

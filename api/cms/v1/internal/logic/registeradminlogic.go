@@ -36,10 +36,11 @@ func (l *RegisterAdminLogic) RegisterAdmin(req *types.RegisterReq) (resp *types.
 		Exist(l.ctx)
 
 	if err != nil {
-		return nil, common.NewBizError(50001, "检查用户失败")
+		l.Logger.Errorf("检查用户失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 	if exists {
-		return nil, common.NewBizError(40001, "用户名已存在")
+		return nil, common.NewBizError(common.ErrAdminUserAlreadyExists)
 	}
 
 	// 2. 检查邮箱是否存在
@@ -48,31 +49,34 @@ func (l *RegisterAdminLogic) RegisterAdmin(req *types.RegisterReq) (resp *types.
 		Exist(l.ctx)
 
 	if err != nil {
-		return nil, common.NewBizError(50002, "检查邮箱失败")
+		l.Logger.Errorf("检查邮箱失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 	if emailExists {
-		return nil, common.NewBizError(40002, "邮箱已注册")
+		return nil, common.NewBizError(common.ErrAdminEmailAlreadyExists)
 	}
 
 	// 3. 加密密码
 	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, common.NewBizError(50003, "密码加密失败")
+		l.Logger.Errorf("密码加密失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminPasswordHashFail)
 	}
 
 	// 4. 创建用户
 	_, err = l.svcCtx.EntClient.AdminUser.
 		Create().
 		SetUsername(req.Username).
-		SetEmail(req.Email).
 		SetPasswordHash(string(hashed)).
 		SetNickname(req.Nickname).
+		SetEmail(req.Email).
 		SetIsSuper(false).
-		SetIsActive(false).
+		SetIsActive(true).
 		Save(l.ctx)
 
 	if err != nil {
-		return nil, common.NewBizError(50004, "用户创建失败")
+		l.Logger.Errorf("创建管理员失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminCreateFailed)
 	}
 
 	return &types.RegisterResp{

@@ -15,6 +15,13 @@ const (
 	ErrAdminUserAlreadyExists = 3001 // 管理员已存在
 	ErrAdminUserNotFound      = 3002 // 管理员不存在
 	ErrAdminPasswordIncorrect = 3003 // 密码错误
+	ErrAdminCountFailed       = 3004 // 获取管理员总数失败
+	ErrAdminListFailed        = 3005 // 获取管理员列表失败
+	ErrAdminPasswordHashFail   = 3006 // 密码加密失败
+	ErrAdminCreateFailed       = 3007 // 创建管理员失败
+	ErrAdminEmailAlreadyExists = 3008 // 邮箱已被注册
+	ErrUserIDFormat           = 3009 // 用户ID格式错误
+	ErrPasswordUpdateFailed   = 3010 // 密码更新失败
 
 	// Request validation errors (4000-4999)
 	ErrInvalidParams = 4001 // 参数错误
@@ -28,5 +35,12 @@ var errorMessages = map[int]string{
 	ErrAdminUserAlreadyExists: "管理员已存在",
 	ErrAdminUserNotFound:      "管理员不存在",
 	ErrAdminPasswordIncorrect: "密码错误",
+	ErrAdminCountFailed:       "获取管理员总数失败",
+	ErrAdminListFailed:        "获取管理员列表失败",
+	ErrAdminPasswordHashFail:   "密码加密失败",
+	ErrAdminCreateFailed:       "创建管理员失败",
+	ErrAdminEmailAlreadyExists: "邮箱已被注册",
+	ErrUserIDFormat:           "用户ID格式错误",
+	ErrPasswordUpdateFailed:   "密码更新失败",
 	ErrInvalidParams:          "参数错误",
 }
