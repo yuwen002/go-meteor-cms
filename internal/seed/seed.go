@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
@@ -110,14 +111,7 @@ func initSuperAdminRole(ctx context.Context, client *ent.Client) (*ent.AdminRole
 }
 
 func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.AdminPermission, error) {
-	// 检查是否已有权限
-	count, err := client.AdminPermission.Query().Count(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if count > 0 {
-		return client.AdminPermission.Query().All(ctx)
-	}
+	var result []*ent.AdminPermission
 
 	// 定义权限列表（先建菜单，再建按钮/API）
 	menus := []struct {
@@ -141,50 +135,76 @@ func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.Adm
 		Method     string
 		APIPath    string
 	}{
-		{"新增用户", "system:admin_user:add", 2, "用户管理", "POST", "/admin/users"},
-		{"编辑用户", "system:admin_user:edit", 2, "用户管理", "PUT", "/admin/users/:id"},
-		{"删除用户", "system:admin_user:delete", 2, "用户管理", "DELETE", "/admin/users/:id"},
+		{"新增管理员", "system:admin_user:add", 2, "管理员管理", "POST", "/admin/users"},
+		{"编辑管理员", "system:admin_user:edit", 2, "管理员管理", "PUT", "/admin/users/:id"},
+		{"删除管理员", "system:admin_user:delete", 2, "管理员管理", "DELETE", "/admin/users/:id"},
 	}
 
-	// 1️⃣ 创建菜单
+	// 1️⃣ 创建或获取菜单
 	menuMap := make(map[string]*ent.AdminPermission)
 	for _, m := range menus {
-		p, err := client.AdminPermission.Create().
-			SetName(m.Name).
-			SetPermission(m.Permission).
-			SetType(m.Type).
-			SetPath(m.Path).
-			SetComponent(m.Component).
-			SetIsActive(true).
-			Save(ctx)
-		if err != nil {
+		// 检查是否已存在
+		existing, err := client.AdminPermission.Query().
+			Where(adminpermission.Permission(m.Permission)).
+			Only(ctx)
+
+		if ent.IsNotFound(err) {
+			// 不存在则创建
+			p, err := client.AdminPermission.Create().
+				SetName(m.Name).
+				SetPermission(m.Permission).
+				SetType(m.Type).
+				SetPath(m.Path).
+				SetComponent(m.Component).
+				SetIsActive(true).
+				Save(ctx)
+			if err != nil {
+				return nil, err
+			}
+			menuMap[m.Name] = p
+			result = append(result, p)
+		} else if err == nil {
+			// 已存在，直接使用
+			menuMap[m.Name] = existing
+			result = append(result, existing)
+		} else {
 			return nil, err
 		}
-		menuMap[m.Name] = p
 	}
 
-	// 2️⃣ 创建按钮/API，设置 parent_id
-	var result []*ent.AdminPermission
+	// 2️⃣ 创建或获取按钮/API
 	for _, b := range buttons {
-		parent := menuMap[b.ParentName]
-		p, err := client.AdminPermission.Create().
-			SetName(b.Name).
-			SetPermission(b.Permission).
-			SetType(b.Type).
-			SetParentID(parent.ID).
-			SetMethod(b.Method).
-			SetAPIPath(b.APIPath).
-			SetIsActive(true).
-			Save(ctx)
-		if err != nil {
+		parent, ok := menuMap[b.ParentName]
+		if !ok {
+			continue // 如果父菜单不存在，跳过
+		}
+
+		// 检查是否已存在
+		existing, err := client.AdminPermission.Query().
+			Where(adminpermission.Permission(b.Permission)).
+			Only(ctx)
+
+		if ent.IsNotFound(err) {
+			// 不存在则创建
+			p, err := client.AdminPermission.Create().
+				SetName(b.Name).
+				SetPermission(b.Permission).
+				SetType(b.Type).
+				SetParentID(parent.ID).
+				SetMethod(b.Method).
+				SetAPIPath(b.APIPath).
+				SetIsActive(true).
+				Save(ctx)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, p)
+		} else if err == nil {
+			// 已存在，直接使用
+			result = append(result, existing)
+		} else {
 			return nil, err
 		}
-		result = append(result, p)
-	}
-
-	// 3️⃣ 合并菜单和按钮，返回全部权限
-	for _, m := range menuMap {
-		result = append(result, m)
 	}
 
 	return result, nil

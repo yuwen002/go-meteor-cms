@@ -44,6 +44,15 @@ type CommonResp struct {
 	Message string `json:"message"`
 }
 
+type CreateAdminReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Nickname string `json:"nickname"`
+	Phone    string `json:"phone"`
+	IsActive bool   `json:"is_active"`
+	IsSuper  bool   `json:"is_super"`
+}
+
 type ForgotPasswordReq struct {
 	Username string `json:"username" validate:"required"` // 必填
 }
