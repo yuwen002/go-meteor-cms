@@ -12,7 +12,11 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -73,7 +77,11 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			adminuser.Table: adminuser.ValidColumn,
+			adminpermission.Table:     adminpermission.ValidColumn,
+			adminrole.Table:           adminrole.ValidColumn,
+			adminrolepermission.Table: adminrolepermission.ValidColumn,
+			adminuser.Table:           adminuser.ValidColumn,
+			adminuserrole.Table:       adminuserrole.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

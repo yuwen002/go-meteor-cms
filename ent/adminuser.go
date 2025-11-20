@@ -12,12 +12,18 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 )
 
-// AdminUser is the model entity for the AdminUser schema.
+// 后台管理员用户表
 type AdminUser struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 自增主键ID
 	ID int64 `json:"id,omitempty"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 删除时间，用于软删除
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// 用户名
 	Username string `json:"username,omitempty"`
 	// 密码哈希值
@@ -36,10 +42,6 @@ type AdminUser struct {
 	IsActive bool `json:"is_active,omitempty"`
 	// 最后登录时间
 	LastLoginAt *time.Time `json:"last_login_at,omitempty"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// 更新时间
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 密码重置令牌
 	ResetToken *string `json:"reset_token,omitempty"`
 	// 密码重置令牌过期时间
@@ -58,7 +60,7 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone, adminuser.FieldAvatar, adminuser.FieldResetToken:
 			values[i] = new(sql.NullString)
-		case adminuser.FieldLastLoginAt, adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt, adminuser.FieldResetExpire:
+		case adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt, adminuser.FieldDeletedAt, adminuser.FieldLastLoginAt, adminuser.FieldResetExpire:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -81,6 +83,25 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
+		case adminuser.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				_m.CreatedAt = value.Time
+			}
+		case adminuser.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				_m.UpdatedAt = value.Time
+			}
+		case adminuser.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
+			}
 		case adminuser.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
@@ -136,18 +157,6 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 				_m.LastLoginAt = new(time.Time)
 				*_m.LastLoginAt = value.Time
 			}
-		case adminuser.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				_m.CreatedAt = value.Time
-			}
-		case adminuser.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				_m.UpdatedAt = value.Time
-			}
 		case adminuser.FieldResetToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field reset_token", values[i])
@@ -198,6 +207,17 @@ func (_m *AdminUser) String() string {
 	var builder strings.Builder
 	builder.WriteString("AdminUser(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("username=")
 	builder.WriteString(_m.Username)
 	builder.WriteString(", ")
@@ -226,12 +246,6 @@ func (_m *AdminUser) String() string {
 		builder.WriteString("last_login_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	if v := _m.ResetToken; v != nil {
 		builder.WriteString("reset_token=")

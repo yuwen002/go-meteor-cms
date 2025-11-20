@@ -20,6 +20,48 @@ type AdminUserCreate struct {
 	hooks    []Hook
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (_c *AdminUserCreate) SetCreatedAt(v time.Time) *AdminUserCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableCreatedAt(v *time.Time) *AdminUserCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
+	}
+	return _c
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_c *AdminUserCreate) SetUpdatedAt(v time.Time) *AdminUserCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableUpdatedAt(v *time.Time) *AdminUserCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
+	}
+	return _c
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (_c *AdminUserCreate) SetDeletedAt(v time.Time) *AdminUserCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableDeletedAt(v *time.Time) *AdminUserCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
+	}
+	return _c
+}
+
 // SetUsername sets the "username" field.
 func (_c *AdminUserCreate) SetUsername(v string) *AdminUserCreate {
 	_c.mutation.SetUsername(v)
@@ -130,34 +172,6 @@ func (_c *AdminUserCreate) SetNillableLastLoginAt(v *time.Time) *AdminUserCreate
 	return _c
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (_c *AdminUserCreate) SetCreatedAt(v time.Time) *AdminUserCreate {
-	_c.mutation.SetCreatedAt(v)
-	return _c
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *AdminUserCreate) SetNillableCreatedAt(v *time.Time) *AdminUserCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_c *AdminUserCreate) SetUpdatedAt(v time.Time) *AdminUserCreate {
-	_c.mutation.SetUpdatedAt(v)
-	return _c
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *AdminUserCreate) SetNillableUpdatedAt(v *time.Time) *AdminUserCreate {
-	if v != nil {
-		_c.SetUpdatedAt(*v)
-	}
-	return _c
-}
-
 // SetResetToken sets the "reset_token" field.
 func (_c *AdminUserCreate) SetResetToken(v string) *AdminUserCreate {
 	_c.mutation.SetResetToken(v)
@@ -227,6 +241,14 @@ func (_c *AdminUserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *AdminUserCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		v := adminuser.DefaultCreatedAt()
+		_c.mutation.SetCreatedAt(v)
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		v := adminuser.DefaultUpdatedAt()
+		_c.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := _c.mutation.Avatar(); !ok {
 		v := adminuser.DefaultAvatar
 		_c.mutation.SetAvatar(v)
@@ -239,18 +261,16 @@ func (_c *AdminUserCreate) defaults() {
 		v := adminuser.DefaultIsActive
 		_c.mutation.SetIsActive(v)
 	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		v := adminuser.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		v := adminuser.DefaultUpdatedAt()
-		_c.mutation.SetUpdatedAt(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *AdminUserCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "AdminUser.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "AdminUser.updated_at"`)}
+	}
 	if _, ok := _c.mutation.Username(); !ok {
 		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "AdminUser.username"`)}
 	}
@@ -275,12 +295,6 @@ func (_c *AdminUserCreate) check() error {
 	}
 	if _, ok := _c.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "AdminUser.is_active"`)}
-	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "AdminUser.created_at"`)}
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "AdminUser.updated_at"`)}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := adminuser.IDValidator(v); err != nil {
@@ -319,6 +333,18 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := _c.mutation.CreatedAt(); ok {
+		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := _c.mutation.UpdatedAt(); ok {
+		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeletedAt(); ok {
+		_spec.SetField(adminuser.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
+	}
 	if value, ok := _c.mutation.Username(); ok {
 		_spec.SetField(adminuser.FieldUsername, field.TypeString, value)
 		_node.Username = value
@@ -354,14 +380,6 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.LastLoginAt(); ok {
 		_spec.SetField(adminuser.FieldLastLoginAt, field.TypeTime, value)
 		_node.LastLoginAt = &value
-	}
-	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
 	}
 	if value, ok := _c.mutation.ResetToken(); ok {
 		_spec.SetField(adminuser.FieldResetToken, field.TypeString, value)

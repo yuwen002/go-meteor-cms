@@ -3,14 +3,89 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
 
 var (
+	// AdminPermissionsColumns holds the columns for the "admin_permissions" table.
+	AdminPermissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "name", Type: field.TypeString, Comment: "权限名称，如 用户管理 / 新增用户"},
+		{Name: "type", Type: field.TypeInt, Comment: "权限类型：1 菜单 2 按钮 3 API", Default: 1},
+		{Name: "path", Type: field.TypeString, Comment: "前端路由路径，仅菜单(type=1)使用", Default: ""},
+		{Name: "component", Type: field.TypeString, Comment: "前端组件路径，如 views/user/list.vue", Default: ""},
+		{Name: "icon", Type: field.TypeString, Comment: "菜单图标", Default: ""},
+		{Name: "method", Type: field.TypeString, Comment: "API 方法：GET/POST/PUT/DELETE，仅 type=3 使用", Default: ""},
+		{Name: "api_path", Type: field.TypeString, Comment: "API 路径，如 /admin/user/list，仅 type=3 使用", Default: ""},
+		{Name: "permission", Type: field.TypeString, Comment: "权限标识，如 system:user:list", Default: ""},
+		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
+		{Name: "parent_id", Type: field.TypeInt64, Nullable: true, Comment: "父级ID（用于菜单树）"},
+	}
+	// AdminPermissionsTable holds the schema information for the "admin_permissions" table.
+	AdminPermissionsTable = &schema.Table{
+		Name:       "admin_permissions",
+		Comment:    "后台权限表（菜单/按钮/接口）",
+		Columns:    AdminPermissionsColumns,
+		PrimaryKey: []*schema.Column{AdminPermissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_permissions_admin_permissions_children",
+				Columns:    []*schema.Column{AdminPermissionsColumns[14]},
+				RefColumns: []*schema.Column{AdminPermissionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// AdminRolesColumns holds the columns for the "admin_roles" table.
+	AdminRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "name", Type: field.TypeString, Unique: true, Comment: "角色名称"},
+		{Name: "code", Type: field.TypeString, Unique: true, Comment: "角色编码，用于系统标识，如 SUPER_ADMIN"},
+		{Name: "desc", Type: field.TypeString, Nullable: true, Comment: "角色描述", Default: ""},
+		{Name: "data_scope", Type: field.TypeInt, Comment: "数据权限范围：1 全公司 / 2 本部门 / 3 部门及子部门 / 4 仅自己 / 5 自定义部门", Default: 1},
+		{Name: "is_system", Type: field.TypeBool, Comment: "是否系统内置角色（禁止删除）", Default: false},
+		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序，从小到大", Default: 0},
+	}
+	// AdminRolesTable holds the schema information for the "admin_roles" table.
+	AdminRolesTable = &schema.Table{
+		Name:       "admin_roles",
+		Comment:    "后台角色表",
+		Columns:    AdminRolesColumns,
+		PrimaryKey: []*schema.Column{AdminRolesColumns[0]},
+	}
+	// AdminRolePermissionsColumns holds the columns for the "admin_role_permissions" table.
+	AdminRolePermissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID，关联 admin_roles.id"},
+		{Name: "permission_id", Type: field.TypeInt64, Comment: "权限ID，关联 admin_permissions.id"},
+		{Name: "dummy", Type: field.TypeUint8, Comment: "占位字段，无实际意义", Default: 0},
+	}
+	// AdminRolePermissionsTable holds the schema information for the "admin_role_permissions" table.
+	AdminRolePermissionsTable = &schema.Table{
+		Name:       "admin_role_permissions",
+		Comment:    "角色权限关联表",
+		Columns:    AdminRolePermissionsColumns,
+		PrimaryKey: []*schema.Column{AdminRolePermissionsColumns[0]},
+	}
 	// AdminUsersColumns holds the columns for the "admin_users" table.
 	AdminUsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
 		{Name: "username", Type: field.TypeString, Unique: true, Comment: "用户名"},
 		{Name: "password_hash", Type: field.TypeString, Comment: "密码哈希值"},
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Comment: "昵称"},
@@ -20,22 +95,58 @@ var (
 		{Name: "is_super", Type: field.TypeBool, Comment: "是否超级管理员", Default: false},
 		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
 		{Name: "last_login_at", Type: field.TypeTime, Nullable: true, Comment: "最后登录时间"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "reset_token", Type: field.TypeString, Nullable: true, Comment: "密码重置令牌"},
 		{Name: "reset_expire", Type: field.TypeTime, Nullable: true, Comment: "密码重置令牌过期时间"},
 	}
 	// AdminUsersTable holds the schema information for the "admin_users" table.
 	AdminUsersTable = &schema.Table{
 		Name:       "admin_users",
+		Comment:    "后台管理员用户表",
 		Columns:    AdminUsersColumns,
 		PrimaryKey: []*schema.Column{AdminUsersColumns[0]},
 	}
+	// AdminUserRolesColumns holds the columns for the "admin_user_roles" table.
+	AdminUserRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID，关联 admin_users.id"},
+		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID，关联 admin_roles.id"},
+		{Name: "dummy", Type: field.TypeUint8, Comment: "占位字段，无实际意义", Default: 0},
+	}
+	// AdminUserRolesTable holds the schema information for the "admin_user_roles" table.
+	AdminUserRolesTable = &schema.Table{
+		Name:       "admin_user_roles",
+		Comment:    "用户角色关联表",
+		Columns:    AdminUserRolesColumns,
+		PrimaryKey: []*schema.Column{AdminUserRolesColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AdminPermissionsTable,
+		AdminRolesTable,
+		AdminRolePermissionsTable,
 		AdminUsersTable,
+		AdminUserRolesTable,
 	}
 )
 
 func init() {
+	AdminPermissionsTable.ForeignKeys[0].RefTable = AdminPermissionsTable
+	AdminPermissionsTable.Annotation = &entsql.Annotation{
+		Table: "admin_permissions",
+	}
+	AdminRolesTable.Annotation = &entsql.Annotation{
+		Table: "admin_roles",
+	}
+	AdminRolePermissionsTable.Annotation = &entsql.Annotation{
+		Table: "admin_role_permissions",
+	}
+	AdminUsersTable.Annotation = &entsql.Annotation{
+		Table: "admin_users",
+	}
+	AdminUserRolesTable.Annotation = &entsql.Annotation{
+		Table: "admin_user_roles",
+	}
 }

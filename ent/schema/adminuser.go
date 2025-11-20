@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -16,7 +14,15 @@ type AdminUser struct {
 
 func (AdminUser) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.WithComments(true), // 启用表注释
+		entsql.Annotation{Table: "admin_users"},
+		entsql.WithComments(true),
+		schema.Comment("后台管理员用户表"),
+	}
+}
+
+func (AdminUser) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		BaseMixin{}, // created_at / updated_at / deleted_at
 	}
 }
 
@@ -67,15 +73,6 @@ func (AdminUser) Fields() []ent.Field {
 			Comment("最后登录时间").
 			Optional().
 			Nillable(),
-
-		field.Time("created_at").
-			Comment("创建时间").
-			Default(time.Now),
-
-		field.Time("updated_at").
-			Comment("更新时间").
-			Default(time.Now).
-			UpdateDefault(time.Now),
 
 		field.String("reset_token").
 			Comment("密码重置令牌").

@@ -11,68 +11,68 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
 
-// AdminUserQuery is the builder for querying AdminUser entities.
-type AdminUserQuery struct {
+// AdminUserRoleQuery is the builder for querying AdminUserRole entities.
+type AdminUserRoleQuery struct {
 	config
 	ctx        *QueryContext
-	order      []adminuser.OrderOption
+	order      []adminuserrole.OrderOption
 	inters     []Interceptor
-	predicates []predicate.AdminUser
+	predicates []predicate.AdminUserRole
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the AdminUserQuery builder.
-func (_q *AdminUserQuery) Where(ps ...predicate.AdminUser) *AdminUserQuery {
+// Where adds a new predicate for the AdminUserRoleQuery builder.
+func (_q *AdminUserRoleQuery) Where(ps ...predicate.AdminUserRole) *AdminUserRoleQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *AdminUserQuery) Limit(limit int) *AdminUserQuery {
+func (_q *AdminUserRoleQuery) Limit(limit int) *AdminUserRoleQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *AdminUserQuery) Offset(offset int) *AdminUserQuery {
+func (_q *AdminUserRoleQuery) Offset(offset int) *AdminUserRoleQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *AdminUserQuery) Unique(unique bool) *AdminUserQuery {
+func (_q *AdminUserRoleQuery) Unique(unique bool) *AdminUserRoleQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *AdminUserQuery) Order(o ...adminuser.OrderOption) *AdminUserQuery {
+func (_q *AdminUserRoleQuery) Order(o ...adminuserrole.OrderOption) *AdminUserRoleQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
-// First returns the first AdminUser entity from the query.
-// Returns a *NotFoundError when no AdminUser was found.
-func (_q *AdminUserQuery) First(ctx context.Context) (*AdminUser, error) {
+// First returns the first AdminUserRole entity from the query.
+// Returns a *NotFoundError when no AdminUserRole was found.
+func (_q *AdminUserRoleQuery) First(ctx context.Context) (*AdminUserRole, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{adminuser.Label}
+		return nil, &NotFoundError{adminuserrole.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *AdminUserQuery) FirstX(ctx context.Context) *AdminUser {
+func (_q *AdminUserRoleQuery) FirstX(ctx context.Context) *AdminUserRole {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -80,22 +80,22 @@ func (_q *AdminUserQuery) FirstX(ctx context.Context) *AdminUser {
 	return node
 }
 
-// FirstID returns the first AdminUser ID from the query.
-// Returns a *NotFoundError when no AdminUser ID was found.
-func (_q *AdminUserQuery) FirstID(ctx context.Context) (id int64, err error) {
-	var ids []int64
+// FirstID returns the first AdminUserRole ID from the query.
+// Returns a *NotFoundError when no AdminUserRole ID was found.
+func (_q *AdminUserRoleQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{adminuser.Label}
+		err = &NotFoundError{adminuserrole.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *AdminUserQuery) FirstIDX(ctx context.Context) int64 {
+func (_q *AdminUserRoleQuery) FirstIDX(ctx context.Context) int {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -103,10 +103,10 @@ func (_q *AdminUserQuery) FirstIDX(ctx context.Context) int64 {
 	return id
 }
 
-// Only returns a single AdminUser entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one AdminUser entity is found.
-// Returns a *NotFoundError when no AdminUser entities are found.
-func (_q *AdminUserQuery) Only(ctx context.Context) (*AdminUser, error) {
+// Only returns a single AdminUserRole entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one AdminUserRole entity is found.
+// Returns a *NotFoundError when no AdminUserRole entities are found.
+func (_q *AdminUserRoleQuery) Only(ctx context.Context) (*AdminUserRole, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -115,14 +115,14 @@ func (_q *AdminUserQuery) Only(ctx context.Context) (*AdminUser, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{adminuser.Label}
+		return nil, &NotFoundError{adminuserrole.Label}
 	default:
-		return nil, &NotSingularError{adminuser.Label}
+		return nil, &NotSingularError{adminuserrole.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *AdminUserQuery) OnlyX(ctx context.Context) *AdminUser {
+func (_q *AdminUserRoleQuery) OnlyX(ctx context.Context) *AdminUserRole {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -130,11 +130,11 @@ func (_q *AdminUserQuery) OnlyX(ctx context.Context) *AdminUser {
 	return node
 }
 
-// OnlyID is like Only, but returns the only AdminUser ID in the query.
-// Returns a *NotSingularError when more than one AdminUser ID is found.
+// OnlyID is like Only, but returns the only AdminUserRole ID in the query.
+// Returns a *NotSingularError when more than one AdminUserRole ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *AdminUserQuery) OnlyID(ctx context.Context) (id int64, err error) {
-	var ids []int64
+func (_q *AdminUserRoleQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -142,15 +142,15 @@ func (_q *AdminUserQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{adminuser.Label}
+		err = &NotFoundError{adminuserrole.Label}
 	default:
-		err = &NotSingularError{adminuser.Label}
+		err = &NotSingularError{adminuserrole.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *AdminUserQuery) OnlyIDX(ctx context.Context) int64 {
+func (_q *AdminUserRoleQuery) OnlyIDX(ctx context.Context) int {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -158,18 +158,18 @@ func (_q *AdminUserQuery) OnlyIDX(ctx context.Context) int64 {
 	return id
 }
 
-// All executes the query and returns a list of AdminUsers.
-func (_q *AdminUserQuery) All(ctx context.Context) ([]*AdminUser, error) {
+// All executes the query and returns a list of AdminUserRoles.
+func (_q *AdminUserRoleQuery) All(ctx context.Context) ([]*AdminUserRole, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*AdminUser, *AdminUserQuery]()
-	return withInterceptors[[]*AdminUser](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*AdminUserRole, *AdminUserRoleQuery]()
+	return withInterceptors[[]*AdminUserRole](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *AdminUserQuery) AllX(ctx context.Context) []*AdminUser {
+func (_q *AdminUserRoleQuery) AllX(ctx context.Context) []*AdminUserRole {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -177,20 +177,20 @@ func (_q *AdminUserQuery) AllX(ctx context.Context) []*AdminUser {
 	return nodes
 }
 
-// IDs executes the query and returns a list of AdminUser IDs.
-func (_q *AdminUserQuery) IDs(ctx context.Context) (ids []int64, err error) {
+// IDs executes the query and returns a list of AdminUserRole IDs.
+func (_q *AdminUserRoleQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(adminuser.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(adminuserrole.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *AdminUserQuery) IDsX(ctx context.Context) []int64 {
+func (_q *AdminUserRoleQuery) IDsX(ctx context.Context) []int {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -199,16 +199,16 @@ func (_q *AdminUserQuery) IDsX(ctx context.Context) []int64 {
 }
 
 // Count returns the count of the given query.
-func (_q *AdminUserQuery) Count(ctx context.Context) (int, error) {
+func (_q *AdminUserRoleQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*AdminUserQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*AdminUserRoleQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *AdminUserQuery) CountX(ctx context.Context) int {
+func (_q *AdminUserRoleQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -217,7 +217,7 @@ func (_q *AdminUserQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *AdminUserQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *AdminUserRoleQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -230,7 +230,7 @@ func (_q *AdminUserQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *AdminUserQuery) ExistX(ctx context.Context) bool {
+func (_q *AdminUserRoleQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -238,18 +238,18 @@ func (_q *AdminUserQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the AdminUserQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the AdminUserRoleQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *AdminUserQuery) Clone() *AdminUserQuery {
+func (_q *AdminUserRoleQuery) Clone() *AdminUserRoleQuery {
 	if _q == nil {
 		return nil
 	}
-	return &AdminUserQuery{
+	return &AdminUserRoleQuery{
 		config:     _q.config,
 		ctx:        _q.ctx.Clone(),
-		order:      append([]adminuser.OrderOption{}, _q.order...),
+		order:      append([]adminuserrole.OrderOption{}, _q.order...),
 		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.AdminUser{}, _q.predicates...),
+		predicates: append([]predicate.AdminUserRole{}, _q.predicates...),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -266,15 +266,15 @@ func (_q *AdminUserQuery) Clone() *AdminUserQuery {
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.AdminUser.Query().
-//		GroupBy(adminuser.FieldCreatedAt).
+//	client.AdminUserRole.Query().
+//		GroupBy(adminuserrole.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGroupBy {
+func (_q *AdminUserRoleQuery) GroupBy(field string, fields ...string) *AdminUserRoleGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &AdminUserGroupBy{build: _q}
+	grbuild := &AdminUserRoleGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = adminuser.Label
+	grbuild.label = adminuserrole.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -288,23 +288,23 @@ func (_q *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGrou
 //		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
-//	client.AdminUser.Query().
-//		Select(adminuser.FieldCreatedAt).
+//	client.AdminUserRole.Query().
+//		Select(adminuserrole.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (_q *AdminUserQuery) Select(fields ...string) *AdminUserSelect {
+func (_q *AdminUserRoleQuery) Select(fields ...string) *AdminUserRoleSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &AdminUserSelect{AdminUserQuery: _q}
-	sbuild.label = adminuser.Label
+	sbuild := &AdminUserRoleSelect{AdminUserRoleQuery: _q}
+	sbuild.label = adminuserrole.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a AdminUserSelect configured with the given aggregations.
-func (_q *AdminUserQuery) Aggregate(fns ...AggregateFunc) *AdminUserSelect {
+// Aggregate returns a AdminUserRoleSelect configured with the given aggregations.
+func (_q *AdminUserRoleQuery) Aggregate(fns ...AggregateFunc) *AdminUserRoleSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *AdminUserQuery) prepareQuery(ctx context.Context) error {
+func (_q *AdminUserRoleQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -316,7 +316,7 @@ func (_q *AdminUserQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !adminuser.ValidColumn(f) {
+		if !adminuserrole.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -330,16 +330,16 @@ func (_q *AdminUserQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *AdminUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AdminUser, error) {
+func (_q *AdminUserRoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AdminUserRole, error) {
 	var (
-		nodes = []*AdminUser{}
+		nodes = []*AdminUserRole{}
 		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*AdminUser).scanValues(nil, columns)
+		return (*AdminUserRole).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &AdminUser{config: _q.config}
+		node := &AdminUserRole{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
@@ -355,7 +355,7 @@ func (_q *AdminUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ad
 	return nodes, nil
 }
 
-func (_q *AdminUserQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *AdminUserRoleQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
 	_spec.Node.Columns = _q.ctx.Fields
 	if len(_q.ctx.Fields) > 0 {
@@ -364,8 +364,8 @@ func (_q *AdminUserQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(adminuser.Table, adminuser.Columns, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeInt64))
+func (_q *AdminUserRoleQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(adminuserrole.Table, adminuserrole.Columns, sqlgraph.NewFieldSpec(adminuserrole.FieldID, field.TypeInt))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -374,9 +374,9 @@ func (_q *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, adminuser.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, adminuserrole.FieldID)
 		for i := range fields {
-			if fields[i] != adminuser.FieldID {
+			if fields[i] != adminuserrole.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -404,12 +404,12 @@ func (_q *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *AdminUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *AdminUserRoleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(adminuser.Table)
+	t1 := builder.Table(adminuserrole.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = adminuser.Columns
+		columns = adminuserrole.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -436,28 +436,28 @@ func (_q *AdminUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// AdminUserGroupBy is the group-by builder for AdminUser entities.
-type AdminUserGroupBy struct {
+// AdminUserRoleGroupBy is the group-by builder for AdminUserRole entities.
+type AdminUserRoleGroupBy struct {
 	selector
-	build *AdminUserQuery
+	build *AdminUserRoleQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *AdminUserGroupBy) Aggregate(fns ...AggregateFunc) *AdminUserGroupBy {
+func (_g *AdminUserRoleGroupBy) Aggregate(fns ...AggregateFunc) *AdminUserRoleGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *AdminUserGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *AdminUserRoleGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AdminUserQuery, *AdminUserGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*AdminUserRoleQuery, *AdminUserRoleGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *AdminUserGroupBy) sqlScan(ctx context.Context, root *AdminUserQuery, v any) error {
+func (_g *AdminUserRoleGroupBy) sqlScan(ctx context.Context, root *AdminUserRoleQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -484,28 +484,28 @@ func (_g *AdminUserGroupBy) sqlScan(ctx context.Context, root *AdminUserQuery, v
 	return sql.ScanSlice(rows, v)
 }
 
-// AdminUserSelect is the builder for selecting fields of AdminUser entities.
-type AdminUserSelect struct {
-	*AdminUserQuery
+// AdminUserRoleSelect is the builder for selecting fields of AdminUserRole entities.
+type AdminUserRoleSelect struct {
+	*AdminUserRoleQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *AdminUserSelect) Aggregate(fns ...AggregateFunc) *AdminUserSelect {
+func (_s *AdminUserRoleSelect) Aggregate(fns ...AggregateFunc) *AdminUserRoleSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *AdminUserSelect) Scan(ctx context.Context, v any) error {
+func (_s *AdminUserRoleSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AdminUserQuery, *AdminUserSelect](ctx, _s.AdminUserQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*AdminUserRoleQuery, *AdminUserRoleSelect](ctx, _s.AdminUserRoleQuery, _s, _s.inters, v)
 }
 
-func (_s *AdminUserSelect) sqlScan(ctx context.Context, root *AdminUserQuery, v any) error {
+func (_s *AdminUserRoleSelect) sqlScan(ctx context.Context, root *AdminUserRoleQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {

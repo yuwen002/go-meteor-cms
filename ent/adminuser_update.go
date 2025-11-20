@@ -28,6 +28,46 @@ func (_u *AdminUserUpdate) Where(ps ...predicate.AdminUser) *AdminUserUpdate {
 	return _u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (_u *AdminUserUpdate) SetCreatedAt(v time.Time) *AdminUserUpdate {
+	_u.mutation.SetCreatedAt(v)
+	return _u
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableCreatedAt(v *time.Time) *AdminUserUpdate {
+	if v != nil {
+		_u.SetCreatedAt(*v)
+	}
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *AdminUserUpdate) SetUpdatedAt(v time.Time) *AdminUserUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *AdminUserUpdate) SetDeletedAt(v time.Time) *AdminUserUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableDeletedAt(v *time.Time) *AdminUserUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *AdminUserUpdate) ClearDeletedAt() *AdminUserUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // SetUsername sets the "username" field.
 func (_u *AdminUserUpdate) SetUsername(v string) *AdminUserUpdate {
 	_u.mutation.SetUsername(v)
@@ -178,26 +218,6 @@ func (_u *AdminUserUpdate) ClearLastLoginAt() *AdminUserUpdate {
 	return _u
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (_u *AdminUserUpdate) SetCreatedAt(v time.Time) *AdminUserUpdate {
-	_u.mutation.SetCreatedAt(v)
-	return _u
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_u *AdminUserUpdate) SetNillableCreatedAt(v *time.Time) *AdminUserUpdate {
-	if v != nil {
-		_u.SetCreatedAt(*v)
-	}
-	return _u
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *AdminUserUpdate) SetUpdatedAt(v time.Time) *AdminUserUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // SetResetToken sets the "reset_token" field.
 func (_u *AdminUserUpdate) SetResetToken(v string) *AdminUserUpdate {
 	_u.mutation.SetResetToken(v)
@@ -306,6 +326,18 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.CreatedAt(); ok {
+		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(adminuser.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(adminuser.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.Username(); ok {
 		_spec.SetField(adminuser.FieldUsername, field.TypeString, value)
 	}
@@ -345,12 +377,6 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.LastLoginAtCleared() {
 		_spec.ClearField(adminuser.FieldLastLoginAt, field.TypeTime)
 	}
-	if value, ok := _u.mutation.CreatedAt(); ok {
-		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
-	}
 	if value, ok := _u.mutation.ResetToken(); ok {
 		_spec.SetField(adminuser.FieldResetToken, field.TypeString, value)
 	}
@@ -381,6 +407,46 @@ type AdminUserUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *AdminUserMutation
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (_u *AdminUserUpdateOne) SetCreatedAt(v time.Time) *AdminUserUpdateOne {
+	_u.mutation.SetCreatedAt(v)
+	return _u
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableCreatedAt(v *time.Time) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetCreatedAt(*v)
+	}
+	return _u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (_u *AdminUserUpdateOne) SetUpdatedAt(v time.Time) *AdminUserUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *AdminUserUpdateOne) SetDeletedAt(v time.Time) *AdminUserUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableDeletedAt(v *time.Time) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *AdminUserUpdateOne) ClearDeletedAt() *AdminUserUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetUsername sets the "username" field.
@@ -533,26 +599,6 @@ func (_u *AdminUserUpdateOne) ClearLastLoginAt() *AdminUserUpdateOne {
 	return _u
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (_u *AdminUserUpdateOne) SetCreatedAt(v time.Time) *AdminUserUpdateOne {
-	_u.mutation.SetCreatedAt(v)
-	return _u
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_u *AdminUserUpdateOne) SetNillableCreatedAt(v *time.Time) *AdminUserUpdateOne {
-	if v != nil {
-		_u.SetCreatedAt(*v)
-	}
-	return _u
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *AdminUserUpdateOne) SetUpdatedAt(v time.Time) *AdminUserUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // SetResetToken sets the "reset_token" field.
 func (_u *AdminUserUpdateOne) SetResetToken(v string) *AdminUserUpdateOne {
 	_u.mutation.SetResetToken(v)
@@ -691,6 +737,18 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 			}
 		}
 	}
+	if value, ok := _u.mutation.CreatedAt(); ok {
+		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.UpdatedAt(); ok {
+		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(adminuser.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(adminuser.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.Username(); ok {
 		_spec.SetField(adminuser.FieldUsername, field.TypeString, value)
 	}
@@ -729,12 +787,6 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 	}
 	if _u.mutation.LastLoginAtCleared() {
 		_spec.ClearField(adminuser.FieldLastLoginAt, field.TypeTime)
-	}
-	if value, ok := _u.mutation.CreatedAt(); ok {
-		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.ResetToken(); ok {
 		_spec.SetField(adminuser.FieldResetToken, field.TypeString, value)
