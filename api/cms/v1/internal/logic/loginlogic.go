@@ -8,17 +8,9 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"github.com/zeromicro/go-zero/core/logx"
-)
-
-import "errors"
-
-var (
-	ErrUnauthorized      = errors.New("用户名或密码错误")
-	ErrAccountInactive   = errors.New("账号未激活，请联系管理员")
-	ErrInvalidCaptcha    = errors.New("验证码错误")
-	ErrMissingCaptcha    = errors.New("请填写验证码")
 )
 
 type LoginLogic struct {
@@ -38,12 +30,12 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	// 验证验证码
 	if req.Captcha == "" || req.CaptchaID == "" {
-		return nil, ErrMissingCaptcha
+		return nil, common.NewBizError(common.ErrMissingCaptcha)
 	}
 
 	// 验证验证码
 	if !utils.VerifyCaptcha(req.CaptchaID, req.Captcha) {
-		return nil, ErrInvalidCaptcha
+		return nil, common.NewBizError(common.ErrInvalidCaptcha)
 	}
 
 	// 查询数据库用户
@@ -54,19 +46,19 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, ErrUnauthorized
+			return nil, common.NewBizError(common.ErrUnauthorized)
 		}
-		return nil, err
+		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
 	// 验证密码
 	if !utils.CheckPassword(user.PasswordHash, req.Password) {
-		return nil, ErrUnauthorized
+		return nil, common.NewBizError(common.ErrUnauthorized)
 	}
 
 	// 检查用户账号是否激活
 	if !user.IsActive {
-		return nil, ErrAccountInactive
+		return nil, common.NewBizError(common.ErrAccountInactive)
 	}
 
 	// 签发 JWT
@@ -81,7 +73,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 		"login_time": time.Now().Unix(), // 登录时间戳
 	})
 	if err != nil {
-		return nil, err
+		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
 	go func() {

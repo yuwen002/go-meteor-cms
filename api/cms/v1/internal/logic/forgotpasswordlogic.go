@@ -39,9 +39,9 @@ func (l *ForgotPasswordLogic) ForgotPassword(req *types.ForgotPasswordReq) (resp
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, common.NewBizError(40000, "用户不存在")
+			return nil, common.NewBizError(common.ErrAdminUserNotFound)
 		}
-		return nil, common.NewBizError(50000, "系统错误，请稍后重试")
+		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
 	// 2. 生成一个随机 Token，用于重置密码
@@ -55,7 +55,7 @@ func (l *ForgotPasswordLogic) ForgotPassword(req *types.ForgotPasswordReq) (resp
 		SetResetExpire(expire).
 		Save(l.ctx)
 	if err != nil {
-		return nil, err
+		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
 	// 4. 发送邮件（这里先模拟）

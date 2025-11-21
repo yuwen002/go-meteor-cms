@@ -5,6 +5,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -29,7 +30,7 @@ func (l *GetCaptchaLogic) GetCaptcha() (resp *types.CaptchaResp, err error) {
 	captchaID, captchaBase64, err := utils.GenerateCaptcha()
 	if err != nil {
 		l.Logger.Errorf("生成验证码失败: %v", err)
-		return nil, err
+		return nil, common.NewBizError(common.ErrCaptchaGenerate)
 	}
 
 	return &types.CaptchaResp{
