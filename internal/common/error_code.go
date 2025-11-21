@@ -44,3 +44,15 @@ var errorMessages = map[int]string{
 	ErrPasswordUpdateFailed:   "密码更新失败",
 	ErrInvalidParams:          "参数错误",
 }
+
+// GetErrorMessage 获取错误码对应的错误信息
+// 参数：
+//   - code: 错误码
+// 返回值：
+//   - string: 错误信息，如果错误码不存在则返回"未知错误"
+func GetErrorMessage(code int) string {
+	if msg, ok := errorMessages[code]; ok {
+		return msg
+	}
+	return "未知错误"
+}
