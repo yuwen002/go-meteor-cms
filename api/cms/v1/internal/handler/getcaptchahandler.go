@@ -8,7 +8,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
-	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 )
 
 func GetCaptchaHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -16,9 +16,9 @@ func GetCaptchaHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewGetCaptchaLogic(r.Context(), svcCtx)
 		resp, err := l.GetCaptcha()
 		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			common.Fail(w, common.ErrInternalServer, common.GetErrorMessage(common.ErrInternalServer))
+			return
 		}
+		common.Ok(w, resp)
 	}
 }

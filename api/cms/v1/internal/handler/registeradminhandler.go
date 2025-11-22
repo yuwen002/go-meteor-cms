@@ -19,7 +19,7 @@ func registerAdminHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.RegisterReq
 		if err := httpx.Parse(r, &req); err != nil {
-			common.Fail(w, 40000, "参数错误")
+			common.Fail(w, common.ErrInvalidParams, common.GetErrorMessage(common.ErrInvalidParams))
 			return
 		}
 
@@ -53,11 +53,11 @@ func registerAdminHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 					msg = "参数错误"
 				}
 
-				common.Fail(w, 40000, msg)
+				common.Fail(w, common.ErrInvalidParams, msg)
 				return
 			}
 
-			common.Fail(w, 40000, "参数错误")
+			common.Fail(w, common.ErrInvalidParams, common.GetErrorMessage(common.ErrInvalidParams))
 			return
 		}
 
@@ -69,7 +69,7 @@ func registerAdminHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 				common.Fail(w, be.Code, be.Msg)
 				return
 			}
-			common.Fail(w, 50000, "系统错误，请稍后重试")
+			common.Fail(w, common.ErrInternalServer, common.GetErrorMessage(common.ErrInternalServer))
 			return
 		}
 
