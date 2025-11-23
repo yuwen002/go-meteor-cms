@@ -99,6 +99,22 @@ type (
 	CommonResp {
 		Message string `json:"message"`
 	}
+	// 获取管理员详情返回
+	AdminDetailResp {
+		Id       int64  `json:"id"`
+		Username string `json:"username"`
+		Nickname string `json:"nickname"`
+		Email    string `json:"email"`
+		Phone    string `json:"phone"`
+		IsActive bool   `json:"is_active"`
+	}
+	// 更新管理员资料请求
+	UpdateAdminReq {
+		Nickname string `json:"nickname,optional"`
+		Email    string `json:"email,optional"`
+		Phone    string `json:"phone,optional"`
+		IsActive bool   `json:"is_active,optional"`
+	}
 )
 
 @server (
@@ -113,13 +129,19 @@ service cms-api {
 
 	// 管理员修改自己的密码
 	@handler changeMyPassword
-	put /admin/change-password (ChangeMyPasswordReq) returns (CommonResp)
+	put /admin/admin-users/me/change-password (ChangeMyPasswordReq) returns (CommonResp)
 
 	// 管理员重置其他管理员的密码
 	@handler resetAdminPassword
-	put /admin/users/:id/reset-password (ResetAdminPasswordReq) returns (CommonResp)
+	put /admin/admin-users/:id/reset-password (ResetAdminPasswordReq) returns (CommonResp)
 
 	@handler adminCreate
-	post /admin/users/create (CreateAdminReq) returns (CommonResp)
+	post /admin/admin-users/create (CreateAdminReq) returns (CommonResp)
+
+	@handler adminDetail
+	get /admin/admin-users/:id returns (AdminDetailResp)
+
+	@handler adminUpdate
+	put /admin/admin-users/:id (UpdateAdminReq) returns (CommonResp)
 }
 

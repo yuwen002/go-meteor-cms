@@ -4,11 +4,12 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
-	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 )
 
 func adminDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -16,9 +17,14 @@ func adminDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewAdminDetailLogic(r.Context(), svcCtx)
 		resp, err := l.AdminDetail()
 		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			var be *common.BizError
+			if errors.As(err, &be) {
+				common.Fail(w, be.Code, be.Msg)
+				return
+			}
+			common.Fail(w, common.ErrAdminUserNotFound, common.GetErrorMessage(common.ErrAdminUserNotFound))
+			return
 		}
+		common.Ok(w, resp)
 	}
 }

@@ -8,6 +8,8 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,7 +29,23 @@ func NewAdminDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Admin
 }
 
 func (l *AdminDetailLogic) AdminDetail() (resp *types.AdminDetailResp, err error) {
-	// todo: add your logic here and delete this line
+	id := l.ctx.Value("id").(int64) // go-zero 自动解析 :id
 
-	return
+	admin, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, common.NewBizError(common.ErrAdminUserNotFound)
+		}
+		l.Logger.Errorf("获取管理员详情失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	return &types.AdminDetailResp{
+		Id:       admin.ID,
+		Username: admin.Username,
+		Nickname: admin.Nickname,
+		Email:    admin.Email,
+		Phone:    admin.Phone,
+		IsActive: admin.IsActive,
+	}, nil
 }

@@ -27,7 +27,20 @@ func NewAdminUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Admin
 }
 
 func (l *AdminUpdateLogic) AdminUpdate(req *types.UpdateAdminReq) (resp *types.CommonResp, err error) {
-	// todo: add your logic here and delete this line
+	id := l.ctx.Value("id").(int64)
 
-	return
+	_, err = l.svcCtx.EntClient.AdminUser.UpdateOneID(id).
+		SetNickname(req.Nickname).
+		SetEmail(req.Email).
+		SetPhone(req.Phone).
+		SetIsActive(req.IsActive).
+		Save(l.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.CommonResp{
+		Message: "更新成功",
+	}, nil
 }
