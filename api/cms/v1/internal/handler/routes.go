@@ -47,24 +47,34 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: adminListHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodGet,
+					Path:    "/admin/admin-users/:id",
+					Handler: adminDetailHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPut,
-					Path:    "/admin/change-password",
+					Path:    "/admin/admin-users/:id",
+					Handler: adminUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/:id/reset-password",
+					Handler: resetAdminPasswordHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/admin-users/create",
+					Handler: adminCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/me/change-password",
 					Handler: changeMyPasswordHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
 					Path:    "/admin/test-token",
 					Handler: testTokenHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPut,
-					Path:    "/admin/users/:id/reset-password",
-					Handler: resetAdminPasswordHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/admin/users/create",
-					Handler: adminCreateHandler(serverCtx),
 				},
 			}...,
 		),

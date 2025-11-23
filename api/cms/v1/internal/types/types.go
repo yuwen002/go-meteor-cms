@@ -3,6 +3,15 @@
 
 package types
 
+type AdminDetailResp struct {
+	Id       int64  `json:"id"`
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	IsActive bool   `json:"is_active"`
+}
+
 type AdminItem struct {
 	Id          int64  `json:"id"`
 	Username    string `json:"username"`
@@ -92,4 +101,11 @@ type ResetAdminPasswordReq struct {
 type TestTokenResp struct {
 	Message string                 `json:"message"`
 	Claims  map[string]interface{} `json:"claims"`
+}
+
+type UpdateAdminReq struct {
+	Nickname string `json:"nickname,optional"`
+	Email    string `json:"email,optional"`
+	Phone    string `json:"phone,optional"`
+	IsActive bool   `json:"is_active,optional"`
 }
