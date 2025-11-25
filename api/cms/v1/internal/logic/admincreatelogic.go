@@ -53,7 +53,7 @@ func (l *AdminCreateLogic) AdminCreate(req *types.CreateAdminReq) (resp *types.C
 	}
 
 	// 创建用户
-	_, err = l.svcCtx.EntClient.AdminUser.
+	user, err := l.svcCtx.EntClient.AdminUser.
 		Create().
 		SetUsername(req.Username).
 		SetPasswordHash(string(hashed)).
@@ -67,5 +67,5 @@ func (l *AdminCreateLogic) AdminCreate(req *types.CreateAdminReq) (resp *types.C
 		return nil, common.NewBizError(common.ErrAdminCreateFailed)
 	}
 
-	return &types.CommonResp{Message: "创建成功"}, nil
+	return &types.CommonResp{ID: user.ID, Message: "创建成功"}, nil
 }

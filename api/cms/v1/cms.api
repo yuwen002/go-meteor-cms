@@ -20,7 +20,6 @@ type (
 		Username string `json:"username" validate:"required"` // 必填
 	}
 	ForgotPasswordResp {
-		Status  int    `json:"status"` // 状态码（0 成功，1 失败）
 		Message string `json:"message"` // 返回提示
 	}
 	// 注册管理员接口
@@ -92,11 +91,13 @@ type (
 		Username string `json:"username"`
 		Password string `json:"password"`
 		Nickname string `json:"nickname"`
+		Email    string `json:"email"`
 		Phone    string `json:"phone"`
 		IsActive bool   `json:"is_active"`
 		IsSuper  bool   `json:"is_super"`
 	}
 	CommonResp {
+		ID      int64  `json:"id"`
 		Message string `json:"message"`
 	}
 	// 获取管理员详情返回
@@ -133,7 +134,7 @@ service cms-api {
 
 	// 管理员重置其他管理员的密码
 	@handler resetAdminPassword
-	put /admin/admin-users/:id/reset-password (ResetAdminPasswordReq) returns (CommonResp)
+	put /admin/admin-users/reset-password (ResetAdminPasswordReq) returns (CommonResp)
 
 	@handler adminCreate
 	post /admin/admin-users/create (CreateAdminReq) returns (CommonResp)

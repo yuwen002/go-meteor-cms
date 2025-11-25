@@ -50,6 +50,7 @@ type ChangeMyPasswordReq struct {
 }
 
 type CommonResp struct {
+	ID      int64  `json:"id"`
 	Message string `json:"message"`
 }
 
@@ -57,6 +58,7 @@ type CreateAdminReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	IsActive bool   `json:"is_active"`
 	IsSuper  bool   `json:"is_super"`
@@ -67,7 +69,6 @@ type ForgotPasswordReq struct {
 }
 
 type ForgotPasswordResp struct {
-	Status  int    `json:"status"`  // 状态码（0 成功，1 失败）
 	Message string `json:"message"` // 返回提示
 }
 

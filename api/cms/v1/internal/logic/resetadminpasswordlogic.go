@@ -9,6 +9,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -30,7 +31,7 @@ func NewResetAdminPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 
 func (l *ResetAdminPasswordLogic) ResetAdminPassword(req *types.ResetAdminPasswordReq) (resp *types.CommonResp, err error) {
 	// 获取当前登录用户信息
-	claims, ok := l.ctx.Value("user").(map[string]interface{})
+	claims, ok := l.ctx.Value(utils.UserKey).(map[string]interface{})
 	if !ok {
 		return nil, common.NewBizError(common.ErrUnauthorized)
 	}
