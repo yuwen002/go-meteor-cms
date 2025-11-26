@@ -100,9 +100,12 @@ type (
 		ID      int64  `json:"id"`
 		Message string `json:"message"`
 	}
+	AdminDetailReq {
+		ID int64 `path:"id"`
+	}
 	// 获取管理员详情返回
 	AdminDetailResp {
-		Id       int64  `json:"id"`
+		ID       int64  `json:"id"`
 		Username string `json:"username"`
 		Nickname string `json:"nickname"`
 		Email    string `json:"email"`
@@ -140,7 +143,7 @@ service cms-api {
 	post /admin/admin-users/create (CreateAdminReq) returns (CommonResp)
 
 	@handler adminDetail
-	get /admin/admin-users/:id returns (AdminDetailResp)
+	get /admin/admin-users/:id (AdminDetailReq) returns (AdminDetailResp)
 
 	@handler adminUpdate
 	put /admin/admin-users/:id (UpdateAdminReq) returns (CommonResp)

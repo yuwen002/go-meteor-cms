@@ -5,7 +5,6 @@ package logic
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
@@ -29,11 +28,8 @@ func NewAdminDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Admin
 	}
 }
 
-func (l *AdminDetailLogic) AdminDetail() (resp *types.AdminDetailResp, err error) {
-	id := l.ctx.Value("id").(int64)
-	fmt.Println("id:", id)
-
-	admin, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, id)
+func (l *AdminDetailLogic) AdminDetail(req *types.AdminDetailReq) (resp *types.AdminDetailResp, err error) {
+	admin, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, req.ID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, common.NewBizError(common.ErrAdminUserNotFound)
@@ -43,7 +39,7 @@ func (l *AdminDetailLogic) AdminDetail() (resp *types.AdminDetailResp, err error
 	}
 
 	return &types.AdminDetailResp{
-		Id:       admin.ID,
+		ID:       admin.ID,
 		Username: admin.Username,
 		Nickname: admin.Nickname,
 		Email:    admin.Email,

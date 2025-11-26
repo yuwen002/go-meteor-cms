@@ -3,8 +3,12 @@
 
 package types
 
+type AdminDetailReq struct {
+	ID int64 `path:"id"`
+}
+
 type AdminDetailResp struct {
-	Id       int64  `json:"id"`
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
