@@ -27,7 +27,7 @@ func NewAdminUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Admin
 }
 
 func (l *AdminUpdateLogic) AdminUpdate(req *types.UpdateAdminReq) (resp *types.CommonResp, err error) {
-	id := l.ctx.Value("id").(int64)
+	id := req.ID
 
 	_, err = l.svcCtx.EntClient.AdminUser.UpdateOneID(id).
 		SetNickname(req.Nickname).
@@ -41,6 +41,7 @@ func (l *AdminUpdateLogic) AdminUpdate(req *types.UpdateAdminReq) (resp *types.C
 	}
 
 	return &types.CommonResp{
+		ID:      id,
 		Message: "更新成功",
 	}, nil
 }

@@ -114,6 +114,7 @@ type (
 	}
 	// 更新管理员资料请求
 	UpdateAdminReq {
+		ID       int64  `path:"id"`
 		Nickname string `json:"nickname,optional"`
 		Email    string `json:"email,optional"`
 		Phone    string `json:"phone,optional"`
