@@ -5,6 +5,7 @@ package logic
 
 import (
 	"context"
+	"time"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
@@ -40,7 +41,9 @@ func (l *AdminDeleteLogic) AdminDelete(req *types.DeleteAdminReq) (resp *types.C
 	}
 
 	// 执行软删除：更新 deleted_at 字段
-	err = l.svcCtx.EntClient.AdminUser.DeleteOneID(req.Id).Exec(l.ctx)
+	_, err = l.svcCtx.EntClient.AdminUser.UpdateOneID(req.Id).
+		SetDeletedAt(time.Now()).
+		Save(l.ctx)
 
 	if err != nil {
 		l.Logger.Errorf("删除管理员失败: %v", err)
