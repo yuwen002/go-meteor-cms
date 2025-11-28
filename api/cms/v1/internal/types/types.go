@@ -68,6 +68,10 @@ type CreateAdminReq struct {
 	IsSuper  bool   `json:"is_super"`
 }
 
+type DeleteAdminReq struct {
+	Id int64 `path:"id"`
+}
+
 type ForgotPasswordReq struct {
 	Username string `json:"username" validate:"required"` // 必填
 }

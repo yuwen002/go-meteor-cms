@@ -1,4 +1,4 @@
-package softdelete
+package schema
 
 import (
 	"time"

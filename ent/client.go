@@ -778,12 +778,14 @@ func (c *AdminUserClient) GetX(ctx context.Context, id int64) *AdminUser {
 
 // Hooks returns the client hooks.
 func (c *AdminUserClient) Hooks() []Hook {
-	return c.hooks.AdminUser
+	hooks := c.hooks.AdminUser
+	return append(hooks[:len(hooks):len(hooks)], adminuser.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *AdminUserClient) Interceptors() []Interceptor {
-	return c.inters.AdminUser
+	inters := c.inters.AdminUser
+	return append(inters[:len(inters):len(inters)], adminuser.Interceptors[:]...)
 }
 
 func (c *AdminUserClient) mutate(ctx context.Context, m *AdminUserMutation) (Value, error) {

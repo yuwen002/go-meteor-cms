@@ -82,6 +82,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
 		{Name: "username", Type: field.TypeString, Unique: true, Comment: "用户名"},
 		{Name: "password_hash", Type: field.TypeString, Comment: "密码哈希值"},
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Comment: "昵称"},

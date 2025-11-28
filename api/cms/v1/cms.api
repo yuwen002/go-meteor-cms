@@ -120,6 +120,9 @@ type (
 		Phone    string `json:"phone,optional"`
 		IsActive bool   `json:"is_active,optional"`
 	}
+	DeleteAdminReq {
+		Id int64 `path:"id"`
+	}
 )
 
 @server (
@@ -148,5 +151,8 @@ service cms-api {
 
 	@handler adminUpdate
 	put /admin/admin-users/:id (UpdateAdminReq) returns (CommonResp)
+
+	@handler adminDelete
+	delete /admin/admin-users/:id (DeleteAdminReq) returns (CommonResp)
 }
 

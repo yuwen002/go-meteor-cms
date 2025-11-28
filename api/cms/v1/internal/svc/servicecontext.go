@@ -8,6 +8,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/config"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/middleware"
 	"github.com/yuwen002/go-meteor-cms/ent"
+	_ "github.com/yuwen002/go-meteor-cms/ent/runtime"
 	"github.com/zeromicro/go-zero/rest"
 )
 

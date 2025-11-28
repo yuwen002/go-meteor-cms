@@ -36,7 +36,7 @@ func (AdminPermission) Fields() []ent.Field {
 			Unique().
 			Immutable().
 			Comment("主键ID"),
-			
+
 		field.String("name").
 			NotEmpty().
 			Comment("权限名称，如 用户管理 / 新增用户"),

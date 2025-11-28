@@ -8,6 +8,8 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,7 +29,26 @@ func NewAdminDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Admin
 }
 
 func (l *AdminDeleteLogic) AdminDelete(req *types.DeleteAdminReq) (resp *types.CommonResp, err error) {
-	// todo: add your logic here and delete this line
+	// 检查用户是否存在
+	_, err = l.svcCtx.EntClient.AdminUser.Get(l.ctx, req.Id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, common.NewBizError(common.ErrAdminUserNotFound)
+		}
+		l.Logger.Errorf("查询管理员失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
 
-	return
+	// 执行软删除：更新 deleted_at 字段
+	err = l.svcCtx.EntClient.AdminUser.DeleteOneID(req.Id).Exec(l.ctx)
+
+	if err != nil {
+		l.Logger.Errorf("删除管理员失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	return &types.CommonResp{
+		ID:      req.Id,
+		Message: "删除成功",
+	}, nil
 }
