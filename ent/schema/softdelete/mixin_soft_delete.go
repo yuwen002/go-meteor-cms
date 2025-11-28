@@ -1,4 +1,4 @@
-package schema
+package softdelete
 
 import (
 	"context"
@@ -9,10 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
-	"github.com/yuwen002/go-meteor-cms/ent/hook"
-	"github.com/yuwen002/go-meteor-cms/ent/intercept"
-)
-Z	gen "github.com/yuwen002/go-meteor-cms/ent"
+	gen "github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/hook"
 	"github.com/yuwen002/go-meteor-cms/ent/intercept"
 )
@@ -25,8 +22,10 @@ type SoftDeleteMixin struct {
 // Fields of the SoftDeleteMixin.
 func (SoftDeleteMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("delete_time").
-			Optional(),
+		field.Time("deleted_at").
+			Optional().
+			Nillable().
+			Comment("删除时间，用于软删除"),
 	}
 }
 

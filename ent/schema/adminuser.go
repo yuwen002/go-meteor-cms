@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
+	"github.com/yuwen002/go-meteor-cms/ent/schema/softdelete"
 )
 
 // AdminUser holds the schema definition for the AdminUser entity.
@@ -23,7 +24,7 @@ func (AdminUser) Annotations() []schema.Annotation {
 func (AdminUser) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		BaseMixin{}, // created_at / updated_at / deleted_at
-		SoftDeleteMixin{},
+		softdelete.SoftDeleteMixin{},
 	}
 }
 
