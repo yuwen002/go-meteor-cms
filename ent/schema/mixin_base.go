@@ -1,4 +1,4 @@
-package schema
+package softdelete
 
 import (
 	"time"
@@ -23,11 +23,6 @@ func (BaseMixin) Fields() []ent.Field {
 			Default(time.Now).
 			UpdateDefault(time.Now).
 			Comment("更新时间"),
-
-		field.Time("deleted_at").
-			Optional().
-			Nillable().
-			Comment("删除时间，用于软删除"),
 	}
 }
 

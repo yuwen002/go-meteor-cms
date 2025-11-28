@@ -48,26 +48,6 @@ func (_u *AdminRolePermissionUpdate) SetUpdatedAt(v time.Time) *AdminRolePermiss
 	return _u
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *AdminRolePermissionUpdate) SetDeletedAt(v time.Time) *AdminRolePermissionUpdate {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *AdminRolePermissionUpdate) SetNillableDeletedAt(v *time.Time) *AdminRolePermissionUpdate {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *AdminRolePermissionUpdate) ClearDeletedAt() *AdminRolePermissionUpdate {
-	_u.mutation.ClearDeletedAt()
-	return _u
-}
-
 // SetRoleID sets the "role_id" field.
 func (_u *AdminRolePermissionUpdate) SetRoleID(v int64) *AdminRolePermissionUpdate {
 	_u.mutation.ResetRoleID()
@@ -205,12 +185,6 @@ func (_u *AdminRolePermissionUpdate) sqlSave(ctx context.Context) (_node int, er
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrolepermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(adminrolepermission.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(adminrolepermission.FieldDeletedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.RoleID(); ok {
 		_spec.SetField(adminrolepermission.FieldRoleID, field.TypeInt64, value)
 	}
@@ -266,26 +240,6 @@ func (_u *AdminRolePermissionUpdateOne) SetNillableCreatedAt(v *time.Time) *Admi
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *AdminRolePermissionUpdateOne) SetUpdatedAt(v time.Time) *AdminRolePermissionUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *AdminRolePermissionUpdateOne) SetDeletedAt(v time.Time) *AdminRolePermissionUpdateOne {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *AdminRolePermissionUpdateOne) SetNillableDeletedAt(v *time.Time) *AdminRolePermissionUpdateOne {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *AdminRolePermissionUpdateOne) ClearDeletedAt() *AdminRolePermissionUpdateOne {
-	_u.mutation.ClearDeletedAt()
 	return _u
 }
 
@@ -455,12 +409,6 @@ func (_u *AdminRolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *Adm
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrolepermission.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(adminrolepermission.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(adminrolepermission.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.RoleID(); ok {
 		_spec.SetField(adminrolepermission.FieldRoleID, field.TypeInt64, value)

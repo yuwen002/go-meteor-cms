@@ -48,20 +48,6 @@ func (_c *AdminPermissionCreate) SetNillableUpdatedAt(v *time.Time) *AdminPermis
 	return _c
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_c *AdminPermissionCreate) SetDeletedAt(v time.Time) *AdminPermissionCreate {
-	_c.mutation.SetDeletedAt(v)
-	return _c
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_c *AdminPermissionCreate) SetNillableDeletedAt(v *time.Time) *AdminPermissionCreate {
-	if v != nil {
-		_c.SetDeletedAt(*v)
-	}
-	return _c
-}
-
 // SetName sets the "name" field.
 func (_c *AdminPermissionCreate) SetName(v string) *AdminPermissionCreate {
 	_c.mutation.SetName(v)
@@ -397,10 +383,6 @@ func (_c *AdminPermissionCreate) createSpec() (*AdminPermission, *sqlgraph.Creat
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminpermission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := _c.mutation.DeletedAt(); ok {
-		_spec.SetField(adminpermission.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(adminpermission.FieldName, field.TypeString, value)

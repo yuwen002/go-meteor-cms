@@ -48,26 +48,6 @@ func (_u *AdminPermissionUpdate) SetUpdatedAt(v time.Time) *AdminPermissionUpdat
 	return _u
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *AdminPermissionUpdate) SetDeletedAt(v time.Time) *AdminPermissionUpdate {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *AdminPermissionUpdate) SetNillableDeletedAt(v *time.Time) *AdminPermissionUpdate {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *AdminPermissionUpdate) ClearDeletedAt() *AdminPermissionUpdate {
-	_u.mutation.ClearDeletedAt()
-	return _u
-}
-
 // SetName sets the "name" field.
 func (_u *AdminPermissionUpdate) SetName(v string) *AdminPermissionUpdate {
 	_u.mutation.SetName(v)
@@ -358,12 +338,6 @@ func (_u *AdminPermissionUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminpermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(adminpermission.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(adminpermission.FieldDeletedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(adminpermission.FieldName, field.TypeString, value)
 	}
@@ -511,26 +485,6 @@ func (_u *AdminPermissionUpdateOne) SetNillableCreatedAt(v *time.Time) *AdminPer
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *AdminPermissionUpdateOne) SetUpdatedAt(v time.Time) *AdminPermissionUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *AdminPermissionUpdateOne) SetDeletedAt(v time.Time) *AdminPermissionUpdateOne {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *AdminPermissionUpdateOne) SetNillableDeletedAt(v *time.Time) *AdminPermissionUpdateOne {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *AdminPermissionUpdateOne) ClearDeletedAt() *AdminPermissionUpdateOne {
-	_u.mutation.ClearDeletedAt()
 	return _u
 }
 
@@ -853,12 +807,6 @@ func (_u *AdminPermissionUpdateOne) sqlSave(ctx context.Context) (_node *AdminPe
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminpermission.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(adminpermission.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(adminpermission.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(adminpermission.FieldName, field.TypeString, value)

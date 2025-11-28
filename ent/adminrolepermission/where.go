@@ -64,11 +64,6 @@ func UpdatedAt(v time.Time) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldEQ(FieldDeletedAt, v))
-}
-
 // RoleID applies equality check predicate on the "role_id" field. It's identical to RoleIDEQ.
 func RoleID(v int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldEQ(FieldRoleID, v))
@@ -162,56 +157,6 @@ func UpdatedAtLT(v time.Time) predicate.AdminRolePermission {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldEQ(FieldDeletedAt, v))
-}
-
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldNEQ(FieldDeletedAt, v))
-}
-
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldIn(FieldDeletedAt, vs...))
-}
-
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldNotIn(FieldDeletedAt, vs...))
-}
-
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGT(FieldDeletedAt, v))
-}
-
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGTE(FieldDeletedAt, v))
-}
-
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLT(FieldDeletedAt, v))
-}
-
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLTE(FieldDeletedAt, v))
-}
-
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldIsNull(FieldDeletedAt))
-}
-
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldNotNull(FieldDeletedAt))
 }
 
 // RoleIDEQ applies the EQ predicate on the "role_id" field.

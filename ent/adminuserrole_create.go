@@ -48,20 +48,6 @@ func (_c *AdminUserRoleCreate) SetNillableUpdatedAt(v *time.Time) *AdminUserRole
 	return _c
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_c *AdminUserRoleCreate) SetDeletedAt(v time.Time) *AdminUserRoleCreate {
-	_c.mutation.SetDeletedAt(v)
-	return _c
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_c *AdminUserRoleCreate) SetNillableDeletedAt(v *time.Time) *AdminUserRoleCreate {
-	if v != nil {
-		_c.SetDeletedAt(*v)
-	}
-	return _c
-}
-
 // SetUserID sets the "user_id" field.
 func (_c *AdminUserRoleCreate) SetUserID(v int64) *AdminUserRoleCreate {
 	_c.mutation.SetUserID(v)
@@ -197,10 +183,6 @@ func (_c *AdminUserRoleCreate) createSpec() (*AdminUserRole, *sqlgraph.CreateSpe
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminuserrole.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := _c.mutation.DeletedAt(); ok {
-		_spec.SetField(adminuserrole.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.UserID(); ok {
 		_spec.SetField(adminuserrole.FieldUserID, field.TypeInt64, value)

@@ -48,20 +48,6 @@ func (_c *AdminRolePermissionCreate) SetNillableUpdatedAt(v *time.Time) *AdminRo
 	return _c
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_c *AdminRolePermissionCreate) SetDeletedAt(v time.Time) *AdminRolePermissionCreate {
-	_c.mutation.SetDeletedAt(v)
-	return _c
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_c *AdminRolePermissionCreate) SetNillableDeletedAt(v *time.Time) *AdminRolePermissionCreate {
-	if v != nil {
-		_c.SetDeletedAt(*v)
-	}
-	return _c
-}
-
 // SetRoleID sets the "role_id" field.
 func (_c *AdminRolePermissionCreate) SetRoleID(v int64) *AdminRolePermissionCreate {
 	_c.mutation.SetRoleID(v)
@@ -197,10 +183,6 @@ func (_c *AdminRolePermissionCreate) createSpec() (*AdminRolePermission, *sqlgra
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrolepermission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := _c.mutation.DeletedAt(); ok {
-		_spec.SetField(adminrolepermission.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.RoleID(); ok {
 		_spec.SetField(adminrolepermission.FieldRoleID, field.TypeInt64, value)

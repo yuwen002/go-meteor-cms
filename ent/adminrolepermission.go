@@ -21,8 +21,6 @@ type AdminRolePermission struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 删除时间，用于软删除
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// 角色ID，关联 admin_roles.id
 	RoleID int64 `json:"role_id,omitempty"`
 	// 权限ID，关联 admin_permissions.id
@@ -39,7 +37,7 @@ func (*AdminRolePermission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case adminrolepermission.FieldID, adminrolepermission.FieldRoleID, adminrolepermission.FieldPermissionID, adminrolepermission.FieldDummy:
 			values[i] = new(sql.NullInt64)
-		case adminrolepermission.FieldCreatedAt, adminrolepermission.FieldUpdatedAt, adminrolepermission.FieldDeletedAt:
+		case adminrolepermission.FieldCreatedAt, adminrolepermission.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -73,13 +71,6 @@ func (_m *AdminRolePermission) assignValues(columns []string, values []any) erro
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
-			}
-		case adminrolepermission.FieldDeletedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
-			} else if value.Valid {
-				_m.DeletedAt = new(time.Time)
-				*_m.DeletedAt = value.Time
 			}
 		case adminrolepermission.FieldRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -140,11 +131,6 @@ func (_m *AdminRolePermission) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	if v := _m.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.RoleID))

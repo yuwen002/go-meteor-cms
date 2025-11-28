@@ -43,7 +43,6 @@ type AdminPermissionMutation struct {
 	id              *int64
 	created_at      *time.Time
 	updated_at      *time.Time
-	deleted_at      *time.Time
 	name            *string
 	_type           *int
 	add_type        *int
@@ -241,55 +240,6 @@ func (m *AdminPermissionMutation) OldUpdatedAt(ctx context.Context) (v time.Time
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *AdminPermissionMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *AdminPermissionMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *AdminPermissionMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the AdminPermission entity.
-// If the AdminPermission object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AdminPermissionMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *AdminPermissionMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[adminpermission.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *AdminPermissionMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[adminpermission.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *AdminPermissionMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, adminpermission.FieldDeletedAt)
 }
 
 // SetName sets the "name" field.
@@ -856,15 +806,12 @@ func (m *AdminPermissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminPermissionMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, adminpermission.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, adminpermission.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, adminpermission.FieldDeletedAt)
 	}
 	if m.name != nil {
 		fields = append(fields, adminpermission.FieldName)
@@ -911,8 +858,6 @@ func (m *AdminPermissionMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case adminpermission.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case adminpermission.FieldDeletedAt:
-		return m.DeletedAt()
 	case adminpermission.FieldName:
 		return m.Name()
 	case adminpermission.FieldParentID:
@@ -948,8 +893,6 @@ func (m *AdminPermissionMutation) OldField(ctx context.Context, name string) (en
 		return m.OldCreatedAt(ctx)
 	case adminpermission.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case adminpermission.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case adminpermission.FieldName:
 		return m.OldName(ctx)
 	case adminpermission.FieldParentID:
@@ -994,13 +937,6 @@ func (m *AdminPermissionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case adminpermission.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case adminpermission.FieldName:
 		v, ok := value.(string)
@@ -1136,9 +1072,6 @@ func (m *AdminPermissionMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *AdminPermissionMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(adminpermission.FieldDeletedAt) {
-		fields = append(fields, adminpermission.FieldDeletedAt)
-	}
 	if m.FieldCleared(adminpermission.FieldParentID) {
 		fields = append(fields, adminpermission.FieldParentID)
 	}
@@ -1156,9 +1089,6 @@ func (m *AdminPermissionMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *AdminPermissionMutation) ClearField(name string) error {
 	switch name {
-	case adminpermission.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
 	case adminpermission.FieldParentID:
 		m.ClearParentID()
 		return nil
@@ -1175,9 +1105,6 @@ func (m *AdminPermissionMutation) ResetField(name string) error {
 		return nil
 	case adminpermission.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case adminpermission.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case adminpermission.FieldName:
 		m.ResetName()
@@ -1326,7 +1253,6 @@ type AdminRoleMutation struct {
 	id            *int64
 	created_at    *time.Time
 	updated_at    *time.Time
-	deleted_at    *time.Time
 	name          *string
 	code          *string
 	desc          *string
@@ -1516,55 +1442,6 @@ func (m *AdminRoleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *AdminRoleMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *AdminRoleMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *AdminRoleMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the AdminRole entity.
-// If the AdminRole object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AdminRoleMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *AdminRoleMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[adminrole.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *AdminRoleMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[adminrole.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *AdminRoleMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, adminrole.FieldDeletedAt)
 }
 
 // SetName sets the "name" field.
@@ -1906,15 +1783,12 @@ func (m *AdminRoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminRoleMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, adminrole.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, adminrole.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, adminrole.FieldDeletedAt)
 	}
 	if m.name != nil {
 		fields = append(fields, adminrole.FieldName)
@@ -1949,8 +1823,6 @@ func (m *AdminRoleMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case adminrole.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case adminrole.FieldDeletedAt:
-		return m.DeletedAt()
 	case adminrole.FieldName:
 		return m.Name()
 	case adminrole.FieldCode:
@@ -1978,8 +1850,6 @@ func (m *AdminRoleMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldCreatedAt(ctx)
 	case adminrole.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case adminrole.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case adminrole.FieldName:
 		return m.OldName(ctx)
 	case adminrole.FieldCode:
@@ -2016,13 +1886,6 @@ func (m *AdminRoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case adminrole.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case adminrole.FieldName:
 		v, ok := value.(string)
@@ -2130,9 +1993,6 @@ func (m *AdminRoleMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *AdminRoleMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(adminrole.FieldDeletedAt) {
-		fields = append(fields, adminrole.FieldDeletedAt)
-	}
 	if m.FieldCleared(adminrole.FieldDesc) {
 		fields = append(fields, adminrole.FieldDesc)
 	}
@@ -2150,9 +2010,6 @@ func (m *AdminRoleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *AdminRoleMutation) ClearField(name string) error {
 	switch name {
-	case adminrole.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
 	case adminrole.FieldDesc:
 		m.ClearDesc()
 		return nil
@@ -2169,9 +2026,6 @@ func (m *AdminRoleMutation) ResetField(name string) error {
 		return nil
 	case adminrole.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case adminrole.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case adminrole.FieldName:
 		m.ResetName()
@@ -2254,7 +2108,6 @@ type AdminRolePermissionMutation struct {
 	id               *int
 	created_at       *time.Time
 	updated_at       *time.Time
-	deleted_at       *time.Time
 	role_id          *int64
 	addrole_id       *int64
 	permission_id    *int64
@@ -2435,55 +2288,6 @@ func (m *AdminRolePermissionMutation) OldUpdatedAt(ctx context.Context) (v time.
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *AdminRolePermissionMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *AdminRolePermissionMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *AdminRolePermissionMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the AdminRolePermission entity.
-// If the AdminRolePermission object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AdminRolePermissionMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *AdminRolePermissionMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[adminrolepermission.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *AdminRolePermissionMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[adminrolepermission.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *AdminRolePermissionMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, adminrolepermission.FieldDeletedAt)
 }
 
 // SetRoleID sets the "role_id" field.
@@ -2688,15 +2492,12 @@ func (m *AdminRolePermissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminRolePermissionMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, adminrolepermission.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, adminrolepermission.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, adminrolepermission.FieldDeletedAt)
 	}
 	if m.role_id != nil {
 		fields = append(fields, adminrolepermission.FieldRoleID)
@@ -2719,8 +2520,6 @@ func (m *AdminRolePermissionMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case adminrolepermission.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case adminrolepermission.FieldDeletedAt:
-		return m.DeletedAt()
 	case adminrolepermission.FieldRoleID:
 		return m.RoleID()
 	case adminrolepermission.FieldPermissionID:
@@ -2740,8 +2539,6 @@ func (m *AdminRolePermissionMutation) OldField(ctx context.Context, name string)
 		return m.OldCreatedAt(ctx)
 	case adminrolepermission.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case adminrolepermission.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case adminrolepermission.FieldRoleID:
 		return m.OldRoleID(ctx)
 	case adminrolepermission.FieldPermissionID:
@@ -2770,13 +2567,6 @@ func (m *AdminRolePermissionMutation) SetField(name string, value ent.Value) err
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case adminrolepermission.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case adminrolepermission.FieldRoleID:
 		v, ok := value.(int64)
@@ -2867,11 +2657,7 @@ func (m *AdminRolePermissionMutation) AddField(name string, value ent.Value) err
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AdminRolePermissionMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(adminrolepermission.FieldDeletedAt) {
-		fields = append(fields, adminrolepermission.FieldDeletedAt)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2884,11 +2670,6 @@ func (m *AdminRolePermissionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AdminRolePermissionMutation) ClearField(name string) error {
-	switch name {
-	case adminrolepermission.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
-	}
 	return fmt.Errorf("unknown AdminRolePermission nullable field %s", name)
 }
 
@@ -2901,9 +2682,6 @@ func (m *AdminRolePermissionMutation) ResetField(name string) error {
 		return nil
 	case adminrolepermission.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case adminrolepermission.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case adminrolepermission.FieldRoleID:
 		m.ResetRoleID()
@@ -2974,7 +2752,6 @@ type AdminUserMutation struct {
 	id            *int64
 	created_at    *time.Time
 	updated_at    *time.Time
-	deleted_at    *time.Time
 	username      *string
 	password_hash *string
 	nickname      *string
@@ -3166,55 +2943,6 @@ func (m *AdminUserMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *AdminUserMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *AdminUserMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *AdminUserMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the AdminUser entity.
-// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AdminUserMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *AdminUserMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[adminuser.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *AdminUserMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[adminuser.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *AdminUserMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, adminuser.FieldDeletedAt)
 }
 
 // SetUsername sets the "username" field.
@@ -3725,15 +3453,12 @@ func (m *AdminUserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminUserMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, adminuser.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, adminuser.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, adminuser.FieldDeletedAt)
 	}
 	if m.username != nil {
 		fields = append(fields, adminuser.FieldUsername)
@@ -3780,8 +3505,6 @@ func (m *AdminUserMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case adminuser.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case adminuser.FieldDeletedAt:
-		return m.DeletedAt()
 	case adminuser.FieldUsername:
 		return m.Username()
 	case adminuser.FieldPasswordHash:
@@ -3817,8 +3540,6 @@ func (m *AdminUserMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldCreatedAt(ctx)
 	case adminuser.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case adminuser.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case adminuser.FieldUsername:
 		return m.OldUsername(ctx)
 	case adminuser.FieldPasswordHash:
@@ -3863,13 +3584,6 @@ func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case adminuser.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case adminuser.FieldUsername:
 		v, ok := value.(string)
@@ -3978,9 +3692,6 @@ func (m *AdminUserMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *AdminUserMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(adminuser.FieldDeletedAt) {
-		fields = append(fields, adminuser.FieldDeletedAt)
-	}
 	if m.FieldCleared(adminuser.FieldNickname) {
 		fields = append(fields, adminuser.FieldNickname)
 	}
@@ -4013,9 +3724,6 @@ func (m *AdminUserMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *AdminUserMutation) ClearField(name string) error {
 	switch name {
-	case adminuser.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
 	case adminuser.FieldNickname:
 		m.ClearNickname()
 		return nil
@@ -4047,9 +3755,6 @@ func (m *AdminUserMutation) ResetField(name string) error {
 		return nil
 	case adminuser.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case adminuser.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case adminuser.FieldUsername:
 		m.ResetUsername()
@@ -4144,7 +3849,6 @@ type AdminUserRoleMutation struct {
 	id            *int
 	created_at    *time.Time
 	updated_at    *time.Time
-	deleted_at    *time.Time
 	user_id       *int64
 	adduser_id    *int64
 	role_id       *int64
@@ -4325,55 +4029,6 @@ func (m *AdminUserRoleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *AdminUserRoleMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *AdminUserRoleMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *AdminUserRoleMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the AdminUserRole entity.
-// If the AdminUserRole object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AdminUserRoleMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *AdminUserRoleMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[adminuserrole.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *AdminUserRoleMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[adminuserrole.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *AdminUserRoleMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, adminuserrole.FieldDeletedAt)
 }
 
 // SetUserID sets the "user_id" field.
@@ -4578,15 +4233,12 @@ func (m *AdminUserRoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminUserRoleMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, adminuserrole.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, adminuserrole.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, adminuserrole.FieldDeletedAt)
 	}
 	if m.user_id != nil {
 		fields = append(fields, adminuserrole.FieldUserID)
@@ -4609,8 +4261,6 @@ func (m *AdminUserRoleMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case adminuserrole.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case adminuserrole.FieldDeletedAt:
-		return m.DeletedAt()
 	case adminuserrole.FieldUserID:
 		return m.UserID()
 	case adminuserrole.FieldRoleID:
@@ -4630,8 +4280,6 @@ func (m *AdminUserRoleMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldCreatedAt(ctx)
 	case adminuserrole.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case adminuserrole.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case adminuserrole.FieldUserID:
 		return m.OldUserID(ctx)
 	case adminuserrole.FieldRoleID:
@@ -4660,13 +4308,6 @@ func (m *AdminUserRoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case adminuserrole.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case adminuserrole.FieldUserID:
 		v, ok := value.(int64)
@@ -4757,11 +4398,7 @@ func (m *AdminUserRoleMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AdminUserRoleMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(adminuserrole.FieldDeletedAt) {
-		fields = append(fields, adminuserrole.FieldDeletedAt)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -4774,11 +4411,6 @@ func (m *AdminUserRoleMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AdminUserRoleMutation) ClearField(name string) error {
-	switch name {
-	case adminuserrole.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
-	}
 	return fmt.Errorf("unknown AdminUserRole nullable field %s", name)
 }
 
@@ -4791,9 +4423,6 @@ func (m *AdminUserRoleMutation) ResetField(name string) error {
 		return nil
 	case adminuserrole.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case adminuserrole.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case adminuserrole.FieldUserID:
 		m.ResetUserID()

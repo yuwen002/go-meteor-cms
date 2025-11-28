@@ -23,6 +23,7 @@ func (AdminUser) Annotations() []schema.Annotation {
 func (AdminUser) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		BaseMixin{}, // created_at / updated_at / deleted_at
+		//softdelete.SoftDeleteMixin{},
 	}
 }
 
