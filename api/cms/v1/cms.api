@@ -1,4 +1,12 @@
 type (
+	// 禁用管理员请求
+	DisableAdminReq {
+		ID int64 `path:"id"`
+	}
+	// 启用管理员请求
+	EnableAdminReq {
+		ID int64 `path:"id"`
+	}
 	// 获取验证码响应
 	CaptchaResp {
 		CaptchaID     string `json:"captcha_id"` // 验证码ID
@@ -154,5 +162,11 @@ service cms-api {
 
 	@handler adminDelete
 	delete /admin/admin-users/:id (DeleteAdminReq) returns (CommonResp)
+
+	@handler disableAdmin
+	put /admin/admin-users/:id/disable (DisableAdminReq) returns (CommonResp)
+
+	@handler enableAdmin
+	put /admin/admin-users/:id/enable (EnableAdminReq) returns (CommonResp)
 }
 

@@ -62,6 +62,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: adminDeleteHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/:id/disable",
+					Handler: disableAdminHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/:id/enable",
+					Handler: enableAdminHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPost,
 					Path:    "/admin/admin-users/create",
 					Handler: adminCreateHandler(serverCtx),

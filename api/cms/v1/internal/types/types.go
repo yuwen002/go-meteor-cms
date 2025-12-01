@@ -72,6 +72,14 @@ type DeleteAdminReq struct {
 	Id int64 `path:"id"`
 }
 
+type DisableAdminReq struct {
+	ID int64 `path:"id"`
+}
+
+type EnableAdminReq struct {
+	ID int64 `path:"id"`
+}
+
 type ForgotPasswordReq struct {
 	Username string `json:"username" validate:"required"` // 必填
 }
