@@ -14,6 +14,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
+	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
 // The Query interface represents an operation that queries a graph.
@@ -207,6 +208,33 @@ func (f TraverseAdminUserRole) Traverse(ctx context.Context, q ent.Query) error 
 	return fmt.Errorf("unexpected query type %T. expect *ent.AdminUserRoleQuery", q)
 }
 
+// The TokenBlacklistFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f TokenBlacklistFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TokenBlacklistQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TokenBlacklistQuery", q)
+}
+
+// The TraverseTokenBlacklist type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTokenBlacklist func(context.Context, *ent.TokenBlacklistQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseTokenBlacklist) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseTokenBlacklist) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TokenBlacklistQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.TokenBlacklistQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
@@ -220,6 +248,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AdminUserQuery, predicate.AdminUser, adminuser.OrderOption]{typ: ent.TypeAdminUser, tq: q}, nil
 	case *ent.AdminUserRoleQuery:
 		return &query[*ent.AdminUserRoleQuery, predicate.AdminUserRole, adminuserrole.OrderOption]{typ: ent.TypeAdminUserRole, tq: q}, nil
+	case *ent.TokenBlacklistQuery:
+		return &query[*ent.TokenBlacklistQuery, predicate.TokenBlacklist, tokenblacklist.OrderOption]{typ: ent.TypeTokenBlacklist, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/schema"
+	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -216,6 +217,29 @@ func init() {
 	adminuserroleDescDummy := adminuserroleFields[2].Descriptor()
 	// adminuserrole.DefaultDummy holds the default value on creation for the dummy field.
 	adminuserrole.DefaultDummy = adminuserroleDescDummy.Default.(uint8)
+	tokenblacklistMixin := schema.TokenBlacklist{}.Mixin()
+	tokenblacklistMixinFields0 := tokenblacklistMixin[0].Fields()
+	_ = tokenblacklistMixinFields0
+	tokenblacklistFields := schema.TokenBlacklist{}.Fields()
+	_ = tokenblacklistFields
+	// tokenblacklistDescCreatedAt is the schema descriptor for created_at field.
+	tokenblacklistDescCreatedAt := tokenblacklistMixinFields0[0].Descriptor()
+	// tokenblacklist.DefaultCreatedAt holds the default value on creation for the created_at field.
+	tokenblacklist.DefaultCreatedAt = tokenblacklistDescCreatedAt.Default.(func() time.Time)
+	// tokenblacklistDescUpdatedAt is the schema descriptor for updated_at field.
+	tokenblacklistDescUpdatedAt := tokenblacklistMixinFields0[1].Descriptor()
+	// tokenblacklist.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	tokenblacklist.DefaultUpdatedAt = tokenblacklistDescUpdatedAt.Default.(func() time.Time)
+	// tokenblacklist.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	tokenblacklist.UpdateDefaultUpdatedAt = tokenblacklistDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tokenblacklistDescToken is the schema descriptor for token field.
+	tokenblacklistDescToken := tokenblacklistFields[1].Descriptor()
+	// tokenblacklist.TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	tokenblacklist.TokenValidator = tokenblacklistDescToken.Validators[0].(func(string) error)
+	// tokenblacklistDescID is the schema descriptor for id field.
+	tokenblacklistDescID := tokenblacklistFields[0].Descriptor()
+	// tokenblacklist.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	tokenblacklist.IDValidator = tokenblacklistDescID.Validators[0].(func(int64) error)
 }
 
 const (

@@ -20,3 +20,6 @@ type AdminUser func(*sql.Selector)
 
 // AdminUserRole is the predicate function for adminuserrole builders.
 type AdminUserRole func(*sql.Selector)
+
+// TokenBlacklist is the predicate function for tokenblacklist builders.
+type TokenBlacklist func(*sql.Selector)

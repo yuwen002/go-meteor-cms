@@ -87,6 +87,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: resetAdminPasswordHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodPost,
+					Path:    "/admin/logout",
+					Handler: adminLogoutHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodGet,
 					Path:    "/admin/test-token",
 					Handler: testTokenHandler(serverCtx),

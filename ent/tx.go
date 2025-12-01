@@ -22,6 +22,8 @@ type Tx struct {
 	AdminUser *AdminUserClient
 	// AdminUserRole is the client for interacting with the AdminUserRole builders.
 	AdminUserRole *AdminUserRoleClient
+	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
+	TokenBlacklist *TokenBlacklistClient
 
 	// lazily loaded.
 	client     *Client
@@ -158,6 +160,7 @@ func (tx *Tx) init() {
 	tx.AdminRolePermission = NewAdminRolePermissionClient(tx.config)
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.AdminUserRole = NewAdminUserRoleClient(tx.config)
+	tx.TokenBlacklist = NewTokenBlacklistClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

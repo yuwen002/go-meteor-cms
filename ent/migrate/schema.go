@@ -118,6 +118,33 @@ var (
 		Columns:    AdminUserRolesColumns,
 		PrimaryKey: []*schema.Column{AdminUserRolesColumns[0]},
 	}
+	// TokenBlacklistsColumns holds the columns for the "token_blacklists" table.
+	TokenBlacklistsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "token", Type: field.TypeString, Comment: "被加入黑名单的完整 JWT token 字符串"},
+		{Name: "expired_at", Type: field.TypeTime, Comment: "该 token 原本的过期时间，用于定时清理黑名单（过期后可删除）"},
+	}
+	// TokenBlacklistsTable holds the schema information for the "token_blacklists" table.
+	TokenBlacklistsTable = &schema.Table{
+		Name:       "token_blacklists",
+		Comment:    "JWT Token 黑名单表，用于存储已注销或失效的 JWT token",
+		Columns:    TokenBlacklistsColumns,
+		PrimaryKey: []*schema.Column{TokenBlacklistsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tokenblacklist_token",
+				Unique:  true,
+				Columns: []*schema.Column{TokenBlacklistsColumns[3]},
+			},
+			{
+				Name:    "tokenblacklist_expired_at",
+				Unique:  false,
+				Columns: []*schema.Column{TokenBlacklistsColumns[4]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminPermissionsTable,
@@ -125,6 +152,7 @@ var (
 		AdminRolePermissionsTable,
 		AdminUsersTable,
 		AdminUserRolesTable,
+		TokenBlacklistsTable,
 	}
 )
 

@@ -17,6 +17,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -82,6 +83,7 @@ func checkColumn(t, c string) error {
 			adminrolepermission.Table: adminrolepermission.ValidColumn,
 			adminuser.Table:           adminuser.ValidColumn,
 			adminuserrole.Table:       adminuserrole.ValidColumn,
+			tokenblacklist.Table:      tokenblacklist.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)
