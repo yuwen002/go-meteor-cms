@@ -31,6 +31,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:        c,
 		EntClient:     client,
-		JwtMiddleware: middleware.JwtMiddleware(&c),
+		JwtMiddleware: middleware.NewJwtMiddleware(&c, client),
 	}
 }

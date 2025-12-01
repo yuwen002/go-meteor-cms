@@ -140,6 +140,9 @@ service cms-api {
 	@handler testToken
 	get /admin/test-token returns (TestTokenResp)
 
+	@handler adminLogout
+	post /admin/logout returns (CommonResp)
+
 	@handler adminList
 	get /admin/admin-users (AdminListReq) returns (AdminListResp)
 

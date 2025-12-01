@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/yuwen002/go-meteor-cms/ent"
+	_ "github.com/yuwen002/go-meteor-cms/ent/runtime"
 	"github.com/yuwen002/go-meteor-cms/internal/seed"
 )
 

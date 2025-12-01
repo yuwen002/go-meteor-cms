@@ -15,6 +15,7 @@ const (
 	ErrInvalidCaptcha     = 2006 // 验证码错误
 	ErrAccountInactive    = 2007 // 账号未激活
 	ErrCaptchaGenerate    = 2008 // 验证码生成失败
+	ErrInvalidToken       = 2009 // 无效的token
 
 	// Admin user errors (3000-3999)
 	ErrAdminUserAlreadyExists  = 3001 // 管理员已存在
@@ -39,6 +40,7 @@ var errorMessages = map[int]string{
 	ErrUnauthorized:            "用户名或密码错误",
 	ErrForbidden:               "禁止访问",
 	ErrMissingUserContext:      "用户会话已过期，请重新登录",
+	ErrInvalidToken:            "无效的token",
 	ErrMissingCaptcha:          "验证码不能为空",
 	ErrInvalidCaptcha:          "验证码错误",
 	ErrAccountInactive:         "账号未激活，请联系管理员",
