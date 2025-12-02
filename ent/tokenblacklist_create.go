@@ -48,9 +48,23 @@ func (_c *TokenBlacklistCreate) SetNillableUpdatedAt(v *time.Time) *TokenBlackli
 	return _c
 }
 
+// SetTokenHash sets the "token_hash" field.
+func (_c *TokenBlacklistCreate) SetTokenHash(v string) *TokenBlacklistCreate {
+	_c.mutation.SetTokenHash(v)
+	return _c
+}
+
 // SetToken sets the "token" field.
 func (_c *TokenBlacklistCreate) SetToken(v string) *TokenBlacklistCreate {
 	_c.mutation.SetToken(v)
+	return _c
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (_c *TokenBlacklistCreate) SetNillableToken(v *string) *TokenBlacklistCreate {
+	if v != nil {
+		_c.SetToken(*v)
+	}
 	return _c
 }
 
@@ -119,8 +133,13 @@ func (_c *TokenBlacklistCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "TokenBlacklist.updated_at"`)}
 	}
-	if _, ok := _c.mutation.Token(); !ok {
-		return &ValidationError{Name: "token", err: errors.New(`ent: missing required field "TokenBlacklist.token"`)}
+	if _, ok := _c.mutation.TokenHash(); !ok {
+		return &ValidationError{Name: "token_hash", err: errors.New(`ent: missing required field "TokenBlacklist.token_hash"`)}
+	}
+	if v, ok := _c.mutation.TokenHash(); ok {
+		if err := tokenblacklist.TokenHashValidator(v); err != nil {
+			return &ValidationError{Name: "token_hash", err: fmt.Errorf(`ent: validator failed for field "TokenBlacklist.token_hash": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.Token(); ok {
 		if err := tokenblacklist.TokenValidator(v); err != nil {
@@ -174,6 +193,10 @@ func (_c *TokenBlacklistCreate) createSpec() (*TokenBlacklist, *sqlgraph.CreateS
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(tokenblacklist.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.TokenHash(); ok {
+		_spec.SetField(tokenblacklist.FieldTokenHash, field.TypeString, value)
+		_node.TokenHash = value
 	}
 	if value, ok := _c.mutation.Token(); ok {
 		_spec.SetField(tokenblacklist.FieldToken, field.TypeString, value)

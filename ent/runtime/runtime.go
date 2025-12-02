@@ -232,8 +232,26 @@ func init() {
 	tokenblacklist.DefaultUpdatedAt = tokenblacklistDescUpdatedAt.Default.(func() time.Time)
 	// tokenblacklist.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	tokenblacklist.UpdateDefaultUpdatedAt = tokenblacklistDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tokenblacklistDescTokenHash is the schema descriptor for token_hash field.
+	tokenblacklistDescTokenHash := tokenblacklistFields[1].Descriptor()
+	// tokenblacklist.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	tokenblacklist.TokenHashValidator = func() func(string) error {
+		validators := tokenblacklistDescTokenHash.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(token_hash string) error {
+			for _, fn := range fns {
+				if err := fn(token_hash); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// tokenblacklistDescToken is the schema descriptor for token field.
-	tokenblacklistDescToken := tokenblacklistFields[1].Descriptor()
+	tokenblacklistDescToken := tokenblacklistFields[2].Descriptor()
 	// tokenblacklist.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	tokenblacklist.TokenValidator = tokenblacklistDescToken.Validators[0].(func(string) error)
 	// tokenblacklistDescID is the schema descriptor for id field.

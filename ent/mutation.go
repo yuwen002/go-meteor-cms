@@ -4568,6 +4568,7 @@ type TokenBlacklistMutation struct {
 	id            *int64
 	created_at    *time.Time
 	updated_at    *time.Time
+	token_hash    *string
 	token         *string
 	expired_at    *time.Time
 	clearedFields map[string]struct{}
@@ -4752,6 +4753,42 @@ func (m *TokenBlacklistMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetTokenHash sets the "token_hash" field.
+func (m *TokenBlacklistMutation) SetTokenHash(s string) {
+	m.token_hash = &s
+}
+
+// TokenHash returns the value of the "token_hash" field in the mutation.
+func (m *TokenBlacklistMutation) TokenHash() (r string, exists bool) {
+	v := m.token_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenHash returns the old "token_hash" field's value of the TokenBlacklist entity.
+// If the TokenBlacklist object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TokenBlacklistMutation) OldTokenHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenHash: %w", err)
+	}
+	return oldValue.TokenHash, nil
+}
+
+// ResetTokenHash resets all changes to the "token_hash" field.
+func (m *TokenBlacklistMutation) ResetTokenHash() {
+	m.token_hash = nil
+}
+
 // SetToken sets the "token" field.
 func (m *TokenBlacklistMutation) SetToken(s string) {
 	m.token = &s
@@ -4783,9 +4820,22 @@ func (m *TokenBlacklistMutation) OldToken(ctx context.Context) (v string, err er
 	return oldValue.Token, nil
 }
 
+// ClearToken clears the value of the "token" field.
+func (m *TokenBlacklistMutation) ClearToken() {
+	m.token = nil
+	m.clearedFields[tokenblacklist.FieldToken] = struct{}{}
+}
+
+// TokenCleared returns if the "token" field was cleared in this mutation.
+func (m *TokenBlacklistMutation) TokenCleared() bool {
+	_, ok := m.clearedFields[tokenblacklist.FieldToken]
+	return ok
+}
+
 // ResetToken resets all changes to the "token" field.
 func (m *TokenBlacklistMutation) ResetToken() {
 	m.token = nil
+	delete(m.clearedFields, tokenblacklist.FieldToken)
 }
 
 // SetExpiredAt sets the "expired_at" field.
@@ -4858,12 +4908,15 @@ func (m *TokenBlacklistMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TokenBlacklistMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, tokenblacklist.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, tokenblacklist.FieldUpdatedAt)
+	}
+	if m.token_hash != nil {
+		fields = append(fields, tokenblacklist.FieldTokenHash)
 	}
 	if m.token != nil {
 		fields = append(fields, tokenblacklist.FieldToken)
@@ -4883,6 +4936,8 @@ func (m *TokenBlacklistMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case tokenblacklist.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case tokenblacklist.FieldTokenHash:
+		return m.TokenHash()
 	case tokenblacklist.FieldToken:
 		return m.Token()
 	case tokenblacklist.FieldExpiredAt:
@@ -4900,6 +4955,8 @@ func (m *TokenBlacklistMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldCreatedAt(ctx)
 	case tokenblacklist.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case tokenblacklist.FieldTokenHash:
+		return m.OldTokenHash(ctx)
 	case tokenblacklist.FieldToken:
 		return m.OldToken(ctx)
 	case tokenblacklist.FieldExpiredAt:
@@ -4926,6 +4983,13 @@ func (m *TokenBlacklistMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case tokenblacklist.FieldTokenHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenHash(v)
 		return nil
 	case tokenblacklist.FieldToken:
 		v, ok := value.(string)
@@ -4970,7 +5034,11 @@ func (m *TokenBlacklistMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TokenBlacklistMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(tokenblacklist.FieldToken) {
+		fields = append(fields, tokenblacklist.FieldToken)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -4983,6 +5051,11 @@ func (m *TokenBlacklistMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TokenBlacklistMutation) ClearField(name string) error {
+	switch name {
+	case tokenblacklist.FieldToken:
+		m.ClearToken()
+		return nil
+	}
 	return fmt.Errorf("unknown TokenBlacklist nullable field %s", name)
 }
 
@@ -4995,6 +5068,9 @@ func (m *TokenBlacklistMutation) ResetField(name string) error {
 		return nil
 	case tokenblacklist.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case tokenblacklist.FieldTokenHash:
+		m.ResetTokenHash()
 		return nil
 	case tokenblacklist.FieldToken:
 		m.ResetToken()

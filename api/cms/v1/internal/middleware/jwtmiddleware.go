@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -43,10 +44,13 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 
 		tokenStr := parts[1]
 
-		// 检查token是否在黑名单中
+		// 生成token的哈希值
+		tokenHash := utils.GenerateTokenHash(tokenStr)
+
+		// 检查token是否在黑名单中（使用token_hash进行查询）
 		exists, err := m.db.TokenBlacklist.
 			Query().
-			Where(tokenblacklist.Token(tokenStr)).
+			Where(tokenblacklist.TokenHash(tokenHash)).
 			Exist(r.Context())
 
 		if err != nil {
@@ -67,6 +71,8 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 				"username": "admin",
 			}
 			ctx := utils.WithUserCtx(r.Context(), claims)
+			// 存储token到context
+			ctx = context.WithValue(ctx, "token", tokenStr)
 			r = r.WithContext(ctx)
 			next(w, r)
 			return
@@ -79,8 +85,10 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// 把用户信息塞进 context，后面所有 logic 都能直接拿
+		// 把用户信息和token塞进 context，后面所有 logic 都能直接拿
 		ctx := utils.WithUserCtx(r.Context(), claims)
+		// 存储token到context
+		ctx = context.WithValue(ctx, "token", tokenStr)
 		r = r.WithContext(ctx)
 
 		// 放行

@@ -17,6 +17,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldTokenHash holds the string denoting the token_hash field in the database.
+	FieldTokenHash = "token_hash"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
 	// FieldExpiredAt holds the string denoting the expired_at field in the database.
@@ -30,6 +32,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldTokenHash,
 	FieldToken,
 	FieldExpiredAt,
 }
@@ -51,6 +54,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	TokenHashValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -73,6 +78,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByTokenHash orders the results by the token_hash field.
+func ByTokenHash(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenHash, opts...).ToFunc()
 }
 
 // ByToken orders the results by the token field.

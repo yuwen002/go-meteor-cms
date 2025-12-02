@@ -22,7 +22,9 @@ type TokenBlacklist struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 被加入黑名单的完整 JWT token 字符串
+	// JWT token 的 SHA256 哈希值，用于唯一索引
+	TokenHash string `json:"token_hash,omitempty"`
+	// 完整的 JWT token 字符串（用于调试/日志）
 	Token string `json:"token,omitempty"`
 	// 该 token 原本的过期时间，用于定时清理黑名单（过期后可删除）
 	ExpiredAt    time.Time `json:"expired_at,omitempty"`
@@ -36,7 +38,7 @@ func (*TokenBlacklist) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case tokenblacklist.FieldID:
 			values[i] = new(sql.NullInt64)
-		case tokenblacklist.FieldToken:
+		case tokenblacklist.FieldTokenHash, tokenblacklist.FieldToken:
 			values[i] = new(sql.NullString)
 		case tokenblacklist.FieldCreatedAt, tokenblacklist.FieldUpdatedAt, tokenblacklist.FieldExpiredAt:
 			values[i] = new(sql.NullTime)
@@ -72,6 +74,12 @@ func (_m *TokenBlacklist) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
+			}
+		case tokenblacklist.FieldTokenHash:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field token_hash", values[i])
+			} else if value.Valid {
+				_m.TokenHash = value.String
 			}
 		case tokenblacklist.FieldToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -126,6 +134,9 @@ func (_m *TokenBlacklist) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("token_hash=")
+	builder.WriteString(_m.TokenHash)
 	builder.WriteString(", ")
 	builder.WriteString("token=")
 	builder.WriteString(_m.Token)

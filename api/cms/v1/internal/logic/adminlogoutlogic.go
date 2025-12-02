@@ -49,8 +49,12 @@ func (l *AdminLogoutLogic) AdminLogout() (resp *types.CommonResp, err error) {
 	}
 	expTime := time.Unix(int64(exp), 0)
 
+	// 生成 token 的哈希值
+	tokenHash := utils.GenerateTokenHash(token)
+
 	// 将token加入黑名单
 	_, err = l.svcCtx.EntClient.TokenBlacklist.Create().
+		SetTokenHash(tokenHash).
 		SetToken(token).
 		SetExpiredAt(expTime).
 		Save(l.ctx)

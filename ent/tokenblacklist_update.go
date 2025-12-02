@@ -48,6 +48,20 @@ func (_u *TokenBlacklistUpdate) SetUpdatedAt(v time.Time) *TokenBlacklistUpdate 
 	return _u
 }
 
+// SetTokenHash sets the "token_hash" field.
+func (_u *TokenBlacklistUpdate) SetTokenHash(v string) *TokenBlacklistUpdate {
+	_u.mutation.SetTokenHash(v)
+	return _u
+}
+
+// SetNillableTokenHash sets the "token_hash" field if the given value is not nil.
+func (_u *TokenBlacklistUpdate) SetNillableTokenHash(v *string) *TokenBlacklistUpdate {
+	if v != nil {
+		_u.SetTokenHash(*v)
+	}
+	return _u
+}
+
 // SetToken sets the "token" field.
 func (_u *TokenBlacklistUpdate) SetToken(v string) *TokenBlacklistUpdate {
 	_u.mutation.SetToken(v)
@@ -59,6 +73,12 @@ func (_u *TokenBlacklistUpdate) SetNillableToken(v *string) *TokenBlacklistUpdat
 	if v != nil {
 		_u.SetToken(*v)
 	}
+	return _u
+}
+
+// ClearToken clears the value of the "token" field.
+func (_u *TokenBlacklistUpdate) ClearToken() *TokenBlacklistUpdate {
+	_u.mutation.ClearToken()
 	return _u
 }
 
@@ -119,6 +139,11 @@ func (_u *TokenBlacklistUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *TokenBlacklistUpdate) check() error {
+	if v, ok := _u.mutation.TokenHash(); ok {
+		if err := tokenblacklist.TokenHashValidator(v); err != nil {
+			return &ValidationError{Name: "token_hash", err: fmt.Errorf(`ent: validator failed for field "TokenBlacklist.token_hash": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Token(); ok {
 		if err := tokenblacklist.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "TokenBlacklist.token": %w`, err)}
@@ -145,8 +170,14 @@ func (_u *TokenBlacklistUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(tokenblacklist.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := _u.mutation.TokenHash(); ok {
+		_spec.SetField(tokenblacklist.FieldTokenHash, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(tokenblacklist.FieldToken, field.TypeString, value)
+	}
+	if _u.mutation.TokenCleared() {
+		_spec.ClearField(tokenblacklist.FieldToken, field.TypeString)
 	}
 	if value, ok := _u.mutation.ExpiredAt(); ok {
 		_spec.SetField(tokenblacklist.FieldExpiredAt, field.TypeTime, value)
@@ -191,6 +222,20 @@ func (_u *TokenBlacklistUpdateOne) SetUpdatedAt(v time.Time) *TokenBlacklistUpda
 	return _u
 }
 
+// SetTokenHash sets the "token_hash" field.
+func (_u *TokenBlacklistUpdateOne) SetTokenHash(v string) *TokenBlacklistUpdateOne {
+	_u.mutation.SetTokenHash(v)
+	return _u
+}
+
+// SetNillableTokenHash sets the "token_hash" field if the given value is not nil.
+func (_u *TokenBlacklistUpdateOne) SetNillableTokenHash(v *string) *TokenBlacklistUpdateOne {
+	if v != nil {
+		_u.SetTokenHash(*v)
+	}
+	return _u
+}
+
 // SetToken sets the "token" field.
 func (_u *TokenBlacklistUpdateOne) SetToken(v string) *TokenBlacklistUpdateOne {
 	_u.mutation.SetToken(v)
@@ -202,6 +247,12 @@ func (_u *TokenBlacklistUpdateOne) SetNillableToken(v *string) *TokenBlacklistUp
 	if v != nil {
 		_u.SetToken(*v)
 	}
+	return _u
+}
+
+// ClearToken clears the value of the "token" field.
+func (_u *TokenBlacklistUpdateOne) ClearToken() *TokenBlacklistUpdateOne {
+	_u.mutation.ClearToken()
 	return _u
 }
 
@@ -275,6 +326,11 @@ func (_u *TokenBlacklistUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *TokenBlacklistUpdateOne) check() error {
+	if v, ok := _u.mutation.TokenHash(); ok {
+		if err := tokenblacklist.TokenHashValidator(v); err != nil {
+			return &ValidationError{Name: "token_hash", err: fmt.Errorf(`ent: validator failed for field "TokenBlacklist.token_hash": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Token(); ok {
 		if err := tokenblacklist.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "TokenBlacklist.token": %w`, err)}
@@ -318,8 +374,14 @@ func (_u *TokenBlacklistUpdateOne) sqlSave(ctx context.Context) (_node *TokenBla
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(tokenblacklist.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := _u.mutation.TokenHash(); ok {
+		_spec.SetField(tokenblacklist.FieldTokenHash, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(tokenblacklist.FieldToken, field.TypeString, value)
+	}
+	if _u.mutation.TokenCleared() {
+		_spec.ClearField(tokenblacklist.FieldToken, field.TypeString)
 	}
 	if value, ok := _u.mutation.ExpiredAt(); ok {
 		_spec.SetField(tokenblacklist.FieldExpiredAt, field.TypeTime, value)

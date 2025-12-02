@@ -37,10 +37,19 @@ func (TokenBlacklist) Fields() []ent.Field {
 			Positive().
 			Immutable(),
 
-		field.String("token").
+		field.String("token_hash").
+			MaxLen(64).
 			NotEmpty().
-			Annotations(entsql.Prefix(191)).
-			Comment("被加入黑名单的完整 JWT token 字符串"),
+			Unique().
+			Comment("JWT token 的 SHA256 哈希值，用于唯一索引"),
+
+		field.String("token").
+			MaxLen(4096).
+			Optional().
+			Annotations(entsql.Annotation{
+				Size: 4096,
+			}).
+			Comment("完整的 JWT token 字符串（用于调试/日志）"),
 
 		field.Time("expired_at").
 			Comment("该 token 原本的过期时间，用于定时清理黑名单（过期后可删除）"),
@@ -51,8 +60,7 @@ func (TokenBlacklist) Fields() []ent.Field {
 func (TokenBlacklist) Indexes() []ent.Index {
 	return []ent.Index{
 		// token 必须唯一，防止同一 token 重复加入黑名单
-		index.Fields("token").
-			Unique(),
+		index.Fields("token_hash").Unique(),
 
 		// 可选：给过期时间加个普通索引，方便定时清理任务快速查找已过期记录
 		index.Fields("expired_at"),

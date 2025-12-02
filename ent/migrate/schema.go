@@ -123,7 +123,8 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
-		{Name: "token", Type: field.TypeString, Comment: "被加入黑名单的完整 JWT token 字符串"},
+		{Name: "token_hash", Type: field.TypeString, Unique: true, Size: 64, Comment: "JWT token 的 SHA256 哈希值，用于唯一索引"},
+		{Name: "token", Type: field.TypeString, Nullable: true, Size: 4096, Comment: "完整的 JWT token 字符串（用于调试/日志）"},
 		{Name: "expired_at", Type: field.TypeTime, Comment: "该 token 原本的过期时间，用于定时清理黑名单（过期后可删除）"},
 	}
 	// TokenBlacklistsTable holds the schema information for the "token_blacklists" table.
@@ -134,14 +135,14 @@ var (
 		PrimaryKey: []*schema.Column{TokenBlacklistsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "tokenblacklist_token",
+				Name:    "tokenblacklist_token_hash",
 				Unique:  true,
 				Columns: []*schema.Column{TokenBlacklistsColumns[3]},
 			},
 			{
 				Name:    "tokenblacklist_expired_at",
 				Unique:  false,
-				Columns: []*schema.Column{TokenBlacklistsColumns[4]},
+				Columns: []*schema.Column{TokenBlacklistsColumns[5]},
 			},
 		},
 	}

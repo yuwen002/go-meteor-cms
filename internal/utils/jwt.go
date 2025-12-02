@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"time"
 
@@ -68,4 +70,15 @@ func ParseToken(secret, tokenStr string) (map[string]interface{}, error) {
 
 	// 如果 claims 类型转换失败，返回无效 Token 错误
 	return nil, ErrInvalidToken
+}
+
+// GenerateTokenHash 生成 JWT Token 的 SHA256 哈希值
+// 参数:
+//   - token: JWT Token 字符串
+//
+// 返回:
+//   - string: Token 的 SHA256 哈希值（小写十六进制字符串）
+func GenerateTokenHash(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
 }

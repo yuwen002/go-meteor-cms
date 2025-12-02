@@ -64,6 +64,11 @@ func UpdatedAt(v time.Time) predicate.TokenBlacklist {
 	return predicate.TokenBlacklist(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// TokenHash applies equality check predicate on the "token_hash" field. It's identical to TokenHashEQ.
+func TokenHash(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldEQ(FieldTokenHash, v))
+}
+
 // Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
 func Token(v string) predicate.TokenBlacklist {
 	return predicate.TokenBlacklist(sql.FieldEQ(FieldToken, v))
@@ -154,6 +159,71 @@ func UpdatedAtLTE(v time.Time) predicate.TokenBlacklist {
 	return predicate.TokenBlacklist(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
+// TokenHashEQ applies the EQ predicate on the "token_hash" field.
+func TokenHashEQ(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldEQ(FieldTokenHash, v))
+}
+
+// TokenHashNEQ applies the NEQ predicate on the "token_hash" field.
+func TokenHashNEQ(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldNEQ(FieldTokenHash, v))
+}
+
+// TokenHashIn applies the In predicate on the "token_hash" field.
+func TokenHashIn(vs ...string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldIn(FieldTokenHash, vs...))
+}
+
+// TokenHashNotIn applies the NotIn predicate on the "token_hash" field.
+func TokenHashNotIn(vs ...string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldNotIn(FieldTokenHash, vs...))
+}
+
+// TokenHashGT applies the GT predicate on the "token_hash" field.
+func TokenHashGT(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldGT(FieldTokenHash, v))
+}
+
+// TokenHashGTE applies the GTE predicate on the "token_hash" field.
+func TokenHashGTE(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldGTE(FieldTokenHash, v))
+}
+
+// TokenHashLT applies the LT predicate on the "token_hash" field.
+func TokenHashLT(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldLT(FieldTokenHash, v))
+}
+
+// TokenHashLTE applies the LTE predicate on the "token_hash" field.
+func TokenHashLTE(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldLTE(FieldTokenHash, v))
+}
+
+// TokenHashContains applies the Contains predicate on the "token_hash" field.
+func TokenHashContains(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldContains(FieldTokenHash, v))
+}
+
+// TokenHashHasPrefix applies the HasPrefix predicate on the "token_hash" field.
+func TokenHashHasPrefix(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldHasPrefix(FieldTokenHash, v))
+}
+
+// TokenHashHasSuffix applies the HasSuffix predicate on the "token_hash" field.
+func TokenHashHasSuffix(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldHasSuffix(FieldTokenHash, v))
+}
+
+// TokenHashEqualFold applies the EqualFold predicate on the "token_hash" field.
+func TokenHashEqualFold(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldEqualFold(FieldTokenHash, v))
+}
+
+// TokenHashContainsFold applies the ContainsFold predicate on the "token_hash" field.
+func TokenHashContainsFold(v string) predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldContainsFold(FieldTokenHash, v))
+}
+
 // TokenEQ applies the EQ predicate on the "token" field.
 func TokenEQ(v string) predicate.TokenBlacklist {
 	return predicate.TokenBlacklist(sql.FieldEQ(FieldToken, v))
@@ -207,6 +277,16 @@ func TokenHasPrefix(v string) predicate.TokenBlacklist {
 // TokenHasSuffix applies the HasSuffix predicate on the "token" field.
 func TokenHasSuffix(v string) predicate.TokenBlacklist {
 	return predicate.TokenBlacklist(sql.FieldHasSuffix(FieldToken, v))
+}
+
+// TokenIsNil applies the IsNil predicate on the "token" field.
+func TokenIsNil() predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldIsNull(FieldToken))
+}
+
+// TokenNotNil applies the NotNil predicate on the "token" field.
+func TokenNotNil() predicate.TokenBlacklist {
+	return predicate.TokenBlacklist(sql.FieldNotNull(FieldToken))
 }
 
 // TokenEqualFold applies the EqualFold predicate on the "token" field.
