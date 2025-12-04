@@ -32,6 +32,14 @@ const (
 
 	// Request validation errors (4000-4999)
 	ErrInvalidParams = 4001 // 参数错误
+
+	// Department errors (5000-5999)
+	ErrDepartmentNotFound      = 5001 // 部门不存在
+	ErrDepartmentCreateFail    = 5002 // 创建部门失败
+	ErrDepartmentUpdateFail    = 5003 // 更新部门失败
+	ErrDepartmentDeleteFail    = 5004 // 删除部门失败
+	ErrDepartmentListFail      = 5005 // 获取部门列表失败
+	ErrDepartmentParentNotExist = 5006 // 父级部门不存在
 )
 
 var errorMessages = map[int]string{
@@ -57,6 +65,13 @@ var errorMessages = map[int]string{
 	ErrPasswordUpdateFailed:    "密码更新失败",
 	ErrCannotResetOwnPassword:  "不能重置自己的密码，请使用修改密码功能",
 	ErrInvalidParams:           "参数错误",
+	// Department error messages
+	ErrDepartmentNotFound:      "部门不存在",
+	ErrDepartmentCreateFail:    "创建部门失败",
+	ErrDepartmentUpdateFail:    "更新部门失败",
+	ErrDepartmentDeleteFail:    "删除部门失败",
+	ErrDepartmentListFail:      "获取部门列表失败",
+	ErrDepartmentParentNotExist: "父级部门不存在",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息
