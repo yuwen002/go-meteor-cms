@@ -17,9 +17,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminroledept"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -32,12 +34,16 @@ type Client struct {
 	AdminPermission *AdminPermissionClient
 	// AdminRole is the client for interacting with the AdminRole builders.
 	AdminRole *AdminRoleClient
+	// AdminRoleDept is the client for interacting with the AdminRoleDept builders.
+	AdminRoleDept *AdminRoleDeptClient
 	// AdminRolePermission is the client for interacting with the AdminRolePermission builders.
 	AdminRolePermission *AdminRolePermissionClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
 	// AdminUserRole is the client for interacting with the AdminUserRole builders.
 	AdminUserRole *AdminUserRoleClient
+	// Department is the client for interacting with the Department builders.
+	Department *DepartmentClient
 	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
 	TokenBlacklist *TokenBlacklistClient
 }
@@ -53,9 +59,11 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AdminPermission = NewAdminPermissionClient(c.config)
 	c.AdminRole = NewAdminRoleClient(c.config)
+	c.AdminRoleDept = NewAdminRoleDeptClient(c.config)
 	c.AdminRolePermission = NewAdminRolePermissionClient(c.config)
 	c.AdminUser = NewAdminUserClient(c.config)
 	c.AdminUserRole = NewAdminUserRoleClient(c.config)
+	c.Department = NewDepartmentClient(c.config)
 	c.TokenBlacklist = NewTokenBlacklistClient(c.config)
 }
 
@@ -151,9 +159,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:              cfg,
 		AdminPermission:     NewAdminPermissionClient(cfg),
 		AdminRole:           NewAdminRoleClient(cfg),
+		AdminRoleDept:       NewAdminRoleDeptClient(cfg),
 		AdminRolePermission: NewAdminRolePermissionClient(cfg),
 		AdminUser:           NewAdminUserClient(cfg),
 		AdminUserRole:       NewAdminUserRoleClient(cfg),
+		Department:          NewDepartmentClient(cfg),
 		TokenBlacklist:      NewTokenBlacklistClient(cfg),
 	}, nil
 }
@@ -176,9 +186,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:              cfg,
 		AdminPermission:     NewAdminPermissionClient(cfg),
 		AdminRole:           NewAdminRoleClient(cfg),
+		AdminRoleDept:       NewAdminRoleDeptClient(cfg),
 		AdminRolePermission: NewAdminRolePermissionClient(cfg),
 		AdminUser:           NewAdminUserClient(cfg),
 		AdminUserRole:       NewAdminUserRoleClient(cfg),
+		Department:          NewDepartmentClient(cfg),
 		TokenBlacklist:      NewTokenBlacklistClient(cfg),
 	}, nil
 }
@@ -209,8 +221,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AdminPermission, c.AdminRole, c.AdminRolePermission, c.AdminUser,
-		c.AdminUserRole, c.TokenBlacklist,
+		c.AdminPermission, c.AdminRole, c.AdminRoleDept, c.AdminRolePermission,
+		c.AdminUser, c.AdminUserRole, c.Department, c.TokenBlacklist,
 	} {
 		n.Use(hooks...)
 	}
@@ -220,8 +232,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AdminPermission, c.AdminRole, c.AdminRolePermission, c.AdminUser,
-		c.AdminUserRole, c.TokenBlacklist,
+		c.AdminPermission, c.AdminRole, c.AdminRoleDept, c.AdminRolePermission,
+		c.AdminUser, c.AdminUserRole, c.Department, c.TokenBlacklist,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -234,12 +246,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AdminPermission.mutate(ctx, m)
 	case *AdminRoleMutation:
 		return c.AdminRole.mutate(ctx, m)
+	case *AdminRoleDeptMutation:
+		return c.AdminRoleDept.mutate(ctx, m)
 	case *AdminRolePermissionMutation:
 		return c.AdminRolePermission.mutate(ctx, m)
 	case *AdminUserMutation:
 		return c.AdminUser.mutate(ctx, m)
 	case *AdminUserRoleMutation:
 		return c.AdminUserRole.mutate(ctx, m)
+	case *DepartmentMutation:
+		return c.Department.mutate(ctx, m)
 	case *TokenBlacklistMutation:
 		return c.TokenBlacklist.mutate(ctx, m)
 	default:
@@ -389,12 +405,14 @@ func (c *AdminPermissionClient) QueryChildren(_m *AdminPermission) *AdminPermiss
 
 // Hooks returns the client hooks.
 func (c *AdminPermissionClient) Hooks() []Hook {
-	return c.hooks.AdminPermission
+	hooks := c.hooks.AdminPermission
+	return append(hooks[:len(hooks):len(hooks)], adminpermission.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *AdminPermissionClient) Interceptors() []Interceptor {
-	return c.inters.AdminPermission
+	inters := c.inters.AdminPermission
+	return append(inters[:len(inters):len(inters)], adminpermission.Interceptors[:]...)
 }
 
 func (c *AdminPermissionClient) mutate(ctx context.Context, m *AdminPermissionMutation) (Value, error) {
@@ -522,12 +540,14 @@ func (c *AdminRoleClient) GetX(ctx context.Context, id int64) *AdminRole {
 
 // Hooks returns the client hooks.
 func (c *AdminRoleClient) Hooks() []Hook {
-	return c.hooks.AdminRole
+	hooks := c.hooks.AdminRole
+	return append(hooks[:len(hooks):len(hooks)], adminrole.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
 func (c *AdminRoleClient) Interceptors() []Interceptor {
-	return c.inters.AdminRole
+	inters := c.inters.AdminRole
+	return append(inters[:len(inters):len(inters)], adminrole.Interceptors[:]...)
 }
 
 func (c *AdminRoleClient) mutate(ctx context.Context, m *AdminRoleMutation) (Value, error) {
@@ -542,6 +562,141 @@ func (c *AdminRoleClient) mutate(ctx context.Context, m *AdminRoleMutation) (Val
 		return (&AdminRoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AdminRole mutation op: %q", m.Op())
+	}
+}
+
+// AdminRoleDeptClient is a client for the AdminRoleDept schema.
+type AdminRoleDeptClient struct {
+	config
+}
+
+// NewAdminRoleDeptClient returns a client for the AdminRoleDept from the given config.
+func NewAdminRoleDeptClient(c config) *AdminRoleDeptClient {
+	return &AdminRoleDeptClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `adminroledept.Hooks(f(g(h())))`.
+func (c *AdminRoleDeptClient) Use(hooks ...Hook) {
+	c.hooks.AdminRoleDept = append(c.hooks.AdminRoleDept, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `adminroledept.Intercept(f(g(h())))`.
+func (c *AdminRoleDeptClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AdminRoleDept = append(c.inters.AdminRoleDept, interceptors...)
+}
+
+// Create returns a builder for creating a AdminRoleDept entity.
+func (c *AdminRoleDeptClient) Create() *AdminRoleDeptCreate {
+	mutation := newAdminRoleDeptMutation(c.config, OpCreate)
+	return &AdminRoleDeptCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AdminRoleDept entities.
+func (c *AdminRoleDeptClient) CreateBulk(builders ...*AdminRoleDeptCreate) *AdminRoleDeptCreateBulk {
+	return &AdminRoleDeptCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AdminRoleDeptClient) MapCreateBulk(slice any, setFunc func(*AdminRoleDeptCreate, int)) *AdminRoleDeptCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AdminRoleDeptCreateBulk{err: fmt.Errorf("calling to AdminRoleDeptClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AdminRoleDeptCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AdminRoleDeptCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AdminRoleDept.
+func (c *AdminRoleDeptClient) Update() *AdminRoleDeptUpdate {
+	mutation := newAdminRoleDeptMutation(c.config, OpUpdate)
+	return &AdminRoleDeptUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AdminRoleDeptClient) UpdateOne(_m *AdminRoleDept) *AdminRoleDeptUpdateOne {
+	mutation := newAdminRoleDeptMutation(c.config, OpUpdateOne, withAdminRoleDept(_m))
+	return &AdminRoleDeptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AdminRoleDeptClient) UpdateOneID(id int) *AdminRoleDeptUpdateOne {
+	mutation := newAdminRoleDeptMutation(c.config, OpUpdateOne, withAdminRoleDeptID(id))
+	return &AdminRoleDeptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AdminRoleDept.
+func (c *AdminRoleDeptClient) Delete() *AdminRoleDeptDelete {
+	mutation := newAdminRoleDeptMutation(c.config, OpDelete)
+	return &AdminRoleDeptDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AdminRoleDeptClient) DeleteOne(_m *AdminRoleDept) *AdminRoleDeptDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AdminRoleDeptClient) DeleteOneID(id int) *AdminRoleDeptDeleteOne {
+	builder := c.Delete().Where(adminroledept.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AdminRoleDeptDeleteOne{builder}
+}
+
+// Query returns a query builder for AdminRoleDept.
+func (c *AdminRoleDeptClient) Query() *AdminRoleDeptQuery {
+	return &AdminRoleDeptQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAdminRoleDept},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AdminRoleDept entity by its id.
+func (c *AdminRoleDeptClient) Get(ctx context.Context, id int) (*AdminRoleDept, error) {
+	return c.Query().Where(adminroledept.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AdminRoleDeptClient) GetX(ctx context.Context, id int) *AdminRoleDept {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AdminRoleDeptClient) Hooks() []Hook {
+	hooks := c.hooks.AdminRoleDept
+	return append(hooks[:len(hooks):len(hooks)], adminroledept.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *AdminRoleDeptClient) Interceptors() []Interceptor {
+	inters := c.inters.AdminRoleDept
+	return append(inters[:len(inters):len(inters)], adminroledept.Interceptors[:]...)
+}
+
+func (c *AdminRoleDeptClient) mutate(ctx context.Context, m *AdminRoleDeptMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AdminRoleDeptCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AdminRoleDeptUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AdminRoleDeptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AdminRoleDeptDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AdminRoleDept mutation op: %q", m.Op())
 	}
 }
 
@@ -786,6 +941,22 @@ func (c *AdminUserClient) GetX(ctx context.Context, id int64) *AdminUser {
 	return obj
 }
 
+// QueryDepartment queries the department edge of a AdminUser.
+func (c *AdminUserClient) QueryDepartment(_m *AdminUser) *DepartmentQuery {
+	query := (&DepartmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
+			sqlgraph.To(department.Table, department.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, adminuser.DepartmentTable, adminuser.DepartmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AdminUserClient) Hooks() []Hook {
 	hooks := c.hooks.AdminUser
@@ -946,6 +1117,189 @@ func (c *AdminUserRoleClient) mutate(ctx context.Context, m *AdminUserRoleMutati
 	}
 }
 
+// DepartmentClient is a client for the Department schema.
+type DepartmentClient struct {
+	config
+}
+
+// NewDepartmentClient returns a client for the Department from the given config.
+func NewDepartmentClient(c config) *DepartmentClient {
+	return &DepartmentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `department.Hooks(f(g(h())))`.
+func (c *DepartmentClient) Use(hooks ...Hook) {
+	c.hooks.Department = append(c.hooks.Department, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `department.Intercept(f(g(h())))`.
+func (c *DepartmentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Department = append(c.inters.Department, interceptors...)
+}
+
+// Create returns a builder for creating a Department entity.
+func (c *DepartmentClient) Create() *DepartmentCreate {
+	mutation := newDepartmentMutation(c.config, OpCreate)
+	return &DepartmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Department entities.
+func (c *DepartmentClient) CreateBulk(builders ...*DepartmentCreate) *DepartmentCreateBulk {
+	return &DepartmentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DepartmentClient) MapCreateBulk(slice any, setFunc func(*DepartmentCreate, int)) *DepartmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DepartmentCreateBulk{err: fmt.Errorf("calling to DepartmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DepartmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DepartmentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Department.
+func (c *DepartmentClient) Update() *DepartmentUpdate {
+	mutation := newDepartmentMutation(c.config, OpUpdate)
+	return &DepartmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DepartmentClient) UpdateOne(_m *Department) *DepartmentUpdateOne {
+	mutation := newDepartmentMutation(c.config, OpUpdateOne, withDepartment(_m))
+	return &DepartmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DepartmentClient) UpdateOneID(id int64) *DepartmentUpdateOne {
+	mutation := newDepartmentMutation(c.config, OpUpdateOne, withDepartmentID(id))
+	return &DepartmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Department.
+func (c *DepartmentClient) Delete() *DepartmentDelete {
+	mutation := newDepartmentMutation(c.config, OpDelete)
+	return &DepartmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DepartmentClient) DeleteOne(_m *Department) *DepartmentDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DepartmentClient) DeleteOneID(id int64) *DepartmentDeleteOne {
+	builder := c.Delete().Where(department.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DepartmentDeleteOne{builder}
+}
+
+// Query returns a query builder for Department.
+func (c *DepartmentClient) Query() *DepartmentQuery {
+	return &DepartmentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDepartment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Department entity by its id.
+func (c *DepartmentClient) Get(ctx context.Context, id int64) (*Department, error) {
+	return c.Query().Where(department.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DepartmentClient) GetX(ctx context.Context, id int64) *Department {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryParent queries the parent edge of a Department.
+func (c *DepartmentClient) QueryParent(_m *Department) *DepartmentQuery {
+	query := (&DepartmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, id),
+			sqlgraph.To(department.Table, department.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, department.ParentTable, department.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildren queries the children edge of a Department.
+func (c *DepartmentClient) QueryChildren(_m *Department) *DepartmentQuery {
+	query := (&DepartmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, id),
+			sqlgraph.To(department.Table, department.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, department.ChildrenTable, department.ChildrenColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminUsers queries the admin_users edge of a Department.
+func (c *DepartmentClient) QueryAdminUsers(_m *Department) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, department.AdminUsersTable, department.AdminUsersColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DepartmentClient) Hooks() []Hook {
+	hooks := c.hooks.Department
+	return append(hooks[:len(hooks):len(hooks)], department.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *DepartmentClient) Interceptors() []Interceptor {
+	inters := c.inters.Department
+	return append(inters[:len(inters):len(inters)], department.Interceptors[:]...)
+}
+
+func (c *DepartmentClient) mutate(ctx context.Context, m *DepartmentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DepartmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DepartmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DepartmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DepartmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Department mutation op: %q", m.Op())
+	}
+}
+
 // TokenBlacklistClient is a client for the TokenBlacklist schema.
 type TokenBlacklistClient struct {
 	config
@@ -1082,11 +1436,11 @@ func (c *TokenBlacklistClient) mutate(ctx context.Context, m *TokenBlacklistMuta
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminPermission, AdminRole, AdminRolePermission, AdminUser, AdminUserRole,
-		TokenBlacklist []ent.Hook
+		AdminPermission, AdminRole, AdminRoleDept, AdminRolePermission, AdminUser,
+		AdminUserRole, Department, TokenBlacklist []ent.Hook
 	}
 	inters struct {
-		AdminPermission, AdminRole, AdminRolePermission, AdminUser, AdminUserRole,
-		TokenBlacklist []ent.Interceptor
+		AdminPermission, AdminRole, AdminRoleDept, AdminRolePermission, AdminUser,
+		AdminUserRole, Department, TokenBlacklist []ent.Interceptor
 	}
 )

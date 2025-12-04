@@ -10,9 +10,11 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminroledept"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
@@ -127,6 +129,33 @@ func (f TraverseAdminRole) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.AdminRoleQuery", q)
 }
 
+// The AdminRoleDeptFunc type is an adapter to allow the use of ordinary function as a Querier.
+type AdminRoleDeptFunc func(context.Context, *ent.AdminRoleDeptQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f AdminRoleDeptFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.AdminRoleDeptQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AdminRoleDeptQuery", q)
+}
+
+// The TraverseAdminRoleDept type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseAdminRoleDept func(context.Context, *ent.AdminRoleDeptQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseAdminRoleDept) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseAdminRoleDept) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AdminRoleDeptQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.AdminRoleDeptQuery", q)
+}
+
 // The AdminRolePermissionFunc type is an adapter to allow the use of ordinary function as a Querier.
 type AdminRolePermissionFunc func(context.Context, *ent.AdminRolePermissionQuery) (ent.Value, error)
 
@@ -208,6 +237,33 @@ func (f TraverseAdminUserRole) Traverse(ctx context.Context, q ent.Query) error 
 	return fmt.Errorf("unexpected query type %T. expect *ent.AdminUserRoleQuery", q)
 }
 
+// The DepartmentFunc type is an adapter to allow the use of ordinary function as a Querier.
+type DepartmentFunc func(context.Context, *ent.DepartmentQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f DepartmentFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.DepartmentQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.DepartmentQuery", q)
+}
+
+// The TraverseDepartment type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseDepartment func(context.Context, *ent.DepartmentQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseDepartment) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseDepartment) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.DepartmentQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.DepartmentQuery", q)
+}
+
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary function as a Querier.
 type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistQuery) (ent.Value, error)
 
@@ -242,12 +298,16 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AdminPermissionQuery, predicate.AdminPermission, adminpermission.OrderOption]{typ: ent.TypeAdminPermission, tq: q}, nil
 	case *ent.AdminRoleQuery:
 		return &query[*ent.AdminRoleQuery, predicate.AdminRole, adminrole.OrderOption]{typ: ent.TypeAdminRole, tq: q}, nil
+	case *ent.AdminRoleDeptQuery:
+		return &query[*ent.AdminRoleDeptQuery, predicate.AdminRoleDept, adminroledept.OrderOption]{typ: ent.TypeAdminRoleDept, tq: q}, nil
 	case *ent.AdminRolePermissionQuery:
 		return &query[*ent.AdminRolePermissionQuery, predicate.AdminRolePermission, adminrolepermission.OrderOption]{typ: ent.TypeAdminRolePermission, tq: q}, nil
 	case *ent.AdminUserQuery:
 		return &query[*ent.AdminUserQuery, predicate.AdminUser, adminuser.OrderOption]{typ: ent.TypeAdminUser, tq: q}, nil
 	case *ent.AdminUserRoleQuery:
 		return &query[*ent.AdminUserRoleQuery, predicate.AdminUserRole, adminuserrole.OrderOption]{typ: ent.TypeAdminUserRole, tq: q}, nil
+	case *ent.DepartmentQuery:
+		return &query[*ent.DepartmentQuery, predicate.Department, department.OrderOption]{typ: ent.TypeDepartment, tq: q}, nil
 	case *ent.TokenBlacklistQuery:
 		return &query[*ent.TokenBlacklistQuery, predicate.TokenBlacklist, tokenblacklist.OrderOption]{typ: ent.TypeTokenBlacklist, tq: q}, nil
 	default:

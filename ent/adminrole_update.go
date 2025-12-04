@@ -48,6 +48,26 @@ func (_u *AdminRoleUpdate) SetUpdatedAt(v time.Time) *AdminRoleUpdate {
 	return _u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *AdminRoleUpdate) SetDeletedAt(v time.Time) *AdminRoleUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *AdminRoleUpdate) SetNillableDeletedAt(v *time.Time) *AdminRoleUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *AdminRoleUpdate) ClearDeletedAt() *AdminRoleUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *AdminRoleUpdate) SetName(v string) *AdminRoleUpdate {
 	_u.mutation.SetName(v)
@@ -173,7 +193,9 @@ func (_u *AdminRoleUpdate) Mutation() *AdminRoleMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *AdminRoleUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -200,11 +222,15 @@ func (_u *AdminRoleUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *AdminRoleUpdate) defaults() {
+func (_u *AdminRoleUpdate) defaults() error {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if adminrole.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized adminrole.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := adminrole.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -239,6 +265,12 @@ func (_u *AdminRoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrole.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(adminrole.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(adminrole.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(adminrole.FieldName, field.TypeString, value)
@@ -307,6 +339,26 @@ func (_u *AdminRoleUpdateOne) SetNillableCreatedAt(v *time.Time) *AdminRoleUpdat
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *AdminRoleUpdateOne) SetUpdatedAt(v time.Time) *AdminRoleUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *AdminRoleUpdateOne) SetDeletedAt(v time.Time) *AdminRoleUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *AdminRoleUpdateOne) SetNillableDeletedAt(v *time.Time) *AdminRoleUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *AdminRoleUpdateOne) ClearDeletedAt() *AdminRoleUpdateOne {
+	_u.mutation.ClearDeletedAt()
 	return _u
 }
 
@@ -448,7 +500,9 @@ func (_u *AdminRoleUpdateOne) Select(field string, fields ...string) *AdminRoleU
 
 // Save executes the query and returns the updated AdminRole entity.
 func (_u *AdminRoleUpdateOne) Save(ctx context.Context) (*AdminRole, error) {
-	_u.defaults()
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -475,11 +529,15 @@ func (_u *AdminRoleUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *AdminRoleUpdateOne) defaults() {
+func (_u *AdminRoleUpdateOne) defaults() error {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if adminrole.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized adminrole.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := adminrole.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -531,6 +589,12 @@ func (_u *AdminRoleUpdateOne) sqlSave(ctx context.Context) (_node *AdminRole, er
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrole.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(adminrole.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(adminrole.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(adminrole.FieldName, field.TypeString, value)

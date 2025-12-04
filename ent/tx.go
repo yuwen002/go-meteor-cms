@@ -16,12 +16,16 @@ type Tx struct {
 	AdminPermission *AdminPermissionClient
 	// AdminRole is the client for interacting with the AdminRole builders.
 	AdminRole *AdminRoleClient
+	// AdminRoleDept is the client for interacting with the AdminRoleDept builders.
+	AdminRoleDept *AdminRoleDeptClient
 	// AdminRolePermission is the client for interacting with the AdminRolePermission builders.
 	AdminRolePermission *AdminRolePermissionClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
 	// AdminUserRole is the client for interacting with the AdminUserRole builders.
 	AdminUserRole *AdminUserRoleClient
+	// Department is the client for interacting with the Department builders.
+	Department *DepartmentClient
 	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
 	TokenBlacklist *TokenBlacklistClient
 
@@ -157,9 +161,11 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AdminPermission = NewAdminPermissionClient(tx.config)
 	tx.AdminRole = NewAdminRoleClient(tx.config)
+	tx.AdminRoleDept = NewAdminRoleDeptClient(tx.config)
 	tx.AdminRolePermission = NewAdminRolePermissionClient(tx.config)
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.AdminUserRole = NewAdminUserRoleClient(tx.config)
+	tx.Department = NewDepartmentClient(tx.config)
 	tx.TokenBlacklist = NewTokenBlacklistClient(tx.config)
 }
 

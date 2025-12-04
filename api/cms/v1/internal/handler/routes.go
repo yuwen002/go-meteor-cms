@@ -88,6 +88,31 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/admin/departments",
+					Handler: departmentCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/departments/:id",
+					Handler: departmentUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/admin/departments/:id",
+					Handler: departmentDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/departments/:id",
+					Handler: departmentDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/departments/tree",
+					Handler: departmentTreeHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/admin/logout",
 					Handler: adminLogoutHandler(serverCtx),
 				},

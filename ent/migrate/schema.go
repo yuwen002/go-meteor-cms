@@ -14,6 +14,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
 		{Name: "name", Type: field.TypeString, Comment: "权限名称，如 用户管理 / 新增用户"},
 		{Name: "type", Type: field.TypeInt, Comment: "权限类型：1 菜单 2 按钮 3 API", Default: 1},
 		{Name: "path", Type: field.TypeString, Comment: "前端路由路径，仅菜单(type=1)使用", Default: ""},
@@ -35,7 +36,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "admin_permissions_admin_permissions_children",
-				Columns:    []*schema.Column{AdminPermissionsColumns[13]},
+				Columns:    []*schema.Column{AdminPermissionsColumns[14]},
 				RefColumns: []*schema.Column{AdminPermissionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -46,6 +47,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键ID，自增"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
 		{Name: "name", Type: field.TypeString, Unique: true, Comment: "角色名称"},
 		{Name: "code", Type: field.TypeString, Unique: true, Comment: "角色编码，用于系统标识，如 SUPER_ADMIN"},
 		{Name: "desc", Type: field.TypeString, Nullable: true, Comment: "角色描述", Default: ""},
@@ -60,6 +62,22 @@ var (
 		Comment:    "后台角色表",
 		Columns:    AdminRolesColumns,
 		PrimaryKey: []*schema.Column{AdminRolesColumns[0]},
+	}
+	// AdminRoleDeptsColumns holds the columns for the "admin_role_depts" table.
+	AdminRoleDeptsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID"},
+		{Name: "dept_id", Type: field.TypeInt64, Comment: "部门ID"},
+	}
+	// AdminRoleDeptsTable holds the schema information for the "admin_role_depts" table.
+	AdminRoleDeptsTable = &schema.Table{
+		Name:       "admin_role_depts",
+		Comment:    "角色部门关联表",
+		Columns:    AdminRoleDeptsColumns,
+		PrimaryKey: []*schema.Column{AdminRoleDeptsColumns[0]},
 	}
 	// AdminRolePermissionsColumns holds the columns for the "admin_role_permissions" table.
 	AdminRolePermissionsColumns = []*schema.Column{
@@ -94,6 +112,7 @@ var (
 		{Name: "last_login_at", Type: field.TypeTime, Nullable: true, Comment: "最后登录时间"},
 		{Name: "reset_token", Type: field.TypeString, Nullable: true, Comment: "密码重置令牌"},
 		{Name: "reset_expire", Type: field.TypeTime, Nullable: true, Comment: "密码重置令牌过期时间"},
+		{Name: "dept_id", Type: field.TypeInt64, Nullable: true, Comment: "所属部门ID"},
 	}
 	// AdminUsersTable holds the schema information for the "admin_users" table.
 	AdminUsersTable = &schema.Table{
@@ -101,6 +120,14 @@ var (
 		Comment:    "后台管理员用户表",
 		Columns:    AdminUsersColumns,
 		PrimaryKey: []*schema.Column{AdminUsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_users_departments_admin_users",
+				Columns:    []*schema.Column{AdminUsersColumns[15]},
+				RefColumns: []*schema.Column{DepartmentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// AdminUserRolesColumns holds the columns for the "admin_user_roles" table.
 	AdminUserRolesColumns = []*schema.Column{
@@ -117,6 +144,34 @@ var (
 		Comment:    "用户角色关联表",
 		Columns:    AdminUserRolesColumns,
 		PrimaryKey: []*schema.Column{AdminUserRolesColumns[0]},
+	}
+	// DepartmentsColumns holds the columns for the "departments" table.
+	DepartmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "部门ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "name", Type: field.TypeString, Comment: "部门名称"},
+		{Name: "level", Type: field.TypeInt, Comment: "部门层级", Default: 1},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
+		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
+		{Name: "leader_id", Type: field.TypeInt64, Nullable: true, Comment: "部门负责人ID（管理员）"},
+		{Name: "parent_id", Type: field.TypeInt64, Nullable: true, Comment: "父级部门ID"},
+	}
+	// DepartmentsTable holds the schema information for the "departments" table.
+	DepartmentsTable = &schema.Table{
+		Name:       "departments",
+		Comment:    "部门表",
+		Columns:    DepartmentsColumns,
+		PrimaryKey: []*schema.Column{DepartmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "departments_departments_children",
+				Columns:    []*schema.Column{DepartmentsColumns[9]},
+				RefColumns: []*schema.Column{DepartmentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// TokenBlacklistsColumns holds the columns for the "token_blacklists" table.
 	TokenBlacklistsColumns = []*schema.Column{
@@ -150,9 +205,11 @@ var (
 	Tables = []*schema.Table{
 		AdminPermissionsTable,
 		AdminRolesTable,
+		AdminRoleDeptsTable,
 		AdminRolePermissionsTable,
 		AdminUsersTable,
 		AdminUserRolesTable,
+		DepartmentsTable,
 		TokenBlacklistsTable,
 	}
 )
@@ -165,13 +222,21 @@ func init() {
 	AdminRolesTable.Annotation = &entsql.Annotation{
 		Table: "admin_roles",
 	}
+	AdminRoleDeptsTable.Annotation = &entsql.Annotation{
+		Table: "admin_role_depts",
+	}
 	AdminRolePermissionsTable.Annotation = &entsql.Annotation{
 		Table: "admin_role_permissions",
 	}
+	AdminUsersTable.ForeignKeys[0].RefTable = DepartmentsTable
 	AdminUsersTable.Annotation = &entsql.Annotation{
 		Table: "admin_users",
 	}
 	AdminUserRolesTable.Annotation = &entsql.Annotation{
 		Table: "admin_user_roles",
+	}
+	DepartmentsTable.ForeignKeys[0].RefTable = DepartmentsTable
+	DepartmentsTable.Annotation = &entsql.Annotation{
+		Table: "departments",
 	}
 }

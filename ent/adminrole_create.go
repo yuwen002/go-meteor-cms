@@ -48,6 +48,20 @@ func (_c *AdminRoleCreate) SetNillableUpdatedAt(v *time.Time) *AdminRoleCreate {
 	return _c
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_c *AdminRoleCreate) SetDeletedAt(v time.Time) *AdminRoleCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_c *AdminRoleCreate) SetNillableDeletedAt(v *time.Time) *AdminRoleCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
+	}
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *AdminRoleCreate) SetName(v string) *AdminRoleCreate {
 	_c.mutation.SetName(v)
@@ -143,7 +157,9 @@ func (_c *AdminRoleCreate) Mutation() *AdminRoleMutation {
 
 // Save creates the AdminRole in the database.
 func (_c *AdminRoleCreate) Save(ctx context.Context) (*AdminRole, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -170,12 +186,18 @@ func (_c *AdminRoleCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *AdminRoleCreate) defaults() {
+func (_c *AdminRoleCreate) defaults() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if adminrole.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized adminrole.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := adminrole.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if adminrole.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized adminrole.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := adminrole.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
@@ -199,6 +221,7 @@ func (_c *AdminRoleCreate) defaults() {
 		v := adminrole.DefaultSort
 		_c.mutation.SetSort(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -281,6 +304,10 @@ func (_c *AdminRoleCreate) createSpec() (*AdminRole, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrole.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := _c.mutation.DeletedAt(); ok {
+		_spec.SetField(adminrole.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(adminrole.FieldName, field.TypeString, value)

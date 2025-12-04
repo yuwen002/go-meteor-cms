@@ -131,6 +131,42 @@ type (
 	DeleteAdminReq {
 		Id int64 `path:"id"`
 	}
+	DepartmentCreateReq {
+		Name     string `json:"name"` // 部门名称
+		ParentId int64  `json:"parent_id"` // 父级部门ID
+		Sort     int    `json:"sort"` // 排序
+		IsActive bool   `json:"is_active"` // 是否启用
+		LeaderId int64  `json:"leader_id"` // 负责人ID
+	}
+	DepartmentUpdateReq {
+		Id       int64  `path:"id"`
+		Name     string `json:"name"`
+		ParentId int64  `json:"parent_id"`
+		Sort     int    `json:"sort"`
+		IsActive bool   `json:"is_active"`
+		LeaderId int64  `json:"leader_id"`
+	}
+	DepartmentDeleteReq {
+		Id int64 `path:"id"`
+	}
+	DepartmentDetailReq {
+		Id int64 `path:"id"`
+	}
+	DepartmentDetailResp {
+		Id       int64  `json:"id"`
+		Name     string `json:"name"`
+		ParentId int64  `json:"parent_id"`
+		Sort     int    `json:"sort"`
+		IsActive bool   `json:"is_active"`
+		LeaderId int64  `json:"leader_id"`
+	}
+	DepartmentTreeResp {
+		Id       int64                `json:"id"`
+		Name     string               `json:"name"`
+		Sort     int                  `json:"sort"`
+		IsActive bool                 `json:"is_active"`
+		Children []DepartmentTreeResp `json:"children"`
+	}
 )
 
 @server (
@@ -171,5 +207,21 @@ service cms-api {
 
 	@handler enableAdmin
 	put /admin/admin-users/:id/enable (EnableAdminReq) returns (CommonResp)
+
+	// 部门管理
+	@handler departmentCreate
+	post /admin/departments (DepartmentCreateReq) returns (CommonResp)
+
+	@handler departmentUpdate
+	put /admin/departments/:id (DepartmentUpdateReq) returns (CommonResp)
+
+	@handler departmentDelete
+	delete /admin/departments/:id (DepartmentDeleteReq) returns (CommonResp)
+
+	@handler departmentDetail
+	get /admin/departments/:id (DepartmentDetailReq) returns (DepartmentDetailResp)
+
+	@handler departmentTree
+	get /admin/departments/tree returns ([]DepartmentTreeResp)
 }
 

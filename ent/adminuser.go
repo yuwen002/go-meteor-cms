@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
 )
 
 // 后台管理员用户表
@@ -36,6 +37,8 @@ type AdminUser struct {
 	Phone string `json:"phone,omitempty"`
 	// 头像 URL
 	Avatar string `json:"avatar,omitempty"`
+	// 所属部门ID
+	DeptID *int64 `json:"dept_id,omitempty"`
 	// 是否超级管理员
 	IsSuper bool `json:"is_super,omitempty"`
 	// 是否启用
@@ -45,8 +48,31 @@ type AdminUser struct {
 	// 密码重置令牌
 	ResetToken *string `json:"reset_token,omitempty"`
 	// 密码重置令牌过期时间
-	ResetExpire  *time.Time `json:"reset_expire,omitempty"`
+	ResetExpire *time.Time `json:"reset_expire,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AdminUserQuery when eager-loading is set.
+	Edges        AdminUserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AdminUserEdges holds the relations/edges for other nodes in the graph.
+type AdminUserEdges struct {
+	// Department holds the value of the department edge.
+	Department *Department `json:"department,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// DepartmentOrErr returns the Department value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AdminUserEdges) DepartmentOrErr() (*Department, error) {
+	if e.Department != nil {
+		return e.Department, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: department.Label}
+	}
+	return nil, &NotLoadedError{edge: "department"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,7 +82,7 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case adminuser.FieldIsSuper, adminuser.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case adminuser.FieldID:
+		case adminuser.FieldID, adminuser.FieldDeptID:
 			values[i] = new(sql.NullInt64)
 		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone, adminuser.FieldAvatar, adminuser.FieldResetToken:
 			values[i] = new(sql.NullString)
@@ -138,6 +164,13 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Avatar = value.String
 			}
+		case adminuser.FieldDeptID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field dept_id", values[i])
+			} else if value.Valid {
+				_m.DeptID = new(int64)
+				*_m.DeptID = value.Int64
+			}
 		case adminuser.FieldIsSuper:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_super", values[i])
@@ -182,6 +215,11 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *AdminUser) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryDepartment queries the "department" edge of the AdminUser entity.
+func (_m *AdminUser) QueryDepartment() *DepartmentQuery {
+	return NewAdminUserClient(_m.config).QueryDepartment(_m)
 }
 
 // Update returns a builder for updating this AdminUser.
@@ -235,6 +273,11 @@ func (_m *AdminUser) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("avatar=")
 	builder.WriteString(_m.Avatar)
+	builder.WriteString(", ")
+	if v := _m.DeptID; v != nil {
+		builder.WriteString("dept_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("is_super=")
 	builder.WriteString(fmt.Sprintf("%v", _m.IsSuper))

@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -32,6 +33,8 @@ const (
 	FieldPhone = "phone"
 	// FieldAvatar holds the string denoting the avatar field in the database.
 	FieldAvatar = "avatar"
+	// FieldDeptID holds the string denoting the dept_id field in the database.
+	FieldDeptID = "dept_id"
 	// FieldIsSuper holds the string denoting the is_super field in the database.
 	FieldIsSuper = "is_super"
 	// FieldIsActive holds the string denoting the is_active field in the database.
@@ -42,8 +45,17 @@ const (
 	FieldResetToken = "reset_token"
 	// FieldResetExpire holds the string denoting the reset_expire field in the database.
 	FieldResetExpire = "reset_expire"
+	// EdgeDepartment holds the string denoting the department edge name in mutations.
+	EdgeDepartment = "department"
 	// Table holds the table name of the adminuser in the database.
 	Table = "admin_users"
+	// DepartmentTable is the table that holds the department relation/edge.
+	DepartmentTable = "admin_users"
+	// DepartmentInverseTable is the table name for the Department entity.
+	// It exists in this package in order to avoid circular dependency with the "department" package.
+	DepartmentInverseTable = "departments"
+	// DepartmentColumn is the table column denoting the department relation/edge.
+	DepartmentColumn = "dept_id"
 )
 
 // Columns holds all SQL columns for adminuser fields.
@@ -58,6 +70,7 @@ var Columns = []string{
 	FieldEmail,
 	FieldPhone,
 	FieldAvatar,
+	FieldDeptID,
 	FieldIsSuper,
 	FieldIsActive,
 	FieldLastLoginAt,
@@ -156,6 +169,11 @@ func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
 }
 
+// ByDeptID orders the results by the dept_id field.
+func ByDeptID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeptID, opts...).ToFunc()
+}
+
 // ByIsSuper orders the results by the is_super field.
 func ByIsSuper(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsSuper, opts...).ToFunc()
@@ -179,4 +197,18 @@ func ByResetToken(opts ...sql.OrderTermOption) OrderOption {
 // ByResetExpire orders the results by the reset_expire field.
 func ByResetExpire(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldResetExpire, opts...).ToFunc()
+}
+
+// ByDepartmentField orders the results by department field.
+func ByDepartmentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDepartmentStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newDepartmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DepartmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, DepartmentTable, DepartmentColumn),
+	)
 }

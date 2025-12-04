@@ -16,6 +16,7 @@ type AdminPermission struct {
 func (AdminPermission) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		BaseMixin{},
+		SoftDeleteMixin{},
 	}
 }
 

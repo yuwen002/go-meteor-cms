@@ -33,6 +33,18 @@ func (f AdminRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminRoleMutation", m)
 }
 
+// The AdminRoleDeptFunc type is an adapter to allow the use of ordinary
+// function as AdminRoleDept mutator.
+type AdminRoleDeptFunc func(context.Context, *ent.AdminRoleDeptMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AdminRoleDeptFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AdminRoleDeptMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminRoleDeptMutation", m)
+}
+
 // The AdminRolePermissionFunc type is an adapter to allow the use of ordinary
 // function as AdminRolePermission mutator.
 type AdminRolePermissionFunc func(context.Context, *ent.AdminRolePermissionMutation) (ent.Value, error)
@@ -67,6 +79,18 @@ func (f AdminUserRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminUserRoleMutation", m)
+}
+
+// The DepartmentFunc type is an adapter to allow the use of ordinary
+// function as Department mutator.
+type DepartmentFunc func(context.Context, *ent.DepartmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DepartmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DepartmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DepartmentMutation", m)
 }
 
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary

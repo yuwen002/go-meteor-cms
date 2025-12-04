@@ -7,9 +7,11 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminroledept"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/schema"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
@@ -19,6 +21,10 @@ import (
 // to their package variables.
 func init() {
 	adminpermissionMixin := schema.AdminPermission{}.Mixin()
+	adminpermissionMixinHooks1 := adminpermissionMixin[1].Hooks()
+	adminpermission.Hooks[0] = adminpermissionMixinHooks1[0]
+	adminpermissionMixinInters1 := adminpermissionMixin[1].Interceptors()
+	adminpermission.Interceptors[0] = adminpermissionMixinInters1[0]
 	adminpermissionMixinFields0 := adminpermissionMixin[0].Fields()
 	_ = adminpermissionMixinFields0
 	adminpermissionFields := schema.AdminPermission{}.Fields()
@@ -74,6 +80,10 @@ func init() {
 	// adminpermission.DefaultSort holds the default value on creation for the sort field.
 	adminpermission.DefaultSort = adminpermissionDescSort.Default.(int)
 	adminroleMixin := schema.AdminRole{}.Mixin()
+	adminroleMixinHooks1 := adminroleMixin[1].Hooks()
+	adminrole.Hooks[0] = adminroleMixinHooks1[0]
+	adminroleMixinInters1 := adminroleMixin[1].Interceptors()
+	adminrole.Interceptors[0] = adminroleMixinInters1[0]
 	adminroleMixinFields0 := adminroleMixin[0].Fields()
 	_ = adminroleMixinFields0
 	adminroleFields := schema.AdminRole{}.Fields()
@@ -120,6 +130,25 @@ func init() {
 	adminroleDescID := adminroleFields[0].Descriptor()
 	// adminrole.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	adminrole.IDValidator = adminroleDescID.Validators[0].(func(int64) error)
+	adminroledeptMixin := schema.AdminRoleDept{}.Mixin()
+	adminroledeptMixinHooks1 := adminroledeptMixin[1].Hooks()
+	adminroledept.Hooks[0] = adminroledeptMixinHooks1[0]
+	adminroledeptMixinInters1 := adminroledeptMixin[1].Interceptors()
+	adminroledept.Interceptors[0] = adminroledeptMixinInters1[0]
+	adminroledeptMixinFields0 := adminroledeptMixin[0].Fields()
+	_ = adminroledeptMixinFields0
+	adminroledeptFields := schema.AdminRoleDept{}.Fields()
+	_ = adminroledeptFields
+	// adminroledeptDescCreatedAt is the schema descriptor for created_at field.
+	adminroledeptDescCreatedAt := adminroledeptMixinFields0[0].Descriptor()
+	// adminroledept.DefaultCreatedAt holds the default value on creation for the created_at field.
+	adminroledept.DefaultCreatedAt = adminroledeptDescCreatedAt.Default.(func() time.Time)
+	// adminroledeptDescUpdatedAt is the schema descriptor for updated_at field.
+	adminroledeptDescUpdatedAt := adminroledeptMixinFields0[1].Descriptor()
+	// adminroledept.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	adminroledept.DefaultUpdatedAt = adminroledeptDescUpdatedAt.Default.(func() time.Time)
+	// adminroledept.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	adminroledept.UpdateDefaultUpdatedAt = adminroledeptDescUpdatedAt.UpdateDefault.(func() time.Time)
 	adminrolepermissionMixin := schema.AdminRolePermission{}.Mixin()
 	adminrolepermissionMixinFields0 := adminrolepermissionMixin[0].Fields()
 	_ = adminrolepermissionMixinFields0
@@ -179,11 +208,11 @@ func init() {
 	// adminuser.DefaultAvatar holds the default value on creation for the avatar field.
 	adminuser.DefaultAvatar = adminuserDescAvatar.Default.(string)
 	// adminuserDescIsSuper is the schema descriptor for is_super field.
-	adminuserDescIsSuper := adminuserFields[7].Descriptor()
+	adminuserDescIsSuper := adminuserFields[8].Descriptor()
 	// adminuser.DefaultIsSuper holds the default value on creation for the is_super field.
 	adminuser.DefaultIsSuper = adminuserDescIsSuper.Default.(bool)
 	// adminuserDescIsActive is the schema descriptor for is_active field.
-	adminuserDescIsActive := adminuserFields[8].Descriptor()
+	adminuserDescIsActive := adminuserFields[9].Descriptor()
 	// adminuser.DefaultIsActive holds the default value on creation for the is_active field.
 	adminuser.DefaultIsActive = adminuserDescIsActive.Default.(bool)
 	// adminuserDescID is the schema descriptor for id field.
@@ -217,6 +246,45 @@ func init() {
 	adminuserroleDescDummy := adminuserroleFields[2].Descriptor()
 	// adminuserrole.DefaultDummy holds the default value on creation for the dummy field.
 	adminuserrole.DefaultDummy = adminuserroleDescDummy.Default.(uint8)
+	departmentMixin := schema.Department{}.Mixin()
+	departmentMixinHooks1 := departmentMixin[1].Hooks()
+	department.Hooks[0] = departmentMixinHooks1[0]
+	departmentMixinInters1 := departmentMixin[1].Interceptors()
+	department.Interceptors[0] = departmentMixinInters1[0]
+	departmentMixinFields0 := departmentMixin[0].Fields()
+	_ = departmentMixinFields0
+	departmentFields := schema.Department{}.Fields()
+	_ = departmentFields
+	// departmentDescCreatedAt is the schema descriptor for created_at field.
+	departmentDescCreatedAt := departmentMixinFields0[0].Descriptor()
+	// department.DefaultCreatedAt holds the default value on creation for the created_at field.
+	department.DefaultCreatedAt = departmentDescCreatedAt.Default.(func() time.Time)
+	// departmentDescUpdatedAt is the schema descriptor for updated_at field.
+	departmentDescUpdatedAt := departmentMixinFields0[1].Descriptor()
+	// department.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	department.DefaultUpdatedAt = departmentDescUpdatedAt.Default.(func() time.Time)
+	// department.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	department.UpdateDefaultUpdatedAt = departmentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// departmentDescName is the schema descriptor for name field.
+	departmentDescName := departmentFields[1].Descriptor()
+	// department.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	department.NameValidator = departmentDescName.Validators[0].(func(string) error)
+	// departmentDescLevel is the schema descriptor for level field.
+	departmentDescLevel := departmentFields[3].Descriptor()
+	// department.DefaultLevel holds the default value on creation for the level field.
+	department.DefaultLevel = departmentDescLevel.Default.(int)
+	// departmentDescSort is the schema descriptor for sort field.
+	departmentDescSort := departmentFields[4].Descriptor()
+	// department.DefaultSort holds the default value on creation for the sort field.
+	department.DefaultSort = departmentDescSort.Default.(int)
+	// departmentDescIsActive is the schema descriptor for is_active field.
+	departmentDescIsActive := departmentFields[5].Descriptor()
+	// department.DefaultIsActive holds the default value on creation for the is_active field.
+	department.DefaultIsActive = departmentDescIsActive.Default.(bool)
+	// departmentDescID is the schema descriptor for id field.
+	departmentDescID := departmentFields[0].Descriptor()
+	// department.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	department.IDValidator = departmentDescID.Validators[0].(func(int64) error)
 	tokenblacklistMixin := schema.TokenBlacklist{}.Mixin()
 	tokenblacklistMixinFields0 := tokenblacklistMixin[0].Fields()
 	_ = tokenblacklistMixinFields0

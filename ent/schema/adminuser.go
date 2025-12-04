@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -62,6 +63,11 @@ func (AdminUser) Fields() []ent.Field {
 			Comment("头像 URL").
 			Default("/uploads/avatars/meteor-default.jpg"),
 
+		field.Int64("dept_id").
+			Optional().
+			Nillable().
+			Comment("所属部门ID"),
+
 		field.Bool("is_super").
 			Default(false).
 			Comment("是否超级管理员"),
@@ -89,5 +95,10 @@ func (AdminUser) Fields() []ent.Field {
 
 // Edges of the AdminUser.
 func (AdminUser) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("department", Department.Type).
+			Ref("admin_users").
+			Field("dept_id").
+			Unique(),
+	}
 }

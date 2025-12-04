@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
 )
 
 // AdminUserCreate is the builder for creating a AdminUser entity.
@@ -130,6 +131,20 @@ func (_c *AdminUserCreate) SetNillableAvatar(v *string) *AdminUserCreate {
 	return _c
 }
 
+// SetDeptID sets the "dept_id" field.
+func (_c *AdminUserCreate) SetDeptID(v int64) *AdminUserCreate {
+	_c.mutation.SetDeptID(v)
+	return _c
+}
+
+// SetNillableDeptID sets the "dept_id" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableDeptID(v *int64) *AdminUserCreate {
+	if v != nil {
+		_c.SetDeptID(*v)
+	}
+	return _c
+}
+
 // SetIsSuper sets the "is_super" field.
 func (_c *AdminUserCreate) SetIsSuper(v bool) *AdminUserCreate {
 	_c.mutation.SetIsSuper(v)
@@ -204,6 +219,25 @@ func (_c *AdminUserCreate) SetNillableResetExpire(v *time.Time) *AdminUserCreate
 func (_c *AdminUserCreate) SetID(v int64) *AdminUserCreate {
 	_c.mutation.SetID(v)
 	return _c
+}
+
+// SetDepartmentID sets the "department" edge to the Department entity by ID.
+func (_c *AdminUserCreate) SetDepartmentID(id int64) *AdminUserCreate {
+	_c.mutation.SetDepartmentID(id)
+	return _c
+}
+
+// SetNillableDepartmentID sets the "department" edge to the Department entity by ID if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableDepartmentID(id *int64) *AdminUserCreate {
+	if id != nil {
+		_c = _c.SetDepartmentID(*id)
+	}
+	return _c
+}
+
+// SetDepartment sets the "department" edge to the Department entity.
+func (_c *AdminUserCreate) SetDepartment(v *Department) *AdminUserCreate {
+	return _c.SetDepartmentID(v.ID)
 }
 
 // Mutation returns the AdminUserMutation object of the builder.
@@ -397,6 +431,23 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ResetExpire(); ok {
 		_spec.SetField(adminuser.FieldResetExpire, field.TypeTime, value)
 		_node.ResetExpire = &value
+	}
+	if nodes := _c.mutation.DepartmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   adminuser.DepartmentTable,
+			Columns: []string{adminuser.DepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.DeptID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

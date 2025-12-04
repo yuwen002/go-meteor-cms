@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
 
@@ -97,6 +98,11 @@ func Phone(v string) predicate.AdminUser {
 // Avatar applies equality check predicate on the "avatar" field. It's identical to AvatarEQ.
 func Avatar(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldAvatar, v))
+}
+
+// DeptID applies equality check predicate on the "dept_id" field. It's identical to DeptIDEQ.
+func DeptID(v int64) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldDeptID, v))
 }
 
 // IsSuper applies equality check predicate on the "is_super" field. It's identical to IsSuperEQ.
@@ -674,6 +680,36 @@ func AvatarContainsFold(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldContainsFold(FieldAvatar, v))
 }
 
+// DeptIDEQ applies the EQ predicate on the "dept_id" field.
+func DeptIDEQ(v int64) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldDeptID, v))
+}
+
+// DeptIDNEQ applies the NEQ predicate on the "dept_id" field.
+func DeptIDNEQ(v int64) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldDeptID, v))
+}
+
+// DeptIDIn applies the In predicate on the "dept_id" field.
+func DeptIDIn(vs ...int64) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldDeptID, vs...))
+}
+
+// DeptIDNotIn applies the NotIn predicate on the "dept_id" field.
+func DeptIDNotIn(vs ...int64) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldDeptID, vs...))
+}
+
+// DeptIDIsNil applies the IsNil predicate on the "dept_id" field.
+func DeptIDIsNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIsNull(FieldDeptID))
+}
+
+// DeptIDNotNil applies the NotNil predicate on the "dept_id" field.
+func DeptIDNotNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotNull(FieldDeptID))
+}
+
 // IsSuperEQ applies the EQ predicate on the "is_super" field.
 func IsSuperEQ(v bool) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldIsSuper, v))
@@ -867,6 +903,29 @@ func ResetExpireIsNil() predicate.AdminUser {
 // ResetExpireNotNil applies the NotNil predicate on the "reset_expire" field.
 func ResetExpireNotNil() predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldNotNull(FieldResetExpire))
+}
+
+// HasDepartment applies the HasEdge predicate on the "department" edge.
+func HasDepartment() predicate.AdminUser {
+	return predicate.AdminUser(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, DepartmentTable, DepartmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDepartmentWith applies the HasEdge predicate on the "department" edge with a given conditions (other predicates).
+func HasDepartmentWith(preds ...predicate.Department) predicate.AdminUser {
+	return predicate.AdminUser(func(s *sql.Selector) {
+		step := newDepartmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

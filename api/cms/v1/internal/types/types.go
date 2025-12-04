@@ -72,6 +72,48 @@ type DeleteAdminReq struct {
 	Id int64 `path:"id"`
 }
 
+type DepartmentCreateReq struct {
+	Name     string `json:"name"`      // 部门名称
+	ParentId int64  `json:"parent_id"` // 父级部门ID
+	Sort     int    `json:"sort"`      // 排序
+	IsActive bool   `json:"is_active"` // 是否启用
+	LeaderId int64  `json:"leader_id"` // 负责人ID
+}
+
+type DepartmentDeleteReq struct {
+	Id int64 `path:"id"`
+}
+
+type DepartmentDetailReq struct {
+	Id int64 `path:"id"`
+}
+
+type DepartmentDetailResp struct {
+	Id       int64  `json:"id"`
+	Name     string `json:"name"`
+	ParentId int64  `json:"parent_id"`
+	Sort     int    `json:"sort"`
+	IsActive bool   `json:"is_active"`
+	LeaderId int64  `json:"leader_id"`
+}
+
+type DepartmentTreeResp struct {
+	Id       int64                `json:"id"`
+	Name     string               `json:"name"`
+	Sort     int                  `json:"sort"`
+	IsActive bool                 `json:"is_active"`
+	Children []DepartmentTreeResp `json:"children"`
+}
+
+type DepartmentUpdateReq struct {
+	Id       int64  `path:"id"`
+	Name     string `json:"name"`
+	ParentId int64  `json:"parent_id"`
+	Sort     int    `json:"sort"`
+	IsActive bool   `json:"is_active"`
+	LeaderId int64  `json:"leader_id"`
+}
+
 type DisableAdminReq struct {
 	ID int64 `path:"id"`
 }

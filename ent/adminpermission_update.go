@@ -48,6 +48,26 @@ func (_u *AdminPermissionUpdate) SetUpdatedAt(v time.Time) *AdminPermissionUpdat
 	return _u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *AdminPermissionUpdate) SetDeletedAt(v time.Time) *AdminPermissionUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *AdminPermissionUpdate) SetNillableDeletedAt(v *time.Time) *AdminPermissionUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *AdminPermissionUpdate) ClearDeletedAt() *AdminPermissionUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *AdminPermissionUpdate) SetName(v string) *AdminPermissionUpdate {
 	_u.mutation.SetName(v)
@@ -276,7 +296,9 @@ func (_u *AdminPermissionUpdate) RemoveChildren(v ...*AdminPermission) *AdminPer
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *AdminPermissionUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -303,11 +325,15 @@ func (_u *AdminPermissionUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *AdminPermissionUpdate) defaults() {
+func (_u *AdminPermissionUpdate) defaults() error {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if adminpermission.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized adminpermission.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := adminpermission.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -337,6 +363,12 @@ func (_u *AdminPermissionUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminpermission.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(adminpermission.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(adminpermission.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(adminpermission.FieldName, field.TypeString, value)
@@ -485,6 +517,26 @@ func (_u *AdminPermissionUpdateOne) SetNillableCreatedAt(v *time.Time) *AdminPer
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *AdminPermissionUpdateOne) SetUpdatedAt(v time.Time) *AdminPermissionUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *AdminPermissionUpdateOne) SetDeletedAt(v time.Time) *AdminPermissionUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *AdminPermissionUpdateOne) SetNillableDeletedAt(v *time.Time) *AdminPermissionUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *AdminPermissionUpdateOne) ClearDeletedAt() *AdminPermissionUpdateOne {
+	_u.mutation.ClearDeletedAt()
 	return _u
 }
 
@@ -729,7 +781,9 @@ func (_u *AdminPermissionUpdateOne) Select(field string, fields ...string) *Admi
 
 // Save executes the query and returns the updated AdminPermission entity.
 func (_u *AdminPermissionUpdateOne) Save(ctx context.Context) (*AdminPermission, error) {
-	_u.defaults()
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -756,11 +810,15 @@ func (_u *AdminPermissionUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *AdminPermissionUpdateOne) defaults() {
+func (_u *AdminPermissionUpdateOne) defaults() error {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if adminpermission.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized adminpermission.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := adminpermission.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -807,6 +865,12 @@ func (_u *AdminPermissionUpdateOne) sqlSave(ctx context.Context) (_node *AdminPe
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminpermission.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(adminpermission.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(adminpermission.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(adminpermission.FieldName, field.TypeString, value)

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
 
@@ -170,6 +171,26 @@ func (_u *AdminUserUpdate) SetNillableAvatar(v *string) *AdminUserUpdate {
 	return _u
 }
 
+// SetDeptID sets the "dept_id" field.
+func (_u *AdminUserUpdate) SetDeptID(v int64) *AdminUserUpdate {
+	_u.mutation.SetDeptID(v)
+	return _u
+}
+
+// SetNillableDeptID sets the "dept_id" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableDeptID(v *int64) *AdminUserUpdate {
+	if v != nil {
+		_u.SetDeptID(*v)
+	}
+	return _u
+}
+
+// ClearDeptID clears the value of the "dept_id" field.
+func (_u *AdminUserUpdate) ClearDeptID() *AdminUserUpdate {
+	_u.mutation.ClearDeptID()
+	return _u
+}
+
 // SetIsSuper sets the "is_super" field.
 func (_u *AdminUserUpdate) SetIsSuper(v bool) *AdminUserUpdate {
 	_u.mutation.SetIsSuper(v)
@@ -258,9 +279,34 @@ func (_u *AdminUserUpdate) ClearResetExpire() *AdminUserUpdate {
 	return _u
 }
 
+// SetDepartmentID sets the "department" edge to the Department entity by ID.
+func (_u *AdminUserUpdate) SetDepartmentID(id int64) *AdminUserUpdate {
+	_u.mutation.SetDepartmentID(id)
+	return _u
+}
+
+// SetNillableDepartmentID sets the "department" edge to the Department entity by ID if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableDepartmentID(id *int64) *AdminUserUpdate {
+	if id != nil {
+		_u = _u.SetDepartmentID(*id)
+	}
+	return _u
+}
+
+// SetDepartment sets the "department" edge to the Department entity.
+func (_u *AdminUserUpdate) SetDepartment(v *Department) *AdminUserUpdate {
+	return _u.SetDepartmentID(v.ID)
+}
+
 // Mutation returns the AdminUserMutation object of the builder.
 func (_u *AdminUserUpdate) Mutation() *AdminUserMutation {
 	return _u.mutation
+}
+
+// ClearDepartment clears the "department" edge to the Department entity.
+func (_u *AdminUserUpdate) ClearDepartment() *AdminUserUpdate {
+	_u.mutation.ClearDepartment()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -394,6 +440,35 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ResetExpireCleared() {
 		_spec.ClearField(adminuser.FieldResetExpire, field.TypeTime)
+	}
+	if _u.mutation.DepartmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   adminuser.DepartmentTable,
+			Columns: []string{adminuser.DepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DepartmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   adminuser.DepartmentTable,
+			Columns: []string{adminuser.DepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -557,6 +632,26 @@ func (_u *AdminUserUpdateOne) SetNillableAvatar(v *string) *AdminUserUpdateOne {
 	return _u
 }
 
+// SetDeptID sets the "dept_id" field.
+func (_u *AdminUserUpdateOne) SetDeptID(v int64) *AdminUserUpdateOne {
+	_u.mutation.SetDeptID(v)
+	return _u
+}
+
+// SetNillableDeptID sets the "dept_id" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableDeptID(v *int64) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetDeptID(*v)
+	}
+	return _u
+}
+
+// ClearDeptID clears the value of the "dept_id" field.
+func (_u *AdminUserUpdateOne) ClearDeptID() *AdminUserUpdateOne {
+	_u.mutation.ClearDeptID()
+	return _u
+}
+
 // SetIsSuper sets the "is_super" field.
 func (_u *AdminUserUpdateOne) SetIsSuper(v bool) *AdminUserUpdateOne {
 	_u.mutation.SetIsSuper(v)
@@ -645,9 +740,34 @@ func (_u *AdminUserUpdateOne) ClearResetExpire() *AdminUserUpdateOne {
 	return _u
 }
 
+// SetDepartmentID sets the "department" edge to the Department entity by ID.
+func (_u *AdminUserUpdateOne) SetDepartmentID(id int64) *AdminUserUpdateOne {
+	_u.mutation.SetDepartmentID(id)
+	return _u
+}
+
+// SetNillableDepartmentID sets the "department" edge to the Department entity by ID if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableDepartmentID(id *int64) *AdminUserUpdateOne {
+	if id != nil {
+		_u = _u.SetDepartmentID(*id)
+	}
+	return _u
+}
+
+// SetDepartment sets the "department" edge to the Department entity.
+func (_u *AdminUserUpdateOne) SetDepartment(v *Department) *AdminUserUpdateOne {
+	return _u.SetDepartmentID(v.ID)
+}
+
 // Mutation returns the AdminUserMutation object of the builder.
 func (_u *AdminUserUpdateOne) Mutation() *AdminUserMutation {
 	return _u.mutation
+}
+
+// ClearDepartment clears the "department" edge to the Department entity.
+func (_u *AdminUserUpdateOne) ClearDepartment() *AdminUserUpdateOne {
+	_u.mutation.ClearDepartment()
+	return _u
 }
 
 // Where appends a list predicates to the AdminUserUpdate builder.
@@ -811,6 +931,35 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 	}
 	if _u.mutation.ResetExpireCleared() {
 		_spec.ClearField(adminuser.FieldResetExpire, field.TypeTime)
+	}
+	if _u.mutation.DepartmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   adminuser.DepartmentTable,
+			Columns: []string{adminuser.DepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DepartmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   adminuser.DepartmentTable,
+			Columns: []string{adminuser.DepartmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &AdminUser{config: _u.config}
 	_spec.Assign = _node.assignValues
