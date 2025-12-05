@@ -40,6 +40,8 @@ const (
 	ErrDepartmentDeleteFail    = 5004 // 删除部门失败
 	ErrDepartmentListFail      = 5005 // 获取部门列表失败
 	ErrDepartmentParentNotExist = 5006 // 父级部门不存在
+	ErrDepartmentSetSelfAsParent = 5007 // 不能将自己设为父级部门
+	ErrDepartmentHasChildren     = 5008 // 该部门下存在子部门，禁止删除
 )
 
 var errorMessages = map[int]string{
@@ -72,6 +74,8 @@ var errorMessages = map[int]string{
 	ErrDepartmentDeleteFail:    "删除部门失败",
 	ErrDepartmentListFail:      "获取部门列表失败",
 	ErrDepartmentParentNotExist: "父级部门不存在",
+	ErrDepartmentSetSelfAsParent: "不能将自己设为父级部门",
+	ErrDepartmentHasChildren:     "该部门下存在子部门，禁止删除",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

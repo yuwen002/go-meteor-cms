@@ -8,6 +8,9 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,7 +30,34 @@ func NewDepartmentDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *DepartmentDetailLogic) DepartmentDetail(req *types.DepartmentDetailReq) (resp *types.DepartmentDetailResp, err error) {
-	// todo: add your logic here and delete this line
+	dept, err := l.svcCtx.EntClient.Department.
+		Query().
+		Where(department.IDEQ(req.Id)).
+		Only(l.ctx)
 
-	return
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, common.NewBizError(common.ErrDepartmentNotFound)
+		}
+		return nil, err
+	}
+
+	resp = &types.DepartmentDetailResp{
+		Id:       dept.ID,
+		Name:     dept.Name,
+		Sort:     dept.Sort,
+		IsActive: dept.IsActive,
+		LeaderId: 0,
+		ParentId: 0,
+	}
+
+	if dept.LeaderID != nil {
+		resp.LeaderId = *dept.LeaderID
+	}
+
+	if dept.ParentID != nil {
+		resp.ParentId = *dept.ParentID
+	}
+
+	return resp, nil
 }

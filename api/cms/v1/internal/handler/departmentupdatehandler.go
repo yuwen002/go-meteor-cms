@@ -4,11 +4,13 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -16,16 +18,19 @@ func departmentUpdateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.DepartmentUpdateReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
+			common.Fail(w, common.ErrInvalidParams, common.GetErrorMessage(common.ErrInvalidParams))
 			return
 		}
 
 		l := logic.NewDepartmentUpdateLogic(r.Context(), svcCtx)
 		resp, err := l.DepartmentUpdate(&req)
 		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
+			var bizErr *common.BizError
+			if errors.As(err, &bizErr) {
+				common.Fail(w, bizErr.Code, bizErr.Msg)
+			}
 		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			common.Ok(w, resp)
 		}
 	}
 }

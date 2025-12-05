@@ -8,6 +8,9 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,7 +30,53 @@ func NewDepartmentUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *DepartmentUpdateLogic) DepartmentUpdate(req *types.DepartmentUpdateReq) (resp *types.CommonResp, err error) {
-	// todo: add your logic here and delete this line
+	// 校验部门是否存在
+	dept, err := l.svcCtx.EntClient.Department.
+		Query().
+		Where(department.IDEQ(req.Id)).
+		Only(l.ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, common.NewBizError(common.ErrDepartmentNotFound)
+		}
+		return nil, err
+	}
 
-	return
+	// 不能把自己设为自己的父级
+	if req.ParentId == dept.ID {
+		return nil, common.NewBizError(common.ErrDepartmentSetSelfAsParent)
+	}
+
+	// 校验父级是否存在（如果 parent_id != 0）
+	if req.ParentId != 0 {
+		exist, err := l.svcCtx.EntClient.Department.
+			Query().
+			Where(department.IDEQ(req.ParentId)).
+			Exist(l.ctx)
+		if err != nil {
+			return nil, err
+		}
+		if !exist {
+			return nil, common.NewBizError(common.ErrDepartmentParentNotExist)
+		}
+	}
+
+	// 4️⃣ 执行更新
+	err = l.svcCtx.EntClient.Department.
+		UpdateOneID(req.Id).
+		SetName(req.Name).
+		SetParentID(req.ParentId).
+		SetSort(req.Sort).
+		SetIsActive(req.IsActive).
+		SetNillableLeaderID(&req.LeaderId).
+		Exec(l.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.CommonResp{
+		ID:      0,
+		Message: "更新成功",
+	}, nil
 }
