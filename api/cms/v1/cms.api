@@ -167,6 +167,10 @@ type (
 		IsActive bool                 `json:"is_active"`
 		Children []DepartmentTreeResp `json:"children"`
 	}
+	AdminBindDeptReq {
+		Id     int64 `path:"id"` // 管理员ID
+		DeptId int64 `json:"dept_id"` // 部门ID
+	}
 )
 
 @server (
@@ -223,5 +227,9 @@ service cms-api {
 
 	@handler departmentTree
 	get /admin/departments/tree returns ([]DepartmentTreeResp)
+
+	// 管理员绑定部门
+	@handler adminBindDepartment
+	put /admin/admin-users/:id/bind-department (AdminBindDeptReq) returns (CommonResp)
 }
 

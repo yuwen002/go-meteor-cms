@@ -3,6 +3,11 @@
 
 package types
 
+type AdminBindDeptReq struct {
+	Id     int64 `path:"id"`      // 管理员ID
+	DeptId int64 `json:"dept_id"` // 部门ID
+}
+
 type AdminDetailReq struct {
 	ID int64 `path:"id"`
 }

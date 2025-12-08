@@ -63,6 +63,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/:id/bind-department",
+					Handler: adminBindDepartmentHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
 					Path:    "/admin/admin-users/:id/disable",
 					Handler: disableAdminHandler(serverCtx),
 				},

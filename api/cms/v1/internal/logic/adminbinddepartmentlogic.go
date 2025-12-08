@@ -8,7 +8,10 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/department"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,5 +37,42 @@ func (l *AdminBindDepartmentLogic) AdminBindDepartment(req *types.AdminBindDeptR
 		Where(adminuser.IDEQ(req.Id)).
 		Only(l.ctx)
 
-	return
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, common.NewBizError(common.ErrAdminUserNotFound)
+		}
+		logx.Error("查询管理员信息失败，ID: %d, 错误: %v", req.Id, err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	// 2️⃣ 校验部门是否存在
+	exist, err := l.svcCtx.EntClient.Department.
+		Query().
+		Where(department.IDEQ(req.DeptId)).
+		Exist(l.ctx)
+
+	if err != nil {
+		l.Errorf("查询部门信息失败, 部门ID: %d, 错误: %v", req.DeptId, err)
+		return nil, err
+	}
+
+	if !exist {
+		return nil, common.NewBizError(common.ErrDepartmentNotFound)
+	}
+
+	// 3️⃣ 绑定部门
+	err = user.
+		Update().
+		SetDeptID(req.DeptId).
+		Exec(l.ctx)
+
+	if err != nil {
+		l.Errorf("更新管理员部门信息失败, 管理员ID: %d, 部门ID: %d, 错误: %v", req.Id, req.DeptId, err)
+		return nil, err
+	}
+
+	return &types.CommonResp{
+		ID:      0,
+		Message: "绑定成功",
+	}, nil
 }
