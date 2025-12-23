@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 	gen "github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/hook"
@@ -34,6 +35,13 @@ type softDeleteKey struct{}
 // SkipSoftDelete returns a new context that skips the soft-delete interceptor/mutators.
 func SkipSoftDelete(parent context.Context) context.Context {
 	return context.WithValue(parent, softDeleteKey{}, true)
+}
+
+// Indexes 定义索引
+func (SoftDeleteMixin) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("deleted_at"),
+	}
 }
 
 // Interceptors of the SoftDeleteMixin.

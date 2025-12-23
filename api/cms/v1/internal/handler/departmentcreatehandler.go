@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
@@ -24,9 +25,13 @@ func departmentCreateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewDepartmentCreateLogic(r.Context(), svcCtx)
 		resp, err := l.DepartmentCreate(&req)
 		if err != nil {
-			common.Fail(w, common.ErrInternalServer, err.Error())
-		} else {
-			common.Ok(w, resp)
+			// 如果是业务错误，使用业务错误码，否则使用内部服务器错误
+			var bizErr *common.BizError
+			if errors.As(err, &bizErr) {
+				common.Fail(w, bizErr.Code, bizErr.Msg)
+			}
+			return
 		}
+		common.Ok(w, resp)
 	}
 }

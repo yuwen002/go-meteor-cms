@@ -5,6 +5,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
@@ -38,6 +39,8 @@ func (l *DepartmentTreeLogic) DepartmentTree() (resp []*types.DepartmentTreeResp
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("list:", list)
 
 	// 构建 map
 	nodeMap := make(map[int64]*types.DepartmentTreeResp)

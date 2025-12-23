@@ -54,10 +54,31 @@ func (l *DepartmentUpdateLogic) DepartmentUpdate(req *types.DepartmentUpdateReq)
 			Where(department.IDEQ(req.ParentId)).
 			Exist(l.ctx)
 		if err != nil {
-			return nil, err
+			l.Logger.Errorf("查询父部门失败: %v", err)
+			return nil, common.NewBizError(common.ErrDepartmentParentNotExist)
 		}
 		if !exist {
 			return nil, common.NewBizError(common.ErrDepartmentParentNotExist)
+		}
+	}
+
+	// 如果部门名称有变化，检查新名称是否已存在
+	if req.Name != dept.Name {
+		exists, err := l.svcCtx.EntClient.Department.
+			Query().
+			Where(
+				department.And(
+					department.NameEQ(req.Name),
+					department.IDNEQ(req.Id), // 排除当前部门
+				),
+			).
+			Exist(l.ctx)
+		if err != nil {
+			l.Logger.Errorf("检查部门名称是否存在失败: %v", err)
+			return nil, common.NewBizError(common.ErrDepartmentUpdateFail)
+		}
+		if exists {
+			return nil, common.NewBizError(common.ErrDepartmentNameExists)
 		}
 	}
 

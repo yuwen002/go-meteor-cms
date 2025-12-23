@@ -34,14 +34,17 @@ const (
 	ErrInvalidParams = 4001 // 参数错误
 
 	// Department errors (5000-5999)
-	ErrDepartmentNotFound      = 5001 // 部门不存在
-	ErrDepartmentCreateFail    = 5002 // 创建部门失败
-	ErrDepartmentUpdateFail    = 5003 // 更新部门失败
-	ErrDepartmentDeleteFail    = 5004 // 删除部门失败
-	ErrDepartmentListFail      = 5005 // 获取部门列表失败
-	ErrDepartmentParentNotExist = 5006 // 父级部门不存在
+	ErrDepartmentNotFound        = 5001 // 部门不存在
+	ErrDepartmentCreateFail      = 5002 // 创建部门失败
+	ErrDepartmentUpdateFail      = 5003 // 更新部门失败
+	ErrDepartmentDeleteFail      = 5004 // 删除部门失败
+	ErrDepartmentListFail        = 5005 // 获取部门列表失败
+	ErrDepartmentParentNotExist  = 5006 // 父级部门不存在
 	ErrDepartmentSetSelfAsParent = 5007 // 不能将自己设为父级部门
 	ErrDepartmentHasChildren     = 5008 // 该部门下存在子部门，禁止删除
+	ErrDepartmentSetLeaderFail   = 5009 // 设置部门负责人失败
+	ErrDepartmentNameExists      = 5010 // 部门名称已存在
+	ErrDepartmentParentNotActive = 5011 // 父部门未启用
 )
 
 var errorMessages = map[int]string{
@@ -68,14 +71,17 @@ var errorMessages = map[int]string{
 	ErrCannotResetOwnPassword:  "不能重置自己的密码，请使用修改密码功能",
 	ErrInvalidParams:           "参数错误",
 	// Department error messages
-	ErrDepartmentNotFound:      "部门不存在",
-	ErrDepartmentCreateFail:    "创建部门失败",
-	ErrDepartmentUpdateFail:    "更新部门失败",
-	ErrDepartmentDeleteFail:    "删除部门失败",
-	ErrDepartmentListFail:      "获取部门列表失败",
-	ErrDepartmentParentNotExist: "父级部门不存在",
+	ErrDepartmentNotFound:        "部门不存在",
+	ErrDepartmentCreateFail:      "创建部门失败",
+	ErrDepartmentUpdateFail:      "更新部门失败",
+	ErrDepartmentDeleteFail:      "删除部门失败",
+	ErrDepartmentListFail:        "获取部门列表失败",
+	ErrDepartmentParentNotExist:  "父级部门不存在",
 	ErrDepartmentSetSelfAsParent: "不能将自己设为父级部门",
 	ErrDepartmentHasChildren:     "该部门下存在子部门，禁止删除",
+	ErrDepartmentSetLeaderFail:   "设置部门负责人失败",
+	ErrDepartmentNameExists:      "部门名称已存在",
+	ErrDepartmentParentNotActive: "父部门未启用，无法添加子部门",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

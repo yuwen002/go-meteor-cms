@@ -64,7 +64,7 @@ func (l *DepartmentDeleteLogic) DepartmentDelete(req *types.DepartmentDeleteReq)
 	}
 
 	return &types.CommonResp{
-		ID:      0,
+		ID:      req.Id,
 		Message: "删除成功",
 	}, nil
 }

@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // BaseMixin 提供所有表的公共字段
@@ -32,8 +33,11 @@ func (BaseMixin) Edges() []ent.Edge {
 	return nil
 }
 
+// Indexes 定义索引
 func (BaseMixin) Indexes() []ent.Index {
-	return nil
+	return []ent.Index{
+		index.Fields("created_at"),
+	}
 }
 
 func (BaseMixin) Annotations() []schema.Annotation {
