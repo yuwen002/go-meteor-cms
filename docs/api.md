@@ -294,3 +294,348 @@ Authorization: Bearer <token>
 **错误码**:
 - `3002`: 管理员不存在
 - `1000`: 服务器内部错误
+
+### 管理员登出
+
+管理员登出接口。
+
+**URL**: `POST /admin/logout`
+
+**请求参数**: 无
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "message": "登出成功"
+  }
+}
+```
+
+### 管理员详情
+
+获取指定管理员的详细信息。
+
+**URL**: `GET /admin/admin-users/:id`
+
+**路径参数**:
+- `id`: 管理员ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "username": "admin",
+    "nickname": "管理员",
+    "email": "admin@example.com",
+    "phone": "13800138000",
+    "is_active": true
+  }
+}
+```
+
+### 创建管理员
+
+创建新的管理员账号（需要超级管理员权限）。
+
+**URL**: `POST /admin/admin-users/create`
+
+**请求参数**:
+```json
+{
+  "username": "newadmin",
+  "password": "password123",
+  "nickname": "新管理员",
+  "email": "newadmin@example.com",
+  "phone": "13800000000",
+  "is_active": true,
+  "is_super": false
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "创建管理员成功"
+  }
+}
+```
+
+### 更新管理员
+
+更新指定管理员的信息（需要超级管理员权限）。
+
+**URL**: `PUT /admin/admin-users/:id`
+
+**路径参数**:
+- `id`: 管理员ID
+
+**请求参数**:
+```json
+{
+  "nickname": "更新的昵称",
+  "email": "updated@example.com",
+  "phone": "13800000000",
+  "is_active": true
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "更新管理员成功"
+  }
+}
+```
+
+### 删除管理员
+
+删除指定管理员账号（需要超级管理员权限）。
+
+**URL**: `DELETE /admin/admin-users/:id`
+
+**路径参数**:
+- `id`: 管理员ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "删除管理员成功"
+  }
+}
+```
+
+### 部门管理
+
+#### 创建部门
+
+创建新的部门（需要超级管理员权限）。
+
+**URL**: `POST /admin/departments`
+
+**请求参数**:
+```json
+{
+  "name": "技术部",
+  "parent_id": 0,
+  "sort": 1,
+  "is_active": true,
+  "leader_id": 1
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "创建部门成功"
+  }
+}
+```
+
+#### 更新部门
+
+更新指定部门信息（需要超级管理员权限）。
+
+**URL**: `PUT /admin/departments/:id`
+
+**路径参数**:
+- `id`: 部门ID
+
+**请求参数**:
+```json
+{
+  "name": "更新的部门名称",
+  "parent_id": 0,
+  "sort": 2,
+  "is_active": true,
+  "leader_id": 1
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "更新部门成功"
+  }
+}
+```
+
+#### 删除部门
+
+删除指定部门（需要超级管理员权限）。
+
+**URL**: `DELETE /admin/departments/:id`
+
+**路径参数**:
+- `id`: 部门ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "删除部门成功"
+  }
+}
+```
+
+#### 部门详情
+
+获取指定部门的详细信息。
+
+**URL**: `GET /admin/departments/:id`
+
+**路径参数**:
+- `id`: 部门ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "技术部",
+    "parent_id": 0,
+    "sort": 1,
+    "is_active": true,
+    "leader_id": 1
+  }
+}
+```
+
+#### 部门树
+
+获取部门树结构。
+
+**URL**: `GET /admin/departments/tree`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "技术部",
+      "sort": 1,
+      "is_active": true,
+      "children": [
+        {
+          "id": 2,
+          "name": "前端组",
+          "sort": 1,
+          "is_active": true,
+          "children": []
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 管理员绑定部门
+
+将管理员绑定到指定部门（需要超级管理员权限）。
+
+**URL**: `PUT /admin/admin-users/:id/bind-department`
+
+**路径参数**:
+- `id`: 管理员ID
+
+**请求参数**:
+```json
+{
+  "dept_id": 1
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "绑定部门成功"
+  }
+}
+```
+
+### 修改自己的密码
+
+管理员修改自己的密码。
+
+**URL**: `PUT /admin/admin-users/me/change-password`
+
+**请求参数**:
+```json
+{
+  "old_password": "oldpassword",
+  "new_password": "newpassword"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "message": "密码修改成功"
+  }
+}
+```
+
+### 重置其他管理员的密码
+
+超级管理员重置其他管理员的密码。
+
+**URL**: `PUT /admin/admin-users/reset-password`
+
+**请求参数**:
+```json
+{
+  "id": 2,
+  "new_password": "newpassword"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "message": "密码已重置"
+  }
+}
+```
