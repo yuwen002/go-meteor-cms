@@ -9,6 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 )
 
@@ -16,7 +18,8 @@ import (
 type AdminUserRole struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// 主键ID
+	ID int64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -25,9 +28,43 @@ type AdminUserRole struct {
 	UserID int64 `json:"user_id,omitempty"`
 	// 角色ID，关联 admin_roles.id
 	RoleID int64 `json:"role_id,omitempty"`
-	// 占位字段，无实际意义
-	Dummy        uint8 `json:"dummy,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AdminUserRoleQuery when eager-loading is set.
+	Edges        AdminUserRoleEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AdminUserRoleEdges holds the relations/edges for other nodes in the graph.
+type AdminUserRoleEdges struct {
+	// User holds the value of the user edge.
+	User *AdminUser `json:"user,omitempty"`
+	// Role holds the value of the role edge.
+	Role *AdminRole `json:"role,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AdminUserRoleEdges) UserOrErr() (*AdminUser, error) {
+	if e.User != nil {
+		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: adminuser.Label}
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
+// RoleOrErr returns the Role value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AdminUserRoleEdges) RoleOrErr() (*AdminRole, error) {
+	if e.Role != nil {
+		return e.Role, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: adminrole.Label}
+	}
+	return nil, &NotLoadedError{edge: "role"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,7 +72,7 @@ func (*AdminUserRole) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case adminuserrole.FieldID, adminuserrole.FieldUserID, adminuserrole.FieldRoleID, adminuserrole.FieldDummy:
+		case adminuserrole.FieldID, adminuserrole.FieldUserID, adminuserrole.FieldRoleID:
 			values[i] = new(sql.NullInt64)
 		case adminuserrole.FieldCreatedAt, adminuserrole.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -59,7 +96,7 @@ func (_m *AdminUserRole) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case adminuserrole.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -84,12 +121,6 @@ func (_m *AdminUserRole) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.RoleID = value.Int64
 			}
-		case adminuserrole.FieldDummy:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field dummy", values[i])
-			} else if value.Valid {
-				_m.Dummy = uint8(value.Int64)
-			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -101,6 +132,16 @@ func (_m *AdminUserRole) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *AdminUserRole) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryUser queries the "user" edge of the AdminUserRole entity.
+func (_m *AdminUserRole) QueryUser() *AdminUserQuery {
+	return NewAdminUserRoleClient(_m.config).QueryUser(_m)
+}
+
+// QueryRole queries the "role" edge of the AdminUserRole entity.
+func (_m *AdminUserRole) QueryRole() *AdminRoleQuery {
+	return NewAdminUserRoleClient(_m.config).QueryRole(_m)
 }
 
 // Update returns a builder for updating this AdminUserRole.
@@ -137,9 +178,6 @@ func (_m *AdminUserRole) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.RoleID))
-	builder.WriteString(", ")
-	builder.WriteString("dummy=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Dummy))
 	builder.WriteByte(')')
 	return builder.String()
 }

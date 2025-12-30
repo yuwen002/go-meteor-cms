@@ -876,6 +876,29 @@ func HasChildrenWith(preds ...predicate.AdminPermission) predicate.AdminPermissi
 	})
 }
 
+// HasRoles applies the HasEdge predicate on the "roles" edge.
+func HasRoles() predicate.AdminPermission {
+	return predicate.AdminPermission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, RolesTable, RolesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRolesWith applies the HasEdge predicate on the "roles" edge with a given conditions (other predicates).
+func HasRolesWith(preds ...predicate.AdminRole) predicate.AdminPermission {
+	return predicate.AdminPermission(func(s *sql.Selector) {
+		step := newRolesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.AdminPermission) predicate.AdminPermission {
 	return predicate.AdminPermission(sql.AndPredicates(predicates...))

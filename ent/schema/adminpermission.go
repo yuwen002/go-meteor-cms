@@ -91,10 +91,19 @@ func (AdminPermission) Fields() []ent.Field {
 
 func (AdminPermission) Edges() []ent.Edge {
 	return []ent.Edge{
+		// 权限树
 		edge.From("parent", AdminPermission.Type).
 			Ref("children").
 			Field("parent_id").
-			Unique(),
+			Unique().
+			Annotations(
+				entsql.OnDelete(entsql.SetNull),
+			),
+
 		edge.To("children", AdminPermission.Type),
+
+		// 角色-权限（反向多对多）
+		edge.From("roles", AdminRole.Type).
+			Ref("permissions"),
 	}
 }

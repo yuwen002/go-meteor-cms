@@ -47,6 +47,8 @@ const (
 	EdgeParent = "parent"
 	// EdgeChildren holds the string denoting the children edge name in mutations.
 	EdgeChildren = "children"
+	// EdgeRoles holds the string denoting the roles edge name in mutations.
+	EdgeRoles = "roles"
 	// Table holds the table name of the adminpermission in the database.
 	Table = "admin_permissions"
 	// ParentTable is the table that holds the parent relation/edge.
@@ -57,6 +59,11 @@ const (
 	ChildrenTable = "admin_permissions"
 	// ChildrenColumn is the table column denoting the children relation/edge.
 	ChildrenColumn = "parent_id"
+	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
+	RolesTable = "admin_role_permissions"
+	// RolesInverseTable is the table name for the AdminRole entity.
+	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
+	RolesInverseTable = "admin_roles"
 )
 
 // Columns holds all SQL columns for adminpermission fields.
@@ -77,6 +84,12 @@ var Columns = []string{
 	FieldIsActive,
 	FieldSort,
 }
+
+var (
+	// RolesPrimaryKey and RolesColumn2 are the table columns denoting the
+	// primary key for the roles relation (M2M).
+	RolesPrimaryKey = []string{"role_id", "permission_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -222,6 +235,20 @@ func ByChildren(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newChildrenStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByRolesCount orders the results by roles count.
+func ByRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRolesStep(), opts...)
+	}
+}
+
+// ByRoles orders the results by roles terms.
+func ByRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newParentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -234,5 +261,12 @@ func newChildrenStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+	)
+}
+func newRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RolesTable, RolesPrimaryKey...),
 	)
 }

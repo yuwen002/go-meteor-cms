@@ -47,6 +47,10 @@ const (
 	FieldResetExpire = "reset_expire"
 	// EdgeDepartment holds the string denoting the department edge name in mutations.
 	EdgeDepartment = "department"
+	// EdgeRoles holds the string denoting the roles edge name in mutations.
+	EdgeRoles = "roles"
+	// EdgeUserRoles holds the string denoting the user_roles edge name in mutations.
+	EdgeUserRoles = "user_roles"
 	// Table holds the table name of the adminuser in the database.
 	Table = "admin_users"
 	// DepartmentTable is the table that holds the department relation/edge.
@@ -56,6 +60,18 @@ const (
 	DepartmentInverseTable = "departments"
 	// DepartmentColumn is the table column denoting the department relation/edge.
 	DepartmentColumn = "dept_id"
+	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
+	RolesTable = "admin_user_roles"
+	// RolesInverseTable is the table name for the AdminRole entity.
+	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
+	RolesInverseTable = "admin_roles"
+	// UserRolesTable is the table that holds the user_roles relation/edge.
+	UserRolesTable = "admin_user_roles"
+	// UserRolesInverseTable is the table name for the AdminUserRole entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuserrole" package.
+	UserRolesInverseTable = "admin_user_roles"
+	// UserRolesColumn is the table column denoting the user_roles relation/edge.
+	UserRolesColumn = "user_id"
 )
 
 // Columns holds all SQL columns for adminuser fields.
@@ -77,6 +93,12 @@ var Columns = []string{
 	FieldResetToken,
 	FieldResetExpire,
 }
+
+var (
+	// RolesPrimaryKey and RolesColumn2 are the table columns denoting the
+	// primary key for the roles relation (M2M).
+	RolesPrimaryKey = []string{"user_id", "role_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -205,10 +227,52 @@ func ByDepartmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDepartmentStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByRolesCount orders the results by roles count.
+func ByRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRolesStep(), opts...)
+	}
+}
+
+// ByRoles orders the results by roles terms.
+func ByRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserRolesCount orders the results by user_roles count.
+func ByUserRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserRolesStep(), opts...)
+	}
+}
+
+// ByUserRoles orders the results by user_roles terms.
+func ByUserRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newDepartmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DepartmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, DepartmentTable, DepartmentColumn),
+	)
+}
+func newRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, RolesTable, RolesPrimaryKey...),
+	)
+}
+func newUserRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserRolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserRolesTable, UserRolesColumn),
 	)
 }

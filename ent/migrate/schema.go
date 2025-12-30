@@ -41,6 +41,18 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "adminpermission_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminPermissionsColumns[1]},
+			},
+			{
+				Name:    "adminpermission_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminPermissionsColumns[3]},
+			},
+		},
 	}
 	// AdminRolesColumns holds the columns for the "admin_roles" table.
 	AdminRolesColumns = []*schema.Column{
@@ -62,15 +74,27 @@ var (
 		Comment:    "后台角色表",
 		Columns:    AdminRolesColumns,
 		PrimaryKey: []*schema.Column{AdminRolesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "adminrole_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminRolesColumns[1]},
+			},
+			{
+				Name:    "adminrole_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminRolesColumns[3]},
+			},
+		},
 	}
 	// AdminRoleDeptsColumns holds the columns for the "admin_role_depts" table.
 	AdminRoleDeptsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
-		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID"},
-		{Name: "dept_id", Type: field.TypeInt64, Comment: "部门ID"},
+		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID，关联 admin_roles.id"},
+		{Name: "dept_id", Type: field.TypeInt64, Comment: "部门ID，关联 departments.id"},
 	}
 	// AdminRoleDeptsTable holds the schema information for the "admin_role_depts" table.
 	AdminRoleDeptsTable = &schema.Table{
@@ -78,15 +102,31 @@ var (
 		Comment:    "角色部门关联表",
 		Columns:    AdminRoleDeptsColumns,
 		PrimaryKey: []*schema.Column{AdminRoleDeptsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "adminroledept_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminRoleDeptsColumns[1]},
+			},
+			{
+				Name:    "adminroledept_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminRoleDeptsColumns[3]},
+			},
+			{
+				Name:    "adminroledept_role_id_dept_id",
+				Unique:  true,
+				Columns: []*schema.Column{AdminRoleDeptsColumns[4], AdminRoleDeptsColumns[5]},
+			},
+		},
 	}
 	// AdminRolePermissionsColumns holds the columns for the "admin_role_permissions" table.
 	AdminRolePermissionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID，关联 admin_roles.id"},
 		{Name: "permission_id", Type: field.TypeInt64, Comment: "权限ID，关联 admin_permissions.id"},
-		{Name: "dummy", Type: field.TypeUint8, Comment: "占位字段，无实际意义", Default: 0},
 	}
 	// AdminRolePermissionsTable holds the schema information for the "admin_role_permissions" table.
 	AdminRolePermissionsTable = &schema.Table{
@@ -94,6 +134,32 @@ var (
 		Comment:    "角色权限关联表",
 		Columns:    AdminRolePermissionsColumns,
 		PrimaryKey: []*schema.Column{AdminRolePermissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_role_permissions_admin_roles_role",
+				Columns:    []*schema.Column{AdminRolePermissionsColumns[3]},
+				RefColumns: []*schema.Column{AdminRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "admin_role_permissions_admin_permissions_permission",
+				Columns:    []*schema.Column{AdminRolePermissionsColumns[4]},
+				RefColumns: []*schema.Column{AdminPermissionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "adminrolepermission_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminRolePermissionsColumns[1]},
+			},
+			{
+				Name:    "adminrolepermission_role_id_permission_id",
+				Unique:  true,
+				Columns: []*schema.Column{AdminRolePermissionsColumns[3], AdminRolePermissionsColumns[4]},
+			},
+		},
 	}
 	// AdminUsersColumns holds the columns for the "admin_users" table.
 	AdminUsersColumns = []*schema.Column{
@@ -128,15 +194,26 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "adminuser_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminUsersColumns[1]},
+			},
+			{
+				Name:    "adminuser_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminUsersColumns[3]},
+			},
+		},
 	}
 	// AdminUserRolesColumns holds the columns for the "admin_user_roles" table.
 	AdminUserRolesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID，关联 admin_users.id"},
 		{Name: "role_id", Type: field.TypeInt64, Comment: "角色ID，关联 admin_roles.id"},
-		{Name: "dummy", Type: field.TypeUint8, Comment: "占位字段，无实际意义", Default: 0},
 	}
 	// AdminUserRolesTable holds the schema information for the "admin_user_roles" table.
 	AdminUserRolesTable = &schema.Table{
@@ -144,6 +221,32 @@ var (
 		Comment:    "用户角色关联表",
 		Columns:    AdminUserRolesColumns,
 		PrimaryKey: []*schema.Column{AdminUserRolesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_user_roles_admin_users_user",
+				Columns:    []*schema.Column{AdminUserRolesColumns[3]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "admin_user_roles_admin_roles_role",
+				Columns:    []*schema.Column{AdminUserRolesColumns[4]},
+				RefColumns: []*schema.Column{AdminRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "adminuserrole_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AdminUserRolesColumns[1]},
+			},
+			{
+				Name:    "adminuserrole_user_id_role_id",
+				Unique:  true,
+				Columns: []*schema.Column{AdminUserRolesColumns[3], AdminUserRolesColumns[4]},
+			},
+		},
 	}
 	// DepartmentsColumns holds the columns for the "departments" table.
 	DepartmentsColumns = []*schema.Column{
@@ -172,6 +275,18 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "department_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{DepartmentsColumns[1]},
+			},
+			{
+				Name:    "department_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{DepartmentsColumns[3]},
+			},
+		},
 	}
 	// TokenBlacklistsColumns holds the columns for the "token_blacklists" table.
 	TokenBlacklistsColumns = []*schema.Column{
@@ -189,6 +304,11 @@ var (
 		Columns:    TokenBlacklistsColumns,
 		PrimaryKey: []*schema.Column{TokenBlacklistsColumns[0]},
 		Indexes: []*schema.Index{
+			{
+				Name:    "tokenblacklist_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TokenBlacklistsColumns[1]},
+			},
 			{
 				Name:    "tokenblacklist_token_hash",
 				Unique:  true,
@@ -225,6 +345,8 @@ func init() {
 	AdminRoleDeptsTable.Annotation = &entsql.Annotation{
 		Table: "admin_role_depts",
 	}
+	AdminRolePermissionsTable.ForeignKeys[0].RefTable = AdminRolesTable
+	AdminRolePermissionsTable.ForeignKeys[1].RefTable = AdminPermissionsTable
 	AdminRolePermissionsTable.Annotation = &entsql.Annotation{
 		Table: "admin_role_permissions",
 	}
@@ -232,6 +354,10 @@ func init() {
 	AdminUsersTable.Annotation = &entsql.Annotation{
 		Table: "admin_users",
 	}
+	AdminUsersTable.Annotation.Incremental = new(bool)
+	*AdminUsersTable.Annotation.Incremental = true
+	AdminUserRolesTable.ForeignKeys[0].RefTable = AdminUsersTable
+	AdminUserRolesTable.ForeignKeys[1].RefTable = AdminRolesTable
 	AdminUserRolesTable.Annotation = &entsql.Annotation{
 		Table: "admin_user_roles",
 	}

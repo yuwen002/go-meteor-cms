@@ -10,7 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 )
 
@@ -240,6 +242,36 @@ func (_c *AdminUserCreate) SetDepartment(v *Department) *AdminUserCreate {
 	return _c.SetDepartmentID(v.ID)
 }
 
+// AddRoleIDs adds the "roles" edge to the AdminRole entity by IDs.
+func (_c *AdminUserCreate) AddRoleIDs(ids ...int64) *AdminUserCreate {
+	_c.mutation.AddRoleIDs(ids...)
+	return _c
+}
+
+// AddRoles adds the "roles" edges to the AdminRole entity.
+func (_c *AdminUserCreate) AddRoles(v ...*AdminRole) *AdminUserCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRoleIDs(ids...)
+}
+
+// AddUserRoleIDs adds the "user_roles" edge to the AdminUserRole entity by IDs.
+func (_c *AdminUserCreate) AddUserRoleIDs(ids ...int64) *AdminUserCreate {
+	_c.mutation.AddUserRoleIDs(ids...)
+	return _c
+}
+
+// AddUserRoles adds the "user_roles" edges to the AdminUserRole entity.
+func (_c *AdminUserCreate) AddUserRoles(v ...*AdminUserRole) *AdminUserCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddUserRoleIDs(ids...)
+}
+
 // Mutation returns the AdminUserMutation object of the builder.
 func (_c *AdminUserCreate) Mutation() *AdminUserMutation {
 	return _c.mutation
@@ -447,6 +479,42 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.DeptID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   adminuser.RolesTable,
+			Columns: adminuser.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &AdminUserRoleCreate{config: _c.config, mutation: newAdminUserRoleMutation(_c.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.UserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   adminuser.UserRolesTable,
+			Columns: []string{adminuser.UserRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuserrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

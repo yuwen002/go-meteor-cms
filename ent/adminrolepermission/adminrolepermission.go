@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -21,10 +22,26 @@ const (
 	FieldRoleID = "role_id"
 	// FieldPermissionID holds the string denoting the permission_id field in the database.
 	FieldPermissionID = "permission_id"
-	// FieldDummy holds the string denoting the dummy field in the database.
-	FieldDummy = "dummy"
+	// EdgeRole holds the string denoting the role edge name in mutations.
+	EdgeRole = "role"
+	// EdgePermission holds the string denoting the permission edge name in mutations.
+	EdgePermission = "permission"
 	// Table holds the table name of the adminrolepermission in the database.
 	Table = "admin_role_permissions"
+	// RoleTable is the table that holds the role relation/edge.
+	RoleTable = "admin_role_permissions"
+	// RoleInverseTable is the table name for the AdminRole entity.
+	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
+	RoleInverseTable = "admin_roles"
+	// RoleColumn is the table column denoting the role relation/edge.
+	RoleColumn = "role_id"
+	// PermissionTable is the table that holds the permission relation/edge.
+	PermissionTable = "admin_role_permissions"
+	// PermissionInverseTable is the table name for the AdminPermission entity.
+	// It exists in this package in order to avoid circular dependency with the "adminpermission" package.
+	PermissionInverseTable = "admin_permissions"
+	// PermissionColumn is the table column denoting the permission relation/edge.
+	PermissionColumn = "permission_id"
 )
 
 // Columns holds all SQL columns for adminrolepermission fields.
@@ -34,7 +51,6 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldRoleID,
 	FieldPermissionID,
-	FieldDummy,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -58,8 +74,8 @@ var (
 	RoleIDValidator func(int64) error
 	// PermissionIDValidator is a validator for the "permission_id" field. It is called by the builders before save.
 	PermissionIDValidator func(int64) error
-	// DefaultDummy holds the default value on creation for the "dummy" field.
-	DefaultDummy uint8
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the AdminRolePermission queries.
@@ -90,7 +106,30 @@ func ByPermissionID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPermissionID, opts...).ToFunc()
 }
 
-// ByDummy orders the results by the dummy field.
-func ByDummy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDummy, opts...).ToFunc()
+// ByRoleField orders the results by role field.
+func ByRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRoleStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByPermissionField orders the results by permission field.
+func ByPermissionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPermissionStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newRoleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RoleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
+	)
+}
+func newPermissionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PermissionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, PermissionTable, PermissionColumn),
+	)
 }

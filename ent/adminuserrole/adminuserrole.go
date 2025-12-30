@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -21,10 +22,26 @@ const (
 	FieldUserID = "user_id"
 	// FieldRoleID holds the string denoting the role_id field in the database.
 	FieldRoleID = "role_id"
-	// FieldDummy holds the string denoting the dummy field in the database.
-	FieldDummy = "dummy"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
+	// EdgeRole holds the string denoting the role edge name in mutations.
+	EdgeRole = "role"
 	// Table holds the table name of the adminuserrole in the database.
 	Table = "admin_user_roles"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "admin_user_roles"
+	// UserInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	UserInverseTable = "admin_users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_id"
+	// RoleTable is the table that holds the role relation/edge.
+	RoleTable = "admin_user_roles"
+	// RoleInverseTable is the table name for the AdminRole entity.
+	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
+	RoleInverseTable = "admin_roles"
+	// RoleColumn is the table column denoting the role relation/edge.
+	RoleColumn = "role_id"
 )
 
 // Columns holds all SQL columns for adminuserrole fields.
@@ -34,7 +51,6 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldUserID,
 	FieldRoleID,
-	FieldDummy,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -58,8 +74,8 @@ var (
 	UserIDValidator func(int64) error
 	// RoleIDValidator is a validator for the "role_id" field. It is called by the builders before save.
 	RoleIDValidator func(int64) error
-	// DefaultDummy holds the default value on creation for the "dummy" field.
-	DefaultDummy uint8
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the AdminUserRole queries.
@@ -90,7 +106,30 @@ func ByRoleID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRoleID, opts...).ToFunc()
 }
 
-// ByDummy orders the results by the dummy field.
-func ByDummy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDummy, opts...).ToFunc()
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByRoleField orders the results by role field.
+func ByRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRoleStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
+	)
+}
+func newRoleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RoleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
+	)
 }

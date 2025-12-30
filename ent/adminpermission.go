@@ -58,9 +58,11 @@ type AdminPermissionEdges struct {
 	Parent *AdminPermission `json:"parent,omitempty"`
 	// Children holds the value of the children edge.
 	Children []*AdminPermission `json:"children,omitempty"`
+	// Roles holds the value of the roles edge.
+	Roles []*AdminRole `json:"roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -81,6 +83,15 @@ func (e AdminPermissionEdges) ChildrenOrErr() ([]*AdminPermission, error) {
 		return e.Children, nil
 	}
 	return nil, &NotLoadedError{edge: "children"}
+}
+
+// RolesOrErr returns the Roles value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminPermissionEdges) RolesOrErr() ([]*AdminRole, error) {
+	if e.loadedTypes[2] {
+		return e.Roles, nil
+	}
+	return nil, &NotLoadedError{edge: "roles"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -224,6 +235,11 @@ func (_m *AdminPermission) QueryParent() *AdminPermissionQuery {
 // QueryChildren queries the "children" edge of the AdminPermission entity.
 func (_m *AdminPermission) QueryChildren() *AdminPermissionQuery {
 	return NewAdminPermissionClient(_m.config).QueryChildren(_m)
+}
+
+// QueryRoles queries the "roles" edge of the AdminPermission entity.
+func (_m *AdminPermission) QueryRoles() *AdminRoleQuery {
+	return NewAdminPermissionClient(_m.config).QueryRoles(_m)
 }
 
 // Update returns a builder for updating this AdminPermission.

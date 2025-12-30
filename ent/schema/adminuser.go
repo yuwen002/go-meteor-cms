@@ -15,6 +15,9 @@ type AdminUser struct {
 
 func (AdminUser) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entsql.Annotation{
+			Incremental: &[]bool{true}[0], // 👈 告诉 ent：这是自增主键
+		},
 		entsql.Annotation{Table: "admin_users"},
 		entsql.WithComments(true),
 		schema.Comment("后台管理员用户表"),
@@ -33,7 +36,6 @@ func (AdminUser) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Comment("自增主键ID").
-			Unique().
 			Positive().
 			Immutable(),
 
@@ -96,9 +98,14 @@ func (AdminUser) Fields() []ent.Field {
 // Edges of the AdminUser.
 func (AdminUser) Edges() []ent.Edge {
 	return []ent.Edge{
+		// 所属部门
 		edge.From("department", Department.Type).
 			Ref("admin_users").
 			Field("dept_id").
 			Unique(),
+
+		// 用户拥有的角色（多对多，通过 admin_user_roles）
+		edge.To("roles", AdminRole.Type).
+			Through("user_roles", AdminUserRole.Type),
 	}
 }

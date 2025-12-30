@@ -4,7 +4,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // AdminUserRole 用户角色关联表
@@ -30,6 +32,11 @@ func (AdminUserRole) Annotations() []schema.Annotation {
 
 func (AdminUserRole) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int64("id").
+			Positive().
+			Immutable().
+			Comment("主键ID"),
+
 		field.Int64("user_id").
 			Comment("用户ID，关联 admin_users.id").
 			Positive(),
@@ -37,15 +44,34 @@ func (AdminUserRole) Fields() []ent.Field {
 		field.Int64("role_id").
 			Comment("角色ID，关联 admin_roles.id").
 			Positive(),
-
-		// 复合唯一
-		field.Uint8("dummy"). // ent 不允许无字段表，所以加个占位字段
-					Comment("占位字段，无实际意义").
-					Default(0),
 	}
 }
 
-// Edges 建立与用户、角色的关系
+func (AdminUserRole) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("user_id", "role_id").
+			Unique(),
+	}
+}
+
 func (AdminUserRole) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		// 指向用户
+		edge.To("user", AdminUser.Type).
+			Field("user_id").
+			Required().
+			Unique().
+			Annotations(
+				entsql.OnDelete(entsql.Cascade),
+			),
+
+		// 指向角色
+		edge.To("role", AdminRole.Type).
+			Field("role_id").
+			Required().
+			Unique().
+			Annotations(
+				entsql.OnDelete(entsql.Cascade),
+			),
+	}
 }

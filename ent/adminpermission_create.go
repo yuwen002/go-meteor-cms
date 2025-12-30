@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 )
 
 // AdminPermissionCreate is the builder for creating a AdminPermission entity.
@@ -232,6 +233,21 @@ func (_c *AdminPermissionCreate) AddChildren(v ...*AdminPermission) *AdminPermis
 		ids[i] = v[i].ID
 	}
 	return _c.AddChildIDs(ids...)
+}
+
+// AddRoleIDs adds the "roles" edge to the AdminRole entity by IDs.
+func (_c *AdminPermissionCreate) AddRoleIDs(ids ...int64) *AdminPermissionCreate {
+	_c.mutation.AddRoleIDs(ids...)
+	return _c
+}
+
+// AddRoles adds the "roles" edges to the AdminRole entity.
+func (_c *AdminPermissionCreate) AddRoles(v ...*AdminRole) *AdminPermissionCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRoleIDs(ids...)
 }
 
 // Mutation returns the AdminPermissionMutation object of the builder.
@@ -477,6 +493,22 @@ func (_c *AdminPermissionCreate) createSpec() (*AdminPermission, *sqlgraph.Creat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

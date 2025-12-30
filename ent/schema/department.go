@@ -75,7 +75,7 @@ func (Department) Edges() []ent.Edge {
 
 		edge.To("children", Department.Type),
 
-		// 关联管理员
+		// 部门下的管理员用户
 		edge.To("admin_users", AdminUser.Type),
 	}
 }

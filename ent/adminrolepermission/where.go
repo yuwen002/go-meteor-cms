@@ -6,51 +6,52 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.AdminRolePermission {
+func ID(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.AdminRolePermission {
+func IDEQ(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.AdminRolePermission {
+func IDNEQ(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.AdminRolePermission {
+func IDIn(ids ...int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.AdminRolePermission {
+func IDNotIn(ids ...int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.AdminRolePermission {
+func IDGT(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.AdminRolePermission {
+func IDGTE(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.AdminRolePermission {
+func IDLT(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.AdminRolePermission {
+func IDLTE(id int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldLTE(FieldID, id))
 }
 
@@ -72,11 +73,6 @@ func RoleID(v int64) predicate.AdminRolePermission {
 // PermissionID applies equality check predicate on the "permission_id" field. It's identical to PermissionIDEQ.
 func PermissionID(v int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldEQ(FieldPermissionID, v))
-}
-
-// Dummy applies equality check predicate on the "dummy" field. It's identical to DummyEQ.
-func Dummy(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldEQ(FieldDummy, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -179,26 +175,6 @@ func RoleIDNotIn(vs ...int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldNotIn(FieldRoleID, vs...))
 }
 
-// RoleIDGT applies the GT predicate on the "role_id" field.
-func RoleIDGT(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGT(FieldRoleID, v))
-}
-
-// RoleIDGTE applies the GTE predicate on the "role_id" field.
-func RoleIDGTE(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGTE(FieldRoleID, v))
-}
-
-// RoleIDLT applies the LT predicate on the "role_id" field.
-func RoleIDLT(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLT(FieldRoleID, v))
-}
-
-// RoleIDLTE applies the LTE predicate on the "role_id" field.
-func RoleIDLTE(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLTE(FieldRoleID, v))
-}
-
 // PermissionIDEQ applies the EQ predicate on the "permission_id" field.
 func PermissionIDEQ(v int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldEQ(FieldPermissionID, v))
@@ -219,64 +195,50 @@ func PermissionIDNotIn(vs ...int64) predicate.AdminRolePermission {
 	return predicate.AdminRolePermission(sql.FieldNotIn(FieldPermissionID, vs...))
 }
 
-// PermissionIDGT applies the GT predicate on the "permission_id" field.
-func PermissionIDGT(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGT(FieldPermissionID, v))
+// HasRole applies the HasEdge predicate on the "role" edge.
+func HasRole() predicate.AdminRolePermission {
+	return predicate.AdminRolePermission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// PermissionIDGTE applies the GTE predicate on the "permission_id" field.
-func PermissionIDGTE(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGTE(FieldPermissionID, v))
+// HasRoleWith applies the HasEdge predicate on the "role" edge with a given conditions (other predicates).
+func HasRoleWith(preds ...predicate.AdminRole) predicate.AdminRolePermission {
+	return predicate.AdminRolePermission(func(s *sql.Selector) {
+		step := newRoleStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// PermissionIDLT applies the LT predicate on the "permission_id" field.
-func PermissionIDLT(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLT(FieldPermissionID, v))
+// HasPermission applies the HasEdge predicate on the "permission" edge.
+func HasPermission() predicate.AdminRolePermission {
+	return predicate.AdminRolePermission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, PermissionTable, PermissionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// PermissionIDLTE applies the LTE predicate on the "permission_id" field.
-func PermissionIDLTE(v int64) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLTE(FieldPermissionID, v))
-}
-
-// DummyEQ applies the EQ predicate on the "dummy" field.
-func DummyEQ(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldEQ(FieldDummy, v))
-}
-
-// DummyNEQ applies the NEQ predicate on the "dummy" field.
-func DummyNEQ(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldNEQ(FieldDummy, v))
-}
-
-// DummyIn applies the In predicate on the "dummy" field.
-func DummyIn(vs ...uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldIn(FieldDummy, vs...))
-}
-
-// DummyNotIn applies the NotIn predicate on the "dummy" field.
-func DummyNotIn(vs ...uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldNotIn(FieldDummy, vs...))
-}
-
-// DummyGT applies the GT predicate on the "dummy" field.
-func DummyGT(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGT(FieldDummy, v))
-}
-
-// DummyGTE applies the GTE predicate on the "dummy" field.
-func DummyGTE(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldGTE(FieldDummy, v))
-}
-
-// DummyLT applies the LT predicate on the "dummy" field.
-func DummyLT(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLT(FieldDummy, v))
-}
-
-// DummyLTE applies the LTE predicate on the "dummy" field.
-func DummyLTE(v uint8) predicate.AdminRolePermission {
-	return predicate.AdminRolePermission(sql.FieldLTE(FieldDummy, v))
+// HasPermissionWith applies the HasEdge predicate on the "permission" edge with a given conditions (other predicates).
+func HasPermissionWith(preds ...predicate.AdminPermission) predicate.AdminRolePermission {
+	return predicate.AdminRolePermission(func(s *sql.Selector) {
+		step := newPermissionStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -149,6 +149,18 @@ func init() {
 	adminroledept.DefaultUpdatedAt = adminroledeptDescUpdatedAt.Default.(func() time.Time)
 	// adminroledept.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminroledept.UpdateDefaultUpdatedAt = adminroledeptDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// adminroledeptDescRoleID is the schema descriptor for role_id field.
+	adminroledeptDescRoleID := adminroledeptFields[1].Descriptor()
+	// adminroledept.RoleIDValidator is a validator for the "role_id" field. It is called by the builders before save.
+	adminroledept.RoleIDValidator = adminroledeptDescRoleID.Validators[0].(func(int64) error)
+	// adminroledeptDescDeptID is the schema descriptor for dept_id field.
+	adminroledeptDescDeptID := adminroledeptFields[2].Descriptor()
+	// adminroledept.DeptIDValidator is a validator for the "dept_id" field. It is called by the builders before save.
+	adminroledept.DeptIDValidator = adminroledeptDescDeptID.Validators[0].(func(int64) error)
+	// adminroledeptDescID is the schema descriptor for id field.
+	adminroledeptDescID := adminroledeptFields[0].Descriptor()
+	// adminroledept.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	adminroledept.IDValidator = adminroledeptDescID.Validators[0].(func(int64) error)
 	adminrolepermissionMixin := schema.AdminRolePermission{}.Mixin()
 	adminrolepermissionMixinFields0 := adminrolepermissionMixin[0].Fields()
 	_ = adminrolepermissionMixinFields0
@@ -165,17 +177,17 @@ func init() {
 	// adminrolepermission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminrolepermission.UpdateDefaultUpdatedAt = adminrolepermissionDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// adminrolepermissionDescRoleID is the schema descriptor for role_id field.
-	adminrolepermissionDescRoleID := adminrolepermissionFields[0].Descriptor()
+	adminrolepermissionDescRoleID := adminrolepermissionFields[1].Descriptor()
 	// adminrolepermission.RoleIDValidator is a validator for the "role_id" field. It is called by the builders before save.
 	adminrolepermission.RoleIDValidator = adminrolepermissionDescRoleID.Validators[0].(func(int64) error)
 	// adminrolepermissionDescPermissionID is the schema descriptor for permission_id field.
-	adminrolepermissionDescPermissionID := adminrolepermissionFields[1].Descriptor()
+	adminrolepermissionDescPermissionID := adminrolepermissionFields[2].Descriptor()
 	// adminrolepermission.PermissionIDValidator is a validator for the "permission_id" field. It is called by the builders before save.
 	adminrolepermission.PermissionIDValidator = adminrolepermissionDescPermissionID.Validators[0].(func(int64) error)
-	// adminrolepermissionDescDummy is the schema descriptor for dummy field.
-	adminrolepermissionDescDummy := adminrolepermissionFields[2].Descriptor()
-	// adminrolepermission.DefaultDummy holds the default value on creation for the dummy field.
-	adminrolepermission.DefaultDummy = adminrolepermissionDescDummy.Default.(uint8)
+	// adminrolepermissionDescID is the schema descriptor for id field.
+	adminrolepermissionDescID := adminrolepermissionFields[0].Descriptor()
+	// adminrolepermission.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	adminrolepermission.IDValidator = adminrolepermissionDescID.Validators[0].(func(int64) error)
 	adminuserMixin := schema.AdminUser{}.Mixin()
 	adminuserMixinHooks1 := adminuserMixin[1].Hooks()
 	adminuser.Hooks[0] = adminuserMixinHooks1[0]
@@ -235,17 +247,17 @@ func init() {
 	// adminuserrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminuserrole.UpdateDefaultUpdatedAt = adminuserroleDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// adminuserroleDescUserID is the schema descriptor for user_id field.
-	adminuserroleDescUserID := adminuserroleFields[0].Descriptor()
+	adminuserroleDescUserID := adminuserroleFields[1].Descriptor()
 	// adminuserrole.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
 	adminuserrole.UserIDValidator = adminuserroleDescUserID.Validators[0].(func(int64) error)
 	// adminuserroleDescRoleID is the schema descriptor for role_id field.
-	adminuserroleDescRoleID := adminuserroleFields[1].Descriptor()
+	adminuserroleDescRoleID := adminuserroleFields[2].Descriptor()
 	// adminuserrole.RoleIDValidator is a validator for the "role_id" field. It is called by the builders before save.
 	adminuserrole.RoleIDValidator = adminuserroleDescRoleID.Validators[0].(func(int64) error)
-	// adminuserroleDescDummy is the schema descriptor for dummy field.
-	adminuserroleDescDummy := adminuserroleFields[2].Descriptor()
-	// adminuserrole.DefaultDummy holds the default value on creation for the dummy field.
-	adminuserrole.DefaultDummy = adminuserroleDescDummy.Default.(uint8)
+	// adminuserroleDescID is the schema descriptor for id field.
+	adminuserroleDescID := adminuserroleFields[0].Descriptor()
+	// adminuserrole.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	adminuserrole.IDValidator = adminuserroleDescID.Validators[0].(func(int64) error)
 	departmentMixin := schema.Department{}.Mixin()
 	departmentMixinHooks1 := departmentMixin[1].Hooks()
 	department.Hooks[0] = departmentMixinHooks1[0]

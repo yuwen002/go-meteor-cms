@@ -59,9 +59,13 @@ type AdminUser struct {
 type AdminUserEdges struct {
 	// Department holds the value of the department edge.
 	Department *Department `json:"department,omitempty"`
+	// Roles holds the value of the roles edge.
+	Roles []*AdminRole `json:"roles,omitempty"`
+	// UserRoles holds the value of the user_roles edge.
+	UserRoles []*AdminUserRole `json:"user_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // DepartmentOrErr returns the Department value or an error if the edge
@@ -73,6 +77,24 @@ func (e AdminUserEdges) DepartmentOrErr() (*Department, error) {
 		return nil, &NotFoundError{label: department.Label}
 	}
 	return nil, &NotLoadedError{edge: "department"}
+}
+
+// RolesOrErr returns the Roles value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminUserEdges) RolesOrErr() ([]*AdminRole, error) {
+	if e.loadedTypes[1] {
+		return e.Roles, nil
+	}
+	return nil, &NotLoadedError{edge: "roles"}
+}
+
+// UserRolesOrErr returns the UserRoles value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminUserEdges) UserRolesOrErr() ([]*AdminUserRole, error) {
+	if e.loadedTypes[2] {
+		return e.UserRoles, nil
+	}
+	return nil, &NotLoadedError{edge: "user_roles"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -220,6 +242,16 @@ func (_m *AdminUser) Value(name string) (ent.Value, error) {
 // QueryDepartment queries the "department" edge of the AdminUser entity.
 func (_m *AdminUser) QueryDepartment() *DepartmentQuery {
 	return NewAdminUserClient(_m.config).QueryDepartment(_m)
+}
+
+// QueryRoles queries the "roles" edge of the AdminUser entity.
+func (_m *AdminUser) QueryRoles() *AdminRoleQuery {
+	return NewAdminUserClient(_m.config).QueryRoles(_m)
+}
+
+// QueryUserRoles queries the "user_roles" edge of the AdminUser entity.
+func (_m *AdminUser) QueryUserRoles() *AdminUserRoleQuery {
+	return NewAdminUserClient(_m.config).QueryUserRoles(_m)
 }
 
 // Update returns a builder for updating this AdminUser.

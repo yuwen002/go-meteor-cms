@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
 
@@ -262,6 +263,21 @@ func (_u *AdminPermissionUpdate) AddChildren(v ...*AdminPermission) *AdminPermis
 	return _u.AddChildIDs(ids...)
 }
 
+// AddRoleIDs adds the "roles" edge to the AdminRole entity by IDs.
+func (_u *AdminPermissionUpdate) AddRoleIDs(ids ...int64) *AdminPermissionUpdate {
+	_u.mutation.AddRoleIDs(ids...)
+	return _u
+}
+
+// AddRoles adds the "roles" edges to the AdminRole entity.
+func (_u *AdminPermissionUpdate) AddRoles(v ...*AdminRole) *AdminPermissionUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRoleIDs(ids...)
+}
+
 // Mutation returns the AdminPermissionMutation object of the builder.
 func (_u *AdminPermissionUpdate) Mutation() *AdminPermissionMutation {
 	return _u.mutation
@@ -292,6 +308,27 @@ func (_u *AdminPermissionUpdate) RemoveChildren(v ...*AdminPermission) *AdminPer
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveChildIDs(ids...)
+}
+
+// ClearRoles clears all "roles" edges to the AdminRole entity.
+func (_u *AdminPermissionUpdate) ClearRoles() *AdminPermissionUpdate {
+	_u.mutation.ClearRoles()
+	return _u
+}
+
+// RemoveRoleIDs removes the "roles" edge to AdminRole entities by IDs.
+func (_u *AdminPermissionUpdate) RemoveRoleIDs(ids ...int64) *AdminPermissionUpdate {
+	_u.mutation.RemoveRoleIDs(ids...)
+	return _u
+}
+
+// RemoveRoles removes "roles" edges to AdminRole entities.
+func (_u *AdminPermissionUpdate) RemoveRoles(v ...*AdminRole) *AdminPermissionUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRoleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -473,6 +510,51 @@ func (_u *AdminPermissionUpdate) sqlSave(ctx context.Context) (_node int, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRolesIDs(); len(nodes) > 0 && !_u.mutation.RolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -734,6 +816,21 @@ func (_u *AdminPermissionUpdateOne) AddChildren(v ...*AdminPermission) *AdminPer
 	return _u.AddChildIDs(ids...)
 }
 
+// AddRoleIDs adds the "roles" edge to the AdminRole entity by IDs.
+func (_u *AdminPermissionUpdateOne) AddRoleIDs(ids ...int64) *AdminPermissionUpdateOne {
+	_u.mutation.AddRoleIDs(ids...)
+	return _u
+}
+
+// AddRoles adds the "roles" edges to the AdminRole entity.
+func (_u *AdminPermissionUpdateOne) AddRoles(v ...*AdminRole) *AdminPermissionUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRoleIDs(ids...)
+}
+
 // Mutation returns the AdminPermissionMutation object of the builder.
 func (_u *AdminPermissionUpdateOne) Mutation() *AdminPermissionMutation {
 	return _u.mutation
@@ -764,6 +861,27 @@ func (_u *AdminPermissionUpdateOne) RemoveChildren(v ...*AdminPermission) *Admin
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveChildIDs(ids...)
+}
+
+// ClearRoles clears all "roles" edges to the AdminRole entity.
+func (_u *AdminPermissionUpdateOne) ClearRoles() *AdminPermissionUpdateOne {
+	_u.mutation.ClearRoles()
+	return _u
+}
+
+// RemoveRoleIDs removes the "roles" edge to AdminRole entities by IDs.
+func (_u *AdminPermissionUpdateOne) RemoveRoleIDs(ids ...int64) *AdminPermissionUpdateOne {
+	_u.mutation.RemoveRoleIDs(ids...)
+	return _u
+}
+
+// RemoveRoles removes "roles" edges to AdminRole entities.
+func (_u *AdminPermissionUpdateOne) RemoveRoles(v ...*AdminRole) *AdminPermissionUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRoleIDs(ids...)
 }
 
 // Where appends a list predicates to the AdminPermissionUpdate builder.
@@ -975,6 +1093,51 @@ func (_u *AdminPermissionUpdateOne) sqlSave(ctx context.Context) (_node *AdminPe
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRolesIDs(); len(nodes) > 0 && !_u.mutation.RolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminpermission.RolesTable,
+			Columns: adminpermission.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

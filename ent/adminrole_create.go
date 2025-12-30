@@ -10,7 +10,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 )
 
 // AdminRoleCreate is the builder for creating a AdminRole entity.
@@ -148,6 +151,51 @@ func (_c *AdminRoleCreate) SetNillableSort(v *int) *AdminRoleCreate {
 func (_c *AdminRoleCreate) SetID(v int64) *AdminRoleCreate {
 	_c.mutation.SetID(v)
 	return _c
+}
+
+// AddPermissionIDs adds the "permissions" edge to the AdminPermission entity by IDs.
+func (_c *AdminRoleCreate) AddPermissionIDs(ids ...int64) *AdminRoleCreate {
+	_c.mutation.AddPermissionIDs(ids...)
+	return _c
+}
+
+// AddPermissions adds the "permissions" edges to the AdminPermission entity.
+func (_c *AdminRoleCreate) AddPermissions(v ...*AdminPermission) *AdminRoleCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPermissionIDs(ids...)
+}
+
+// AddUserIDs adds the "users" edge to the AdminUser entity by IDs.
+func (_c *AdminRoleCreate) AddUserIDs(ids ...int64) *AdminRoleCreate {
+	_c.mutation.AddUserIDs(ids...)
+	return _c
+}
+
+// AddUsers adds the "users" edges to the AdminUser entity.
+func (_c *AdminRoleCreate) AddUsers(v ...*AdminUser) *AdminRoleCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddUserIDs(ids...)
+}
+
+// AddRolePermissionIDs adds the "role_permissions" edge to the AdminRolePermission entity by IDs.
+func (_c *AdminRoleCreate) AddRolePermissionIDs(ids ...int64) *AdminRoleCreate {
+	_c.mutation.AddRolePermissionIDs(ids...)
+	return _c
+}
+
+// AddRolePermissions adds the "role_permissions" edges to the AdminRolePermission entity.
+func (_c *AdminRoleCreate) AddRolePermissions(v ...*AdminRolePermission) *AdminRoleCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRolePermissionIDs(ids...)
 }
 
 // Mutation returns the AdminRoleMutation object of the builder.
@@ -336,6 +384,58 @@ func (_c *AdminRoleCreate) createSpec() (*AdminRole, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(adminrole.FieldSort, field.TypeInt, value)
 		_node.Sort = value
+	}
+	if nodes := _c.mutation.PermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   adminrole.PermissionsTable,
+			Columns: adminrole.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &AdminRolePermissionCreate{config: _c.config, mutation: newAdminRolePermissionMutation(_c.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   adminrole.UsersTable,
+			Columns: adminrole.UsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RolePermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   adminrole.RolePermissionsTable,
+			Columns: []string{adminrole.RolePermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

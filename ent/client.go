@@ -403,6 +403,22 @@ func (c *AdminPermissionClient) QueryChildren(_m *AdminPermission) *AdminPermiss
 	return query
 }
 
+// QueryRoles queries the roles edge of a AdminPermission.
+func (c *AdminPermissionClient) QueryRoles(_m *AdminPermission) *AdminRoleQuery {
+	query := (&AdminRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminpermission.Table, adminpermission.FieldID, id),
+			sqlgraph.To(adminrole.Table, adminrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, adminpermission.RolesTable, adminpermission.RolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AdminPermissionClient) Hooks() []Hook {
 	hooks := c.hooks.AdminPermission
@@ -538,6 +554,54 @@ func (c *AdminRoleClient) GetX(ctx context.Context, id int64) *AdminRole {
 	return obj
 }
 
+// QueryPermissions queries the permissions edge of a AdminRole.
+func (c *AdminRoleClient) QueryPermissions(_m *AdminRole) *AdminPermissionQuery {
+	query := (&AdminPermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminrole.Table, adminrole.FieldID, id),
+			sqlgraph.To(adminpermission.Table, adminpermission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, adminrole.PermissionsTable, adminrole.PermissionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUsers queries the users edge of a AdminRole.
+func (c *AdminRoleClient) QueryUsers(_m *AdminRole) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminrole.Table, adminrole.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, adminrole.UsersTable, adminrole.UsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRolePermissions queries the role_permissions edge of a AdminRole.
+func (c *AdminRoleClient) QueryRolePermissions(_m *AdminRole) *AdminRolePermissionQuery {
+	query := (&AdminRolePermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminrole.Table, adminrole.FieldID, id),
+			sqlgraph.To(adminrolepermission.Table, adminrolepermission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, adminrole.RolePermissionsTable, adminrole.RolePermissionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AdminRoleClient) Hooks() []Hook {
 	hooks := c.hooks.AdminRole
@@ -626,7 +690,7 @@ func (c *AdminRoleDeptClient) UpdateOne(_m *AdminRoleDept) *AdminRoleDeptUpdateO
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AdminRoleDeptClient) UpdateOneID(id int) *AdminRoleDeptUpdateOne {
+func (c *AdminRoleDeptClient) UpdateOneID(id int64) *AdminRoleDeptUpdateOne {
 	mutation := newAdminRoleDeptMutation(c.config, OpUpdateOne, withAdminRoleDeptID(id))
 	return &AdminRoleDeptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -643,7 +707,7 @@ func (c *AdminRoleDeptClient) DeleteOne(_m *AdminRoleDept) *AdminRoleDeptDeleteO
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AdminRoleDeptClient) DeleteOneID(id int) *AdminRoleDeptDeleteOne {
+func (c *AdminRoleDeptClient) DeleteOneID(id int64) *AdminRoleDeptDeleteOne {
 	builder := c.Delete().Where(adminroledept.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -660,12 +724,12 @@ func (c *AdminRoleDeptClient) Query() *AdminRoleDeptQuery {
 }
 
 // Get returns a AdminRoleDept entity by its id.
-func (c *AdminRoleDeptClient) Get(ctx context.Context, id int) (*AdminRoleDept, error) {
+func (c *AdminRoleDeptClient) Get(ctx context.Context, id int64) (*AdminRoleDept, error) {
 	return c.Query().Where(adminroledept.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AdminRoleDeptClient) GetX(ctx context.Context, id int) *AdminRoleDept {
+func (c *AdminRoleDeptClient) GetX(ctx context.Context, id int64) *AdminRoleDept {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -761,7 +825,7 @@ func (c *AdminRolePermissionClient) UpdateOne(_m *AdminRolePermission) *AdminRol
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AdminRolePermissionClient) UpdateOneID(id int) *AdminRolePermissionUpdateOne {
+func (c *AdminRolePermissionClient) UpdateOneID(id int64) *AdminRolePermissionUpdateOne {
 	mutation := newAdminRolePermissionMutation(c.config, OpUpdateOne, withAdminRolePermissionID(id))
 	return &AdminRolePermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -778,7 +842,7 @@ func (c *AdminRolePermissionClient) DeleteOne(_m *AdminRolePermission) *AdminRol
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AdminRolePermissionClient) DeleteOneID(id int) *AdminRolePermissionDeleteOne {
+func (c *AdminRolePermissionClient) DeleteOneID(id int64) *AdminRolePermissionDeleteOne {
 	builder := c.Delete().Where(adminrolepermission.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -795,17 +859,49 @@ func (c *AdminRolePermissionClient) Query() *AdminRolePermissionQuery {
 }
 
 // Get returns a AdminRolePermission entity by its id.
-func (c *AdminRolePermissionClient) Get(ctx context.Context, id int) (*AdminRolePermission, error) {
+func (c *AdminRolePermissionClient) Get(ctx context.Context, id int64) (*AdminRolePermission, error) {
 	return c.Query().Where(adminrolepermission.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AdminRolePermissionClient) GetX(ctx context.Context, id int) *AdminRolePermission {
+func (c *AdminRolePermissionClient) GetX(ctx context.Context, id int64) *AdminRolePermission {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryRole queries the role edge of a AdminRolePermission.
+func (c *AdminRolePermissionClient) QueryRole(_m *AdminRolePermission) *AdminRoleQuery {
+	query := (&AdminRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminrolepermission.Table, adminrolepermission.FieldID, id),
+			sqlgraph.To(adminrole.Table, adminrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, adminrolepermission.RoleTable, adminrolepermission.RoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPermission queries the permission edge of a AdminRolePermission.
+func (c *AdminRolePermissionClient) QueryPermission(_m *AdminRolePermission) *AdminPermissionQuery {
+	query := (&AdminPermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminrolepermission.Table, adminrolepermission.FieldID, id),
+			sqlgraph.To(adminpermission.Table, adminpermission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, adminrolepermission.PermissionTable, adminrolepermission.PermissionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -957,6 +1053,38 @@ func (c *AdminUserClient) QueryDepartment(_m *AdminUser) *DepartmentQuery {
 	return query
 }
 
+// QueryRoles queries the roles edge of a AdminUser.
+func (c *AdminUserClient) QueryRoles(_m *AdminUser) *AdminRoleQuery {
+	query := (&AdminRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
+			sqlgraph.To(adminrole.Table, adminrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, adminuser.RolesTable, adminuser.RolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserRoles queries the user_roles edge of a AdminUser.
+func (c *AdminUserClient) QueryUserRoles(_m *AdminUser) *AdminUserRoleQuery {
+	query := (&AdminUserRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
+			sqlgraph.To(adminuserrole.Table, adminuserrole.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, adminuser.UserRolesTable, adminuser.UserRolesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AdminUserClient) Hooks() []Hook {
 	hooks := c.hooks.AdminUser
@@ -1045,7 +1173,7 @@ func (c *AdminUserRoleClient) UpdateOne(_m *AdminUserRole) *AdminUserRoleUpdateO
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AdminUserRoleClient) UpdateOneID(id int) *AdminUserRoleUpdateOne {
+func (c *AdminUserRoleClient) UpdateOneID(id int64) *AdminUserRoleUpdateOne {
 	mutation := newAdminUserRoleMutation(c.config, OpUpdateOne, withAdminUserRoleID(id))
 	return &AdminUserRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1062,7 +1190,7 @@ func (c *AdminUserRoleClient) DeleteOne(_m *AdminUserRole) *AdminUserRoleDeleteO
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AdminUserRoleClient) DeleteOneID(id int) *AdminUserRoleDeleteOne {
+func (c *AdminUserRoleClient) DeleteOneID(id int64) *AdminUserRoleDeleteOne {
 	builder := c.Delete().Where(adminuserrole.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1079,17 +1207,49 @@ func (c *AdminUserRoleClient) Query() *AdminUserRoleQuery {
 }
 
 // Get returns a AdminUserRole entity by its id.
-func (c *AdminUserRoleClient) Get(ctx context.Context, id int) (*AdminUserRole, error) {
+func (c *AdminUserRoleClient) Get(ctx context.Context, id int64) (*AdminUserRole, error) {
 	return c.Query().Where(adminuserrole.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AdminUserRoleClient) GetX(ctx context.Context, id int) *AdminUserRole {
+func (c *AdminUserRoleClient) GetX(ctx context.Context, id int64) *AdminUserRole {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryUser queries the user edge of a AdminUserRole.
+func (c *AdminUserRoleClient) QueryUser(_m *AdminUserRole) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminuserrole.Table, adminuserrole.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, adminuserrole.UserTable, adminuserrole.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRole queries the role edge of a AdminUserRole.
+func (c *AdminUserRoleClient) QueryRole(_m *AdminUserRole) *AdminRoleQuery {
+	query := (&AdminRoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminuserrole.Table, adminuserrole.FieldID, id),
+			sqlgraph.To(adminrole.Table, adminrole.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, adminuserrole.RoleTable, adminuserrole.RoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

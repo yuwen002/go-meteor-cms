@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 type AdminRoleDept struct {
@@ -30,7 +31,27 @@ func (AdminRoleDept) Annotations() []schema.Annotation {
 
 func (AdminRoleDept) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("role_id").Comment("角色ID"),
-		field.Int64("dept_id").Comment("部门ID"),
+		field.Int64("id").
+			Positive().
+			Immutable().
+			Comment("主键ID"),
+		field.Int64("role_id").
+			Positive().
+			Comment("角色ID，关联 admin_roles.id"),
+
+		field.Int64("dept_id").
+			Positive().
+			Comment("部门ID，关联 departments.id"),
 	}
+}
+
+func (AdminRoleDept) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("role_id", "dept_id").
+			Unique(),
+	}
+}
+
+func (AdminRoleDept) Edges() []ent.Edge {
+	return nil
 }

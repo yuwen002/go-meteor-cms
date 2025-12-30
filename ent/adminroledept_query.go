@@ -82,8 +82,8 @@ func (_q *AdminRoleDeptQuery) FirstX(ctx context.Context) *AdminRoleDept {
 
 // FirstID returns the first AdminRoleDept ID from the query.
 // Returns a *NotFoundError when no AdminRoleDept ID was found.
-func (_q *AdminRoleDeptQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *AdminRoleDeptQuery) FirstID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (_q *AdminRoleDeptQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *AdminRoleDeptQuery) FirstIDX(ctx context.Context) int {
+func (_q *AdminRoleDeptQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +133,8 @@ func (_q *AdminRoleDeptQuery) OnlyX(ctx context.Context) *AdminRoleDept {
 // OnlyID is like Only, but returns the only AdminRoleDept ID in the query.
 // Returns a *NotSingularError when more than one AdminRoleDept ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *AdminRoleDeptQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *AdminRoleDeptQuery) OnlyID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (_q *AdminRoleDeptQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *AdminRoleDeptQuery) OnlyIDX(ctx context.Context) int {
+func (_q *AdminRoleDeptQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +178,7 @@ func (_q *AdminRoleDeptQuery) AllX(ctx context.Context) []*AdminRoleDept {
 }
 
 // IDs executes the query and returns a list of AdminRoleDept IDs.
-func (_q *AdminRoleDeptQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *AdminRoleDeptQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -190,7 +190,7 @@ func (_q *AdminRoleDeptQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *AdminRoleDeptQuery) IDsX(ctx context.Context) []int {
+func (_q *AdminRoleDeptQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -365,7 +365,7 @@ func (_q *AdminRoleDeptQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *AdminRoleDeptQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(adminroledept.Table, adminroledept.Columns, sqlgraph.NewFieldSpec(adminroledept.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(adminroledept.Table, adminroledept.Columns, sqlgraph.NewFieldSpec(adminroledept.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

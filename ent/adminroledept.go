@@ -16,16 +16,17 @@ import (
 type AdminRoleDept struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// 主键ID
+	ID int64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 删除时间，用于软删除
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
-	// 角色ID
+	// 角色ID，关联 admin_roles.id
 	RoleID int64 `json:"role_id,omitempty"`
-	// 部门ID
+	// 部门ID，关联 departments.id
 	DeptID       int64 `json:"dept_id,omitempty"`
 	selectValues sql.SelectValues
 }
@@ -59,7 +60,7 @@ func (_m *AdminRoleDept) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case adminroledept.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])

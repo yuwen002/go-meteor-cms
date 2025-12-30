@@ -10,6 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 )
 
@@ -60,18 +62,20 @@ func (_c *AdminRolePermissionCreate) SetPermissionID(v int64) *AdminRolePermissi
 	return _c
 }
 
-// SetDummy sets the "dummy" field.
-func (_c *AdminRolePermissionCreate) SetDummy(v uint8) *AdminRolePermissionCreate {
-	_c.mutation.SetDummy(v)
+// SetID sets the "id" field.
+func (_c *AdminRolePermissionCreate) SetID(v int64) *AdminRolePermissionCreate {
+	_c.mutation.SetID(v)
 	return _c
 }
 
-// SetNillableDummy sets the "dummy" field if the given value is not nil.
-func (_c *AdminRolePermissionCreate) SetNillableDummy(v *uint8) *AdminRolePermissionCreate {
-	if v != nil {
-		_c.SetDummy(*v)
-	}
-	return _c
+// SetRole sets the "role" edge to the AdminRole entity.
+func (_c *AdminRolePermissionCreate) SetRole(v *AdminRole) *AdminRolePermissionCreate {
+	return _c.SetRoleID(v.ID)
+}
+
+// SetPermission sets the "permission" edge to the AdminPermission entity.
+func (_c *AdminRolePermissionCreate) SetPermission(v *AdminPermission) *AdminRolePermissionCreate {
+	return _c.SetPermissionID(v.ID)
 }
 
 // Mutation returns the AdminRolePermissionMutation object of the builder.
@@ -117,10 +121,6 @@ func (_c *AdminRolePermissionCreate) defaults() {
 		v := adminrolepermission.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := _c.mutation.Dummy(); !ok {
-		v := adminrolepermission.DefaultDummy
-		_c.mutation.SetDummy(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -147,8 +147,16 @@ func (_c *AdminRolePermissionCreate) check() error {
 			return &ValidationError{Name: "permission_id", err: fmt.Errorf(`ent: validator failed for field "AdminRolePermission.permission_id": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.Dummy(); !ok {
-		return &ValidationError{Name: "dummy", err: errors.New(`ent: missing required field "AdminRolePermission.dummy"`)}
+	if v, ok := _c.mutation.ID(); ok {
+		if err := adminrolepermission.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "AdminRolePermission.id": %w`, err)}
+		}
+	}
+	if len(_c.mutation.RoleIDs()) == 0 {
+		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "AdminRolePermission.role"`)}
+	}
+	if len(_c.mutation.PermissionIDs()) == 0 {
+		return &ValidationError{Name: "permission", err: errors.New(`ent: missing required edge "AdminRolePermission.permission"`)}
 	}
 	return nil
 }
@@ -164,8 +172,10 @@ func (_c *AdminRolePermissionCreate) sqlSave(ctx context.Context) (*AdminRolePer
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -174,8 +184,12 @@ func (_c *AdminRolePermissionCreate) sqlSave(ctx context.Context) (*AdminRolePer
 func (_c *AdminRolePermissionCreate) createSpec() (*AdminRolePermission, *sqlgraph.CreateSpec) {
 	var (
 		_node = &AdminRolePermission{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(adminrolepermission.Table, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(adminrolepermission.Table, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt64))
 	)
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(adminrolepermission.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -184,17 +198,39 @@ func (_c *AdminRolePermissionCreate) createSpec() (*AdminRolePermission, *sqlgra
 		_spec.SetField(adminrolepermission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := _c.mutation.RoleID(); ok {
-		_spec.SetField(adminrolepermission.FieldRoleID, field.TypeInt64, value)
-		_node.RoleID = value
+	if nodes := _c.mutation.RoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.RoleTable,
+			Columns: []string{adminrolepermission.RoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.RoleID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if value, ok := _c.mutation.PermissionID(); ok {
-		_spec.SetField(adminrolepermission.FieldPermissionID, field.TypeInt64, value)
-		_node.PermissionID = value
-	}
-	if value, ok := _c.mutation.Dummy(); ok {
-		_spec.SetField(adminrolepermission.FieldDummy, field.TypeUint8, value)
-		_node.Dummy = value
+	if nodes := _c.mutation.PermissionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.PermissionTable,
+			Columns: []string{adminrolepermission.PermissionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.PermissionID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -244,9 +280,9 @@ func (_c *AdminRolePermissionCreateBulk) Save(ctx context.Context) ([]*AdminRole
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

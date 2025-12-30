@@ -62,6 +62,12 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// RoleIDValidator is a validator for the "role_id" field. It is called by the builders before save.
+	RoleIDValidator func(int64) error
+	// DeptIDValidator is a validator for the "dept_id" field. It is called by the builders before save.
+	DeptIDValidator func(int64) error
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the AdminRoleDept queries.

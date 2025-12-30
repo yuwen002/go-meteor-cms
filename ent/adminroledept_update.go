@@ -157,8 +157,26 @@ func (_u *AdminRoleDeptUpdate) defaults() error {
 	return nil
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *AdminRoleDeptUpdate) check() error {
+	if v, ok := _u.mutation.RoleID(); ok {
+		if err := adminroledept.RoleIDValidator(v); err != nil {
+			return &ValidationError{Name: "role_id", err: fmt.Errorf(`ent: validator failed for field "AdminRoleDept.role_id": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.DeptID(); ok {
+		if err := adminroledept.DeptIDValidator(v); err != nil {
+			return &ValidationError{Name: "dept_id", err: fmt.Errorf(`ent: validator failed for field "AdminRoleDept.dept_id": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (_u *AdminRoleDeptUpdate) sqlSave(ctx context.Context) (_node int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(adminroledept.Table, adminroledept.Columns, sqlgraph.NewFieldSpec(adminroledept.FieldID, field.TypeInt))
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(adminroledept.Table, adminroledept.Columns, sqlgraph.NewFieldSpec(adminroledept.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -352,8 +370,26 @@ func (_u *AdminRoleDeptUpdateOne) defaults() error {
 	return nil
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *AdminRoleDeptUpdateOne) check() error {
+	if v, ok := _u.mutation.RoleID(); ok {
+		if err := adminroledept.RoleIDValidator(v); err != nil {
+			return &ValidationError{Name: "role_id", err: fmt.Errorf(`ent: validator failed for field "AdminRoleDept.role_id": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.DeptID(); ok {
+		if err := adminroledept.DeptIDValidator(v); err != nil {
+			return &ValidationError{Name: "dept_id", err: fmt.Errorf(`ent: validator failed for field "AdminRoleDept.dept_id": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (_u *AdminRoleDeptUpdateOne) sqlSave(ctx context.Context) (_node *AdminRoleDept, err error) {
-	_spec := sqlgraph.NewUpdateSpec(adminroledept.Table, adminroledept.Columns, sqlgraph.NewFieldSpec(adminroledept.FieldID, field.TypeInt))
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(adminroledept.Table, adminroledept.Columns, sqlgraph.NewFieldSpec(adminroledept.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AdminRoleDept.id" for update`)}

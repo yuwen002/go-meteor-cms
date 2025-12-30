@@ -9,6 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 )
 
@@ -16,7 +18,8 @@ import (
 type AdminRolePermission struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// 主键ID
+	ID int64 `json:"id,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -25,9 +28,43 @@ type AdminRolePermission struct {
 	RoleID int64 `json:"role_id,omitempty"`
 	// 权限ID，关联 admin_permissions.id
 	PermissionID int64 `json:"permission_id,omitempty"`
-	// 占位字段，无实际意义
-	Dummy        uint8 `json:"dummy,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AdminRolePermissionQuery when eager-loading is set.
+	Edges        AdminRolePermissionEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AdminRolePermissionEdges holds the relations/edges for other nodes in the graph.
+type AdminRolePermissionEdges struct {
+	// Role holds the value of the role edge.
+	Role *AdminRole `json:"role,omitempty"`
+	// Permission holds the value of the permission edge.
+	Permission *AdminPermission `json:"permission,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// RoleOrErr returns the Role value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AdminRolePermissionEdges) RoleOrErr() (*AdminRole, error) {
+	if e.Role != nil {
+		return e.Role, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: adminrole.Label}
+	}
+	return nil, &NotLoadedError{edge: "role"}
+}
+
+// PermissionOrErr returns the Permission value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AdminRolePermissionEdges) PermissionOrErr() (*AdminPermission, error) {
+	if e.Permission != nil {
+		return e.Permission, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: adminpermission.Label}
+	}
+	return nil, &NotLoadedError{edge: "permission"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,7 +72,7 @@ func (*AdminRolePermission) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case adminrolepermission.FieldID, adminrolepermission.FieldRoleID, adminrolepermission.FieldPermissionID, adminrolepermission.FieldDummy:
+		case adminrolepermission.FieldID, adminrolepermission.FieldRoleID, adminrolepermission.FieldPermissionID:
 			values[i] = new(sql.NullInt64)
 		case adminrolepermission.FieldCreatedAt, adminrolepermission.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -59,7 +96,7 @@ func (_m *AdminRolePermission) assignValues(columns []string, values []any) erro
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case adminrolepermission.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -84,12 +121,6 @@ func (_m *AdminRolePermission) assignValues(columns []string, values []any) erro
 			} else if value.Valid {
 				_m.PermissionID = value.Int64
 			}
-		case adminrolepermission.FieldDummy:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field dummy", values[i])
-			} else if value.Valid {
-				_m.Dummy = uint8(value.Int64)
-			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -101,6 +132,16 @@ func (_m *AdminRolePermission) assignValues(columns []string, values []any) erro
 // This includes values selected through modifiers, order, etc.
 func (_m *AdminRolePermission) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryRole queries the "role" edge of the AdminRolePermission entity.
+func (_m *AdminRolePermission) QueryRole() *AdminRoleQuery {
+	return NewAdminRolePermissionClient(_m.config).QueryRole(_m)
+}
+
+// QueryPermission queries the "permission" edge of the AdminRolePermission entity.
+func (_m *AdminRolePermission) QueryPermission() *AdminPermissionQuery {
+	return NewAdminRolePermissionClient(_m.config).QueryPermission(_m)
 }
 
 // Update returns a builder for updating this AdminRolePermission.
@@ -137,9 +178,6 @@ func (_m *AdminRolePermission) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("permission_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PermissionID))
-	builder.WriteString(", ")
-	builder.WriteString("dummy=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Dummy))
 	builder.WriteByte(')')
 	return builder.String()
 }

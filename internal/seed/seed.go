@@ -88,15 +88,19 @@ func initAdminUser(ctx context.Context, client *ent.Client) (*ent.AdminUser, err
 // 返回创建或获取的角色信息和可能的错误
 func initSuperAdminRole(ctx context.Context, client *ent.Client) (*ent.AdminRole, error) {
 	// 1️⃣ 检查超级管理员角色是否存在
-	role, err := client.AdminRole.Query().
+	exist, err := client.AdminRole.Query().
 		Where(adminrole.CodeEQ("SUPER_ADMIN")).
-		Only(ctx)
-	if err == nil {
-		// 已存在，直接返回
-		return role, nil
+		Exist(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if exist {
+		return client.AdminRole.Query().
+			Where(adminrole.CodeEQ("SUPER_ADMIN")).
+			First(ctx)
 	}
 	// 2️⃣ 创建超级管理员角色
-	role, err = client.AdminRole.Create().
+	role, err := client.AdminRole.Create().
 		SetName("超级管理员").
 		SetCode("SUPER_ADMIN").
 		SetDataScope(1).
@@ -143,14 +147,17 @@ func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.Adm
 	// 1️⃣ 创建或获取菜单
 	menuMap := make(map[string]*ent.AdminPermission)
 	for _, m := range menus {
-		// 检查是否已存在
-		existing, err := client.AdminPermission.Query().
-			Where(adminpermission.Permission(m.Permission)).
-			Only(ctx)
+		// 1. 尝试查询是否已存在
+		p, err := client.AdminPermission.Query().
+			Where(
+				adminpermission.TypeEQ(m.Type),
+				adminpermission.PermissionEQ(m.Permission),
+			).
+			First(ctx)
 
 		if ent.IsNotFound(err) {
-			// 不存在则创建
-			p, err := client.AdminPermission.Create().
+			// 2. 不存在则创建
+			p, err = client.AdminPermission.Create().
 				SetName(m.Name).
 				SetPermission(m.Permission).
 				SetType(m.Type).
@@ -161,15 +168,13 @@ func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.Adm
 			if err != nil {
 				return nil, err
 			}
-			menuMap[m.Name] = p
-			result = append(result, p)
-		} else if err == nil {
-			// 已存在，直接使用
-			menuMap[m.Name] = existing
-			result = append(result, existing)
 		} else {
 			return nil, err
 		}
+
+		// 3. 统一收集
+		menuMap[m.Name] = p
+		result = append(result, p)
 	}
 
 	// 2️⃣ 创建或获取按钮/API
@@ -180,13 +185,15 @@ func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.Adm
 		}
 
 		// 检查是否已存在
-		existing, err := client.AdminPermission.Query().
-			Where(adminpermission.Permission(b.Permission)).
-			Only(ctx)
+		p, err := client.AdminPermission.Query().
+			Where(
+				adminpermission.TypeEQ(b.Type),
+				adminpermission.PermissionEQ(b.Permission),
+			).
+			First(ctx)
 
 		if ent.IsNotFound(err) {
-			// 不存在则创建
-			p, err := client.AdminPermission.Create().
+			p, err = client.AdminPermission.Create().
 				SetName(b.Name).
 				SetPermission(b.Permission).
 				SetType(b.Type).
@@ -198,13 +205,11 @@ func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.Adm
 			if err != nil {
 				return nil, err
 			}
-			result = append(result, p)
-		} else if err == nil {
-			// 已存在，直接使用
-			result = append(result, existing)
-		} else {
+		} else if err != nil {
 			return nil, err
 		}
+
+		result = append(result, p)
 	}
 
 	return result, nil

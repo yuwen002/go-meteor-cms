@@ -40,7 +40,7 @@ func (_d *AdminRolePermissionDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *AdminRolePermissionDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(adminrolepermission.Table, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(adminrolepermission.Table, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt64))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

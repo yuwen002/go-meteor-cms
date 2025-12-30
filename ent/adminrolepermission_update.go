@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
@@ -50,7 +52,6 @@ func (_u *AdminRolePermissionUpdate) SetUpdatedAt(v time.Time) *AdminRolePermiss
 
 // SetRoleID sets the "role_id" field.
 func (_u *AdminRolePermissionUpdate) SetRoleID(v int64) *AdminRolePermissionUpdate {
-	_u.mutation.ResetRoleID()
 	_u.mutation.SetRoleID(v)
 	return _u
 }
@@ -63,15 +64,8 @@ func (_u *AdminRolePermissionUpdate) SetNillableRoleID(v *int64) *AdminRolePermi
 	return _u
 }
 
-// AddRoleID adds value to the "role_id" field.
-func (_u *AdminRolePermissionUpdate) AddRoleID(v int64) *AdminRolePermissionUpdate {
-	_u.mutation.AddRoleID(v)
-	return _u
-}
-
 // SetPermissionID sets the "permission_id" field.
 func (_u *AdminRolePermissionUpdate) SetPermissionID(v int64) *AdminRolePermissionUpdate {
-	_u.mutation.ResetPermissionID()
 	_u.mutation.SetPermissionID(v)
 	return _u
 }
@@ -84,36 +78,31 @@ func (_u *AdminRolePermissionUpdate) SetNillablePermissionID(v *int64) *AdminRol
 	return _u
 }
 
-// AddPermissionID adds value to the "permission_id" field.
-func (_u *AdminRolePermissionUpdate) AddPermissionID(v int64) *AdminRolePermissionUpdate {
-	_u.mutation.AddPermissionID(v)
-	return _u
+// SetRole sets the "role" edge to the AdminRole entity.
+func (_u *AdminRolePermissionUpdate) SetRole(v *AdminRole) *AdminRolePermissionUpdate {
+	return _u.SetRoleID(v.ID)
 }
 
-// SetDummy sets the "dummy" field.
-func (_u *AdminRolePermissionUpdate) SetDummy(v uint8) *AdminRolePermissionUpdate {
-	_u.mutation.ResetDummy()
-	_u.mutation.SetDummy(v)
-	return _u
-}
-
-// SetNillableDummy sets the "dummy" field if the given value is not nil.
-func (_u *AdminRolePermissionUpdate) SetNillableDummy(v *uint8) *AdminRolePermissionUpdate {
-	if v != nil {
-		_u.SetDummy(*v)
-	}
-	return _u
-}
-
-// AddDummy adds value to the "dummy" field.
-func (_u *AdminRolePermissionUpdate) AddDummy(v int8) *AdminRolePermissionUpdate {
-	_u.mutation.AddDummy(v)
-	return _u
+// SetPermission sets the "permission" edge to the AdminPermission entity.
+func (_u *AdminRolePermissionUpdate) SetPermission(v *AdminPermission) *AdminRolePermissionUpdate {
+	return _u.SetPermissionID(v.ID)
 }
 
 // Mutation returns the AdminRolePermissionMutation object of the builder.
 func (_u *AdminRolePermissionUpdate) Mutation() *AdminRolePermissionMutation {
 	return _u.mutation
+}
+
+// ClearRole clears the "role" edge to the AdminRole entity.
+func (_u *AdminRolePermissionUpdate) ClearRole() *AdminRolePermissionUpdate {
+	_u.mutation.ClearRole()
+	return _u
+}
+
+// ClearPermission clears the "permission" edge to the AdminPermission entity.
+func (_u *AdminRolePermissionUpdate) ClearPermission() *AdminRolePermissionUpdate {
+	_u.mutation.ClearPermission()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -164,6 +153,12 @@ func (_u *AdminRolePermissionUpdate) check() error {
 			return &ValidationError{Name: "permission_id", err: fmt.Errorf(`ent: validator failed for field "AdminRolePermission.permission_id": %w`, err)}
 		}
 	}
+	if _u.mutation.RoleCleared() && len(_u.mutation.RoleIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AdminRolePermission.role"`)
+	}
+	if _u.mutation.PermissionCleared() && len(_u.mutation.PermissionIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AdminRolePermission.permission"`)
+	}
 	return nil
 }
 
@@ -171,7 +166,7 @@ func (_u *AdminRolePermissionUpdate) sqlSave(ctx context.Context) (_node int, er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(adminrolepermission.Table, adminrolepermission.Columns, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(adminrolepermission.Table, adminrolepermission.Columns, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -185,23 +180,63 @@ func (_u *AdminRolePermissionUpdate) sqlSave(ctx context.Context) (_node int, er
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrolepermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.RoleID(); ok {
-		_spec.SetField(adminrolepermission.FieldRoleID, field.TypeInt64, value)
+	if _u.mutation.RoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.RoleTable,
+			Columns: []string{adminrolepermission.RoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := _u.mutation.AddedRoleID(); ok {
-		_spec.AddField(adminrolepermission.FieldRoleID, field.TypeInt64, value)
+	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.RoleTable,
+			Columns: []string{adminrolepermission.RoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := _u.mutation.PermissionID(); ok {
-		_spec.SetField(adminrolepermission.FieldPermissionID, field.TypeInt64, value)
+	if _u.mutation.PermissionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.PermissionTable,
+			Columns: []string{adminrolepermission.PermissionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := _u.mutation.AddedPermissionID(); ok {
-		_spec.AddField(adminrolepermission.FieldPermissionID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.Dummy(); ok {
-		_spec.SetField(adminrolepermission.FieldDummy, field.TypeUint8, value)
-	}
-	if value, ok := _u.mutation.AddedDummy(); ok {
-		_spec.AddField(adminrolepermission.FieldDummy, field.TypeUint8, value)
+	if nodes := _u.mutation.PermissionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.PermissionTable,
+			Columns: []string{adminrolepermission.PermissionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -245,7 +280,6 @@ func (_u *AdminRolePermissionUpdateOne) SetUpdatedAt(v time.Time) *AdminRolePerm
 
 // SetRoleID sets the "role_id" field.
 func (_u *AdminRolePermissionUpdateOne) SetRoleID(v int64) *AdminRolePermissionUpdateOne {
-	_u.mutation.ResetRoleID()
 	_u.mutation.SetRoleID(v)
 	return _u
 }
@@ -258,15 +292,8 @@ func (_u *AdminRolePermissionUpdateOne) SetNillableRoleID(v *int64) *AdminRolePe
 	return _u
 }
 
-// AddRoleID adds value to the "role_id" field.
-func (_u *AdminRolePermissionUpdateOne) AddRoleID(v int64) *AdminRolePermissionUpdateOne {
-	_u.mutation.AddRoleID(v)
-	return _u
-}
-
 // SetPermissionID sets the "permission_id" field.
 func (_u *AdminRolePermissionUpdateOne) SetPermissionID(v int64) *AdminRolePermissionUpdateOne {
-	_u.mutation.ResetPermissionID()
 	_u.mutation.SetPermissionID(v)
 	return _u
 }
@@ -279,36 +306,31 @@ func (_u *AdminRolePermissionUpdateOne) SetNillablePermissionID(v *int64) *Admin
 	return _u
 }
 
-// AddPermissionID adds value to the "permission_id" field.
-func (_u *AdminRolePermissionUpdateOne) AddPermissionID(v int64) *AdminRolePermissionUpdateOne {
-	_u.mutation.AddPermissionID(v)
-	return _u
+// SetRole sets the "role" edge to the AdminRole entity.
+func (_u *AdminRolePermissionUpdateOne) SetRole(v *AdminRole) *AdminRolePermissionUpdateOne {
+	return _u.SetRoleID(v.ID)
 }
 
-// SetDummy sets the "dummy" field.
-func (_u *AdminRolePermissionUpdateOne) SetDummy(v uint8) *AdminRolePermissionUpdateOne {
-	_u.mutation.ResetDummy()
-	_u.mutation.SetDummy(v)
-	return _u
-}
-
-// SetNillableDummy sets the "dummy" field if the given value is not nil.
-func (_u *AdminRolePermissionUpdateOne) SetNillableDummy(v *uint8) *AdminRolePermissionUpdateOne {
-	if v != nil {
-		_u.SetDummy(*v)
-	}
-	return _u
-}
-
-// AddDummy adds value to the "dummy" field.
-func (_u *AdminRolePermissionUpdateOne) AddDummy(v int8) *AdminRolePermissionUpdateOne {
-	_u.mutation.AddDummy(v)
-	return _u
+// SetPermission sets the "permission" edge to the AdminPermission entity.
+func (_u *AdminRolePermissionUpdateOne) SetPermission(v *AdminPermission) *AdminRolePermissionUpdateOne {
+	return _u.SetPermissionID(v.ID)
 }
 
 // Mutation returns the AdminRolePermissionMutation object of the builder.
 func (_u *AdminRolePermissionUpdateOne) Mutation() *AdminRolePermissionMutation {
 	return _u.mutation
+}
+
+// ClearRole clears the "role" edge to the AdminRole entity.
+func (_u *AdminRolePermissionUpdateOne) ClearRole() *AdminRolePermissionUpdateOne {
+	_u.mutation.ClearRole()
+	return _u
+}
+
+// ClearPermission clears the "permission" edge to the AdminPermission entity.
+func (_u *AdminRolePermissionUpdateOne) ClearPermission() *AdminRolePermissionUpdateOne {
+	_u.mutation.ClearPermission()
+	return _u
 }
 
 // Where appends a list predicates to the AdminRolePermissionUpdate builder.
@@ -372,6 +394,12 @@ func (_u *AdminRolePermissionUpdateOne) check() error {
 			return &ValidationError{Name: "permission_id", err: fmt.Errorf(`ent: validator failed for field "AdminRolePermission.permission_id": %w`, err)}
 		}
 	}
+	if _u.mutation.RoleCleared() && len(_u.mutation.RoleIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AdminRolePermission.role"`)
+	}
+	if _u.mutation.PermissionCleared() && len(_u.mutation.PermissionIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AdminRolePermission.permission"`)
+	}
 	return nil
 }
 
@@ -379,7 +407,7 @@ func (_u *AdminRolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *Adm
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(adminrolepermission.Table, adminrolepermission.Columns, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(adminrolepermission.Table, adminrolepermission.Columns, sqlgraph.NewFieldSpec(adminrolepermission.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AdminRolePermission.id" for update`)}
@@ -410,23 +438,63 @@ func (_u *AdminRolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *Adm
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(adminrolepermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.RoleID(); ok {
-		_spec.SetField(adminrolepermission.FieldRoleID, field.TypeInt64, value)
+	if _u.mutation.RoleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.RoleTable,
+			Columns: []string{adminrolepermission.RoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := _u.mutation.AddedRoleID(); ok {
-		_spec.AddField(adminrolepermission.FieldRoleID, field.TypeInt64, value)
+	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.RoleTable,
+			Columns: []string{adminrolepermission.RoleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if value, ok := _u.mutation.PermissionID(); ok {
-		_spec.SetField(adminrolepermission.FieldPermissionID, field.TypeInt64, value)
+	if _u.mutation.PermissionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.PermissionTable,
+			Columns: []string{adminrolepermission.PermissionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := _u.mutation.AddedPermissionID(); ok {
-		_spec.AddField(adminrolepermission.FieldPermissionID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.Dummy(); ok {
-		_spec.SetField(adminrolepermission.FieldDummy, field.TypeUint8, value)
-	}
-	if value, ok := _u.mutation.AddedDummy(); ok {
-		_spec.AddField(adminrolepermission.FieldDummy, field.TypeUint8, value)
+	if nodes := _u.mutation.PermissionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   adminrolepermission.PermissionTable,
+			Columns: []string{adminrolepermission.PermissionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminpermission.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &AdminRolePermission{config: _u.config}
 	_spec.Assign = _node.assignValues

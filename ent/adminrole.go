@@ -37,8 +37,51 @@ type AdminRole struct {
 	// 是否启用
 	IsActive bool `json:"is_active,omitempty"`
 	// 排序，从小到大
-	Sort         int `json:"sort,omitempty"`
+	Sort int `json:"sort,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AdminRoleQuery when eager-loading is set.
+	Edges        AdminRoleEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AdminRoleEdges holds the relations/edges for other nodes in the graph.
+type AdminRoleEdges struct {
+	// Permissions holds the value of the permissions edge.
+	Permissions []*AdminPermission `json:"permissions,omitempty"`
+	// Users holds the value of the users edge.
+	Users []*AdminUser `json:"users,omitempty"`
+	// RolePermissions holds the value of the role_permissions edge.
+	RolePermissions []*AdminRolePermission `json:"role_permissions,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [3]bool
+}
+
+// PermissionsOrErr returns the Permissions value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminRoleEdges) PermissionsOrErr() ([]*AdminPermission, error) {
+	if e.loadedTypes[0] {
+		return e.Permissions, nil
+	}
+	return nil, &NotLoadedError{edge: "permissions"}
+}
+
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminRoleEdges) UsersOrErr() ([]*AdminUser, error) {
+	if e.loadedTypes[1] {
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
+}
+
+// RolePermissionsOrErr returns the RolePermissions value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminRoleEdges) RolePermissionsOrErr() ([]*AdminRolePermission, error) {
+	if e.loadedTypes[2] {
+		return e.RolePermissions, nil
+	}
+	return nil, &NotLoadedError{edge: "role_permissions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -147,6 +190,21 @@ func (_m *AdminRole) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *AdminRole) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryPermissions queries the "permissions" edge of the AdminRole entity.
+func (_m *AdminRole) QueryPermissions() *AdminPermissionQuery {
+	return NewAdminRoleClient(_m.config).QueryPermissions(_m)
+}
+
+// QueryUsers queries the "users" edge of the AdminRole entity.
+func (_m *AdminRole) QueryUsers() *AdminUserQuery {
+	return NewAdminRoleClient(_m.config).QueryUsers(_m)
+}
+
+// QueryRolePermissions queries the "role_permissions" edge of the AdminRole entity.
+func (_m *AdminRole) QueryRolePermissions() *AdminRolePermissionQuery {
+	return NewAdminRoleClient(_m.config).QueryRolePermissions(_m)
 }
 
 // Update returns a builder for updating this AdminRole.

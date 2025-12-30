@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 )
 
@@ -537,6 +538,75 @@ func SortLT(v int) predicate.AdminRole {
 // SortLTE applies the LTE predicate on the "sort" field.
 func SortLTE(v int) predicate.AdminRole {
 	return predicate.AdminRole(sql.FieldLTE(FieldSort, v))
+}
+
+// HasPermissions applies the HasEdge predicate on the "permissions" edge.
+func HasPermissions() predicate.AdminRole {
+	return predicate.AdminRole(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, PermissionsTable, PermissionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPermissionsWith applies the HasEdge predicate on the "permissions" edge with a given conditions (other predicates).
+func HasPermissionsWith(preds ...predicate.AdminPermission) predicate.AdminRole {
+	return predicate.AdminRole(func(s *sql.Selector) {
+		step := newPermissionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUsers applies the HasEdge predicate on the "users" edge.
+func HasUsers() predicate.AdminRole {
+	return predicate.AdminRole(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
+func HasUsersWith(preds ...predicate.AdminUser) predicate.AdminRole {
+	return predicate.AdminRole(func(s *sql.Selector) {
+		step := newUsersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRolePermissions applies the HasEdge predicate on the "role_permissions" edge.
+func HasRolePermissions() predicate.AdminRole {
+	return predicate.AdminRole(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, RolePermissionsTable, RolePermissionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRolePermissionsWith applies the HasEdge predicate on the "role_permissions" edge with a given conditions (other predicates).
+func HasRolePermissionsWith(preds ...predicate.AdminRolePermission) predicate.AdminRole {
+	return predicate.AdminRole(func(s *sql.Selector) {
+		step := newRolePermissionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

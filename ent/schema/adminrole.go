@@ -72,16 +72,12 @@ func (AdminRole) Fields() []ent.Field {
 
 func (AdminRole) Edges() []ent.Edge {
 	return []ent.Edge{
-		// 角色 - 管理员（多对多）
-		edge.To("roles", AdminRole.Type).
-			Through("admin_user_roles", AdminUserRole.Type),
-
-		// 角色 - 权限（多对多）
+		// 角色-权限
 		edge.To("permissions", AdminPermission.Type).
-			Through("admin_role_permissions", AdminRolePermission.Type),
+			Through("role_permissions", AdminRolePermission.Type),
 
-		// 角色 - 自定义部门（data_scope = 5 时使用）
-		edge.To("departments", Department.Type).
-			Through("admin_role_departments", AdminRoleDept.Type),
+		// 角色-用户（反向多对多）
+		edge.From("users", AdminUser.Type).
+			Ref("roles"),
 	}
 }
