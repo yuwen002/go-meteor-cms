@@ -171,6 +171,73 @@ type (
 		Id     int64 `path:"id"` // 管理员ID
 		DeptId int64 `json:"dept_id"` // 部门ID
 	}
+	// 角色项
+	RoleItem {
+		ID        int64  `json:"id"`
+		Name      string `json:"name"`
+		Code      string `json:"code"`
+		Desc      string `json:"desc"`
+		DataScope int    `json:"data_scope"`
+		IsSystem  bool   `json:"is_system"`
+		IsActive  bool   `json:"is_active"`
+		Sort      int    `json:"sort"`
+		CreatedAt string `json:"created_at"`
+		UpdatedAt string `json:"updated_at"`
+	}
+	// 角色列表请求
+	RoleListReq {
+		Page     int    `form:"page,default=1"` // 页码
+		PageSize int    `form:"page_size,default=20"` // 每页数量
+		Keyword  string `form:"keyword,optional"` // 搜索关键词（角色名称/编码）
+		IsActive *bool  `form:"is_active,optional"` // 是否启用
+	}
+	// 角色列表响应
+	RoleListResp {
+		Total    int64      `json:"total"`
+		Page     int        `json:"page"`
+		PageSize int        `json:"page_size"`
+		List     []RoleItem `json:"list"`
+	}
+	// 创建角色请求
+	CreateRoleReq {
+		Name      string `json:"name" validate:"required"` // 角色名称
+		Code      string `json:"code" validate:"required"` // 角色编码
+		Desc      string `json:"desc"` // 角色描述
+		DataScope int    `json:"data_scope" default:"1"` // 数据权限范围
+		IsActive  bool   `json:"is_active" default:"true"` // 是否启用
+		Sort      int    `json:"sort" default:"0"` // 排序
+	}
+	// 更新角色请求
+	UpdateRoleReq {
+		ID        int64   `path:"id"`
+		Name      *string `json:"name,optional,options=nonzero"` // 角色名称，如果提供则不能为空
+		Code      *string `json:"code,optional,options=nonzero"` // 角色编码，如果提供则不能为空
+		Desc      *string `json:"desc,optional"` // 角色描述
+		DataScope *int    `json:"data_scope,optional"` // 数据权限范围
+		IsActive  *bool   `json:"is_active,optional"` // 是否启用
+		Sort      *int    `json:"sort,optional"` // 排序
+	}
+	// 角色详情请求
+	RoleDetailReq {
+		ID int64 `path:"id"`
+	}
+	// 删除请求
+	DeleteReq {
+		ID int64 `path:"id"`
+	}
+	// 角色详情响应
+	RoleDetailResp {
+		RoleItem
+	}
+	// 分配角色权限请求
+	AssignRolePermissionsReq {
+		RoleID        int64   `path:"id"`
+		PermissionIDs []int64 `json:"permission_ids"` // 权限ID列表
+	}
+	// 获取角色权限ID列表响应
+	RolePermissionIDsResp {
+		PermissionIDs []int64 `json:"permission_ids"`
+	}
 )
 
 @server (
@@ -231,5 +298,33 @@ service cms-api {
 	// 管理员绑定部门
 	@handler adminBindDepartment
 	put /admin/admin-users/:id/bind-department (AdminBindDeptReq) returns (CommonResp)
+
+	// 获取角色列表
+	@handler roleList
+	get /admin/roles (RoleListReq) returns (RoleListResp)
+
+	// 获取角色详情
+	@handler roleDetail
+	get /admin/roles/:id (RoleDetailReq) returns (RoleDetailResp)
+
+	// 创建角色
+	@handler roleCreate
+	post /admin/roles (CreateRoleReq) returns (CommonResp)
+
+	// 更新角色
+	@handler roleUpdate
+	put /admin/roles/:id (UpdateRoleReq) returns (CommonResp)
+
+	// 删除角色
+	@handler roleDelete
+	delete /admin/roles/:id (DeleteReq) returns (CommonResp)
+
+	// 获取角色权限ID列表
+	@handler rolePermissionList
+	get /admin/roles/:id/permissions (RoleDetailReq) returns (RolePermissionIDsResp)
+
+	// 分配角色权限
+	@handler rolePermissionAssign
+	put /admin/roles/:id/permissions (AssignRolePermissionsReq) returns (CommonResp)
 }
 

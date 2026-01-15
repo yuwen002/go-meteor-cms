@@ -48,6 +48,11 @@ type AdminListResp struct {
 	List     []AdminItem `json:"list"`
 }
 
+type AssignRolePermissionsReq struct {
+	RoleID        int64   `path:"id"`
+	PermissionIDs []int64 `json:"permission_ids"` // 权限ID列表
+}
+
 type CaptchaResp struct {
 	CaptchaID     string `json:"captcha_id"`     // 验证码ID
 	CaptchaBase64 string `json:"captcha_base64"` // 验证码图片base64
@@ -73,8 +78,21 @@ type CreateAdminReq struct {
 	IsSuper  bool   `json:"is_super"`
 }
 
+type CreateRoleReq struct {
+	Name      string `json:"name" validate:"required"` // 角色名称
+	Code      string `json:"code" validate:"required"` // 角色编码
+	Desc      string `json:"desc"`                     // 角色描述
+	DataScope int    `json:"data_scope" default:"1"`   // 数据权限范围
+	IsActive  bool   `json:"is_active" default:"true"` // 是否启用
+	Sort      int    `json:"sort" default:"0"`         // 排序
+}
+
 type DeleteAdminReq struct {
 	Id int64 `path:"id"`
+}
+
+type DeleteReq struct {
+	ID int64 `path:"id"`
 }
 
 type DepartmentCreateReq struct {
@@ -162,6 +180,45 @@ type ResetAdminPasswordReq struct {
 	NewPassword string `json:"new_password"`
 }
 
+type RoleDetailReq struct {
+	ID int64 `path:"id"`
+}
+
+type RoleDetailResp struct {
+	RoleItem
+}
+
+type RoleItem struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	Desc      string `json:"desc"`
+	DataScope int    `json:"data_scope"`
+	IsSystem  bool   `json:"is_system"`
+	IsActive  bool   `json:"is_active"`
+	Sort      int    `json:"sort"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type RoleListReq struct {
+	Page     int    `form:"page,default=1"`       // 页码
+	PageSize int    `form:"page_size,default=20"` // 每页数量
+	Keyword  string `form:"keyword,optional"`     // 搜索关键词（角色名称/编码）
+	IsActive *bool  `form:"is_active,optional"`   // 是否启用
+}
+
+type RoleListResp struct {
+	Total    int64      `json:"total"`
+	Page     int        `json:"page"`
+	PageSize int        `json:"page_size"`
+	List     []RoleItem `json:"list"`
+}
+
+type RolePermissionIDsResp struct {
+	PermissionIDs []int64 `json:"permission_ids"`
+}
+
 type TestTokenResp struct {
 	Message string                 `json:"message"`
 	Claims  map[string]interface{} `json:"claims"`
@@ -173,4 +230,14 @@ type UpdateAdminReq struct {
 	Email    string `json:"email,optional"`
 	Phone    string `json:"phone,optional"`
 	IsActive bool   `json:"is_active,optional"`
+}
+
+type UpdateRoleReq struct {
+	ID        int64   `path:"id"`
+	Name      *string `json:"name,optional"`       // 角色名称
+	Code      *string `json:"code,optional"`       // 角色编码
+	Desc      *string `json:"desc,optional"`       // 角色描述
+	DataScope *int    `json:"data_scope,optional"` // 数据权限范围
+	IsActive  *bool   `json:"is_active,optional"`  // 是否启用
+	Sort      *int    `json:"sort,optional"`       // 排序
 }

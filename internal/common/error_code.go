@@ -33,7 +33,7 @@ const (
 	// Request validation errors (4000-4999)
 	ErrInvalidParams = 4001 // 参数错误
 
-	// Department errors (5000-5999)
+	// Department errors (5000-5199)
 	ErrDepartmentNotFound        = 5001 // 部门不存在
 	ErrDepartmentCreateFail      = 5002 // 创建部门失败
 	ErrDepartmentUpdateFail      = 5003 // 更新部门失败
@@ -45,6 +45,20 @@ const (
 	ErrDepartmentSetLeaderFail   = 5009 // 设置部门负责人失败
 	ErrDepartmentNameExists      = 5010 // 部门名称已存在
 	ErrDepartmentParentNotActive = 5011 // 父部门未启用
+
+	// Role errors (5200-5399)
+	ErrRoleNotFound         = 5201 // 角色不存在
+	ErrRoleCreateFail       = 5202 // 创建角色失败
+	ErrRoleUpdateFail       = 5203 // 更新角色失败
+	ErrRoleDeleteFail       = 5204 // 删除角色失败
+	ErrRoleListFail         = 5205 // 获取角色列表失败
+	ErrRoleCodeExists       = 5206 // 角色编码已存在
+	ErrRoleNameExists       = 5207 // 角色名称已存在
+	ErrRoleIsSystemRole     = 5208 // 系统内置角色，禁止修改
+	ErrRoleIsInUse          = 5209 // 角色正在使用中，禁止删除
+	ErrRolePermissionDenied = 5210 // 没有操作该角色的权限
+	ErrRoleCodeCannotBeEmpty = 5211 // 角色编码不能为空
+	ErrRoleNameCannotBeEmpty = 5212 // 角色名称不能为空
 )
 
 var errorMessages = map[int]string{
@@ -82,6 +96,19 @@ var errorMessages = map[int]string{
 	ErrDepartmentSetLeaderFail:   "设置部门负责人失败",
 	ErrDepartmentNameExists:      "部门名称已存在",
 	ErrDepartmentParentNotActive: "父部门未启用，无法添加子部门",
+	// Role error messages
+	ErrRoleNotFound:         "角色不存在",
+	ErrRoleCreateFail:       "创建角色失败",
+	ErrRoleUpdateFail:       "更新角色失败",
+	ErrRoleDeleteFail:       "删除角色失败",
+	ErrRoleListFail:         "获取角色列表失败",
+	ErrRoleCodeExists:       "角色编码已存在",
+	ErrRoleNameExists:       "角色名称已存在",
+	ErrRoleIsSystemRole:     "系统内置角色，禁止修改",
+	ErrRoleIsInUse:          "角色正在使用中，禁止删除",
+	ErrRolePermissionDenied: "没有操作该角色的权限",
+	ErrRoleCodeCannotBeEmpty: "角色编码不能为空",
+	ErrRoleNameCannotBeEmpty: "角色名称不能为空",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息
