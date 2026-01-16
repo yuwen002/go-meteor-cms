@@ -31,7 +31,7 @@ func NewRoleUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleUp
 	}
 }
 
-func (l *RoleUpdateLogic) RoleUpdate(req *types.UpdateRoleReq) (resp *types.CommonResp, err error) {
+func (l *RoleUpdateLogic) RoleUpdate(req *types.RoleUpdateReq) (resp *types.CommonResp, err error) {
 	// 1. 检查角色是否存在
 	role, err := l.svcCtx.EntClient.AdminRole.Get(l.ctx, req.ID)
 	if err != nil {

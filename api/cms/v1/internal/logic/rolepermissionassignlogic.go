@@ -26,7 +26,7 @@ func NewRolePermissionAssignLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
-func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.AssignRolePermissionsReq) (resp *types.CommonResp, err error) {
+func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.RolePermissionAssignReq) (resp *types.CommonResp, err error) {
 	// todo: add your logic here and delete this line
 
 	return

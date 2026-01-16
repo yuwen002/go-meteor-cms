@@ -199,7 +199,7 @@ type (
 		List     []RoleItem `json:"list"`
 	}
 	// 创建角色请求
-	CreateRoleReq {
+	RoleCreateReq {
 		Name      string `json:"name" validate:"required"` // 角色名称
 		Code      string `json:"code" validate:"required"` // 角色编码
 		Desc      string `json:"desc"` // 角色描述
@@ -208,7 +208,7 @@ type (
 		Sort      int    `json:"sort" default:"0"` // 排序
 	}
 	// 更新角色请求
-	UpdateRoleReq {
+	RoleUpdateReq {
 		ID        int64   `path:"id"`
 		Name      *string `json:"name,optional,options=nonzero"` // 角色名称，如果提供则不能为空
 		Code      *string `json:"code,optional,options=nonzero"` // 角色编码，如果提供则不能为空
@@ -222,7 +222,7 @@ type (
 		ID int64 `path:"id"`
 	}
 	// 删除请求
-	DeleteReq {
+	RoleDeleteReq {
 		ID int64 `path:"id"`
 	}
 	// 角色详情响应
@@ -230,7 +230,7 @@ type (
 		RoleItem
 	}
 	// 分配角色权限请求
-	AssignRolePermissionsReq {
+	RolePermissionAssignReq {
 		RoleID        int64   `path:"id"`
 		PermissionIDs []int64 `json:"permission_ids"` // 权限ID列表
 	}
@@ -304,7 +304,7 @@ service cms-api {
 	@handler adminBindDepartment
 	put /admin/admin-users/:id/bind-department (AdminBindDeptReq) returns (CommonResp)
 
-    // 获取角色管理
+	// 获取角色管理
 	// 获取角色列表
 	@handler roleList
 	get /admin/roles (RoleListReq) returns (RoleListResp)
@@ -315,15 +315,15 @@ service cms-api {
 
 	// 创建角色
 	@handler roleCreate
-	post /admin/roles (CreateRoleReq) returns (CommonResp)
+	post /admin/roles (RoleCreateReq) returns (CommonResp)
 
 	// 更新角色
 	@handler roleUpdate
-	put /admin/roles/:id (UpdateRoleReq) returns (CommonResp)
+	put /admin/roles/:id (RoleUpdateReq) returns (CommonResp)
 
 	// 删除角色
 	@handler roleDelete
-	delete /admin/roles/:id (DeleteReq) returns (CommonResp)
+	delete /admin/roles/:id (RoleDeleteReq) returns (CommonResp)
 
 	// 获取角色权限ID列表
 	@handler rolePermissionList
@@ -331,6 +331,6 @@ service cms-api {
 
 	// 分配角色权限
 	@handler rolePermissionAssign
-	put /admin/roles/:id/permissions (AssignRolePermissionsReq) returns (CommonResp)
+	put /admin/roles/:id/permissions (RolePermissionAssignReq) returns (CommonResp)
 }
 

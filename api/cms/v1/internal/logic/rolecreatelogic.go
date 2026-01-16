@@ -29,7 +29,7 @@ func NewRoleCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleCr
 	}
 }
 
-func (l *RoleCreateLogic) RoleCreate(req *types.CreateRoleReq) (resp *types.CommonResp, err error) {
+func (l *RoleCreateLogic) RoleCreate(req *types.RoleCreateReq) (resp *types.CommonResp, err error) {
 	// 1. 检查角色编码是否已存在
 	exists, err := l.svcCtx.EntClient.AdminRole.
 		Query().
