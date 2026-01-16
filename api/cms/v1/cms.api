@@ -238,6 +238,15 @@ type (
 	RolePermissionIDsResp {
 		PermissionIDs []int64 `json:"permission_ids"`
 	}
+	// 权限项
+	PermissionItem {
+		ID   int64  `json:"id"`
+		Name string `json:"name"`
+	}
+	// 获取角色权限列表响应（包含权限名称）
+	RolePermissionListResp {
+		Permissions []PermissionItem `json:"permissions"`
+	}
 )
 
 @server (
@@ -328,6 +337,10 @@ service cms-api {
 	// 获取角色权限ID列表
 	@handler rolePermissionList
 	get /admin/roles/:id/permissions (RoleDetailReq) returns (RolePermissionIDsResp)
+
+	// 获取角色权限列表（包含权限名称）
+	@handler rolePermissionListWithNames
+	get /admin/roles/:id/permissions-with-names (RoleDetailReq) returns (RolePermissionListResp)
 
 	// 分配角色权限
 	@handler rolePermissionAssign

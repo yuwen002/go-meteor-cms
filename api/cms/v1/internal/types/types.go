@@ -146,6 +146,11 @@ type LoginResp struct {
 	Token string `json:"token"` // 登录成功返回 token
 }
 
+type PermissionItem struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 type RegisterReq struct {
 	Username string `json:"username" validate:"required"`       // 必填
 	Password string `json:"password" validate:"required,min=6"` // 必填，最少 6 位
@@ -217,6 +222,10 @@ type RolePermissionAssignReq struct {
 
 type RolePermissionIDsResp struct {
 	PermissionIDs []int64 `json:"permission_ids"`
+}
+
+type RolePermissionListResp struct {
+	Permissions []PermissionItem `json:"permissions"`
 }
 
 type RoleUpdateReq struct {

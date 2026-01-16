@@ -158,6 +158,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodGet,
+					Path:    "/admin/roles/:id/permissions-with-names",
+					Handler: rolePermissionListWithNamesHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
 					Path:    "/admin/test-token",
 					Handler: testTokenHandler(serverCtx),
 				},

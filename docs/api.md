@@ -195,7 +195,7 @@ Authorization: Bearer <token>
 
 管理员修改自己的密码。
 
-**URL**: `PUT /admin/change-password`
+**URL**: `PUT /admin/admin-users/me/change-password`
 
 **请求参数**:
 ```json
@@ -212,31 +212,6 @@ Authorization: Bearer <token>
   "msg": "success",
   "data": {
     "message": "密码修改成功"
-  }
-}
-```
-
-### 重置其他管理员的密码
-
-超级管理员重置其他管理员的密码。
-
-**URL**: `PUT /admin/users/:id/reset-password`
-
-**请求参数**:
-```json
-{
-  "id": 2,
-  "new_password": "newpassword"
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "message": "密码已重置"
   }
 }
 ```
@@ -294,6 +269,31 @@ Authorization: Bearer <token>
 **错误码**:
 - `3002`: 管理员不存在
 - `1000`: 服务器内部错误
+
+### 重置其他管理员的密码
+
+超级管理员重置其他管理员的密码。
+
+**URL**: `PUT /admin/admin-users/reset-password`
+
+**请求参数**:
+```json
+{
+  "id": 2,
+  "new_password": "newpassword"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "message": "密码已重置"
+  }
+}
+```
 
 ### 管理员登出
 
@@ -586,6 +586,208 @@ Authorization: Bearer <token>
   "data": {
     "id": 1,
     "message": "绑定部门成功"
+  }
+}
+```
+
+### 角色管理
+
+#### 角色列表
+
+获取角色列表（需要超级管理员权限）。
+
+**URL**: `GET /admin/roles`
+
+**查询参数**:
+- `page`: 页码（默认1）
+- `page_size`: 每页数量（默认20）
+- `keyword`: 搜索关键词（角色名称/编码，选填）
+- `is_active`: 是否启用（选填）
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "total": 10,
+    "page": 1,
+    "page_size": 20,
+    "list": [
+      {
+        "id": 1,
+        "name": "管理员",
+        "code": "ADMIN",
+        "desc": "系统管理员",
+        "data_scope": 1,
+        "is_system": true,
+        "is_active": true,
+        "sort": 0,
+        "created_at": "2023-01-01T12:00:00Z",
+        "updated_at": "2023-01-01T12:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+#### 角色详情
+
+获取指定角色的详细信息（需要超级管理员权限）。
+
+**URL**: `GET /admin/roles/:id`
+
+**路径参数**:
+- `id`: 角色ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "管理员",
+    "code": "ADMIN",
+    "desc": "系统管理员",
+    "data_scope": 1,
+    "is_system": true,
+    "is_active": true,
+    "sort": 0,
+    "created_at": "2023-01-01T12:00:00Z",
+    "updated_at": "2023-01-01T12:00:00Z"
+  }
+}
+```
+
+#### 创建角色
+
+创建新的角色（需要超级管理员权限）。
+
+**URL**: `POST /admin/roles`
+
+**请求参数**:
+```json
+{
+  "name": "普通用户",
+  "code": "USER",
+  "desc": "普通用户角色",
+  "data_scope": 1,
+  "is_active": true,
+  "sort": 0
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "创建角色成功"
+  }
+}
+```
+
+#### 更新角色
+
+更新指定角色的信息（需要超级管理员权限）。
+
+**URL**: `PUT /admin/roles/:id`
+
+**路径参数**:
+- `id`: 角色ID
+
+**请求参数**:
+```json
+{
+  "name": "更新的角色名称",
+  "code": "UPDATED_CODE",
+  "desc": "更新的角色描述",
+  "data_scope": 2,
+  "is_active": true,
+  "sort": 1
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "更新角色成功"
+  }
+}
+```
+
+#### 删除角色
+
+删除指定角色（需要超级管理员权限）。
+
+**URL**: `DELETE /admin/roles/:id`
+
+**路径参数**:
+- `id`: 角色ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "删除角色成功"
+  }
+}
+```
+
+#### 获取角色权限ID列表
+
+获取指定角色拥有的权限ID列表（需要超级管理员权限）。
+
+**URL**: `GET /admin/roles/:id/permissions`
+
+**路径参数**:
+- `id`: 角色ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "permission_ids": [1, 2, 3]
+  }
+}
+```
+
+#### 分配角色权限
+
+为指定角色分配权限（需要超级管理员权限）。
+
+**URL**: `PUT /admin/roles/:id/permissions`
+
+**路径参数**:
+- `id`: 角色ID
+
+**请求参数**:
+```json
+{
+  "permission_ids": [1, 2, 3]
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "分配权限成功"
   }
 }
 ```
