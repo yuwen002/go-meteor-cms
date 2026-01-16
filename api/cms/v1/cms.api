@@ -280,18 +280,23 @@ service cms-api {
 	put /admin/admin-users/:id/enable (EnableAdminReq) returns (CommonResp)
 
 	// 部门管理
+	// 创建部门
 	@handler departmentCreate
 	post /admin/departments (DepartmentCreateReq) returns (CommonResp)
 
+	// 更新部门信息
 	@handler departmentUpdate
 	put /admin/departments/:id (DepartmentUpdateReq) returns (CommonResp)
 
+	// 删除部门
 	@handler departmentDelete
 	delete /admin/departments/:id (DepartmentDeleteReq) returns (CommonResp)
 
+	// 获取部门详情
 	@handler departmentDetail
 	get /admin/departments/:id (DepartmentDetailReq) returns (DepartmentDetailResp)
 
+	// 获取部门树结构
 	@handler departmentTree
 	get /admin/departments/tree returns ([]DepartmentTreeResp)
 
@@ -299,6 +304,7 @@ service cms-api {
 	@handler adminBindDepartment
 	put /admin/admin-users/:id/bind-department (AdminBindDeptReq) returns (CommonResp)
 
+    // 获取角色管理
 	// 获取角色列表
 	@handler roleList
 	get /admin/roles (RoleListReq) returns (RoleListResp)
