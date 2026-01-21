@@ -146,9 +146,98 @@ type LoginResp struct {
 	Token string `json:"token"` // 登录成功返回 token
 }
 
+type PermissionCreateReq struct {
+	Name       string `json:"name" validate:"required"` // 权限名称
+	ParentID   int64  `json:"parent_id"`                // 父级ID
+	Type       int    `json:"type" validate:"required"` // 权限类型：1 菜单 2 按钮 3 API
+	Path       string `json:"path"`                     // 前端路由路径
+	Component  string `json:"component"`                // 前端组件路径
+	Icon       string `json:"icon"`                     // 菜单图标
+	Method     string `json:"method"`                   // API 方法
+	ApiPath    string `json:"api_path"`                 // API 路径
+	Permission string `json:"permission"`               // 权限标识
+	IsActive   bool   `json:"is_active" default:"true"` // 是否启用
+	Sort       int    `json:"sort" default:"0"`         // 排序
+}
+
+type PermissionDeleteReq struct {
+	ID int64 `path:"id"`
+}
+
+type PermissionDetailItem struct {
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	ParentID   int64  `json:"parent_id"`
+	Type       int    `json:"type"`
+	Path       string `json:"path"`
+	Component  string `json:"component"`
+	Icon       string `json:"icon"`
+	Method     string `json:"method"`
+	ApiPath    string `json:"api_path"`
+	Permission string `json:"permission"`
+	IsActive   bool   `json:"is_active"`
+	Sort       int    `json:"sort"`
+	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
+}
+
+type PermissionDetailReq struct {
+	ID int64 `path:"id"`
+}
+
+type PermissionDetailResp struct {
+	PermissionDetailItem
+}
+
 type PermissionItem struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
+}
+
+type PermissionListReq struct {
+	Page     int    `form:"page,default=1"`       // 页码
+	PageSize int    `form:"page_size,default=20"` // 每页数量
+	Keyword  string `form:"keyword,optional"`     // 搜索关键词（权限名称/权限标识）
+	Type     int    `form:"type,optional"`        // 权限类型：1 菜单 2 按钮 3 API
+	IsActive *bool  `form:"is_active,optional"`   // 是否启用
+}
+
+type PermissionListResp struct {
+	Total    int64                  `json:"total"`
+	Page     int                    `json:"page"`
+	PageSize int                    `json:"page_size"`
+	List     []PermissionDetailItem `json:"list"`
+}
+
+type PermissionTreeItem struct {
+	ID         int64                `json:"id"`
+	Name       string               `json:"name"`
+	ParentID   int64                `json:"parent_id"`
+	Type       int                  `json:"type"`
+	Path       string               `json:"path"`
+	Component  string               `json:"component"`
+	Icon       string               `json:"icon"`
+	Method     string               `json:"method"`
+	ApiPath    string               `json:"api_path"`
+	Permission string               `json:"permission"`
+	IsActive   bool                 `json:"is_active"`
+	Sort       int                  `json:"sort"`
+	Children   []PermissionTreeItem `json:"children"`
+}
+
+type PermissionUpdateReq struct {
+	ID         int64   `path:"id"`
+	Name       *string `json:"name,optional"`       // 权限名称
+	ParentID   *int64  `json:"parent_id,optional"`  // 父级ID
+	Type       *int    `json:"type,optional"`       // 权限类型
+	Path       *string `json:"path,optional"`       // 前端路由路径
+	Component  *string `json:"component,optional"`  // 前端组件路径
+	Icon       *string `json:"icon,optional"`       // 菜单图标
+	Method     *string `json:"method,optional"`     // API 方法
+	ApiPath    *string `json:"api_path,optional"`   // API 路径
+	Permission *string `json:"permission,optional"` // 权限标识
+	IsActive   *bool   `json:"is_active,optional"`  // 是否启用
+	Sort       *int    `json:"sort,optional"`       // 排序
 }
 
 type RegisterReq struct {

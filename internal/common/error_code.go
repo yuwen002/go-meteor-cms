@@ -59,6 +59,20 @@ const (
 	ErrRolePermissionDenied = 5210 // 没有操作该角色的权限
 	ErrRoleCodeCannotBeEmpty = 5211 // 角色编码不能为空
 	ErrRoleNameCannotBeEmpty = 5212 // 角色名称不能为空
+
+	// Permission errors (5400-5599)
+	ErrPermissionNotFound        = 5401 // 权限不存在
+	ErrPermissionCreateFail      = 5402 // 创建权限失败
+	ErrPermissionUpdateFail      = 5403 // 更新权限失败
+	ErrPermissionDeleteFail      = 5404 // 删除权限失败
+	ErrPermissionListFail        = 5405 // 获取权限列表失败
+	ErrPermissionExists          = 5406 // 权限标识已存在
+	ErrPermissionNameExists      = 5407 // 权限名称已存在
+	ErrParentPermissionNotFound  = 5408 // 父级权限不存在
+	ErrPermissionIsSystem        = 5409 // 系统内置权限，禁止修改
+	ErrPermissionInUse           = 5410 // 权限正在使用中，禁止删除
+	ErrPermissionNameCannotBeEmpty = 5411 // 权限名称不能为空
+	ErrPermissionTypeInvalid      = 5412 // 权限类型无效
 )
 
 var errorMessages = map[int]string{
@@ -109,6 +123,19 @@ var errorMessages = map[int]string{
 	ErrRolePermissionDenied: "没有操作该角色的权限",
 	ErrRoleCodeCannotBeEmpty: "角色编码不能为空",
 	ErrRoleNameCannotBeEmpty: "角色名称不能为空",
+	// Permission error messages
+	ErrPermissionNotFound:        "权限不存在",
+	ErrPermissionCreateFail:      "创建权限失败",
+	ErrPermissionUpdateFail:      "更新权限失败",
+	ErrPermissionDeleteFail:      "删除权限失败",
+	ErrPermissionListFail:        "获取权限列表失败",
+	ErrPermissionExists:          "权限标识已存在",
+	ErrPermissionNameExists:      "权限名称已存在",
+	ErrParentPermissionNotFound:  "父级权限不存在",
+	ErrPermissionIsSystem:        "系统内置权限，禁止修改",
+	ErrPermissionInUse:           "权限正在使用中，禁止删除",
+	ErrPermissionNameCannotBeEmpty: "权限名称不能为空",
+	ErrPermissionTypeInvalid:      "权限类型无效",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

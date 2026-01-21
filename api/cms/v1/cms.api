@@ -247,6 +247,96 @@ type (
 	RolePermissionListResp {
 		Permissions []PermissionItem `json:"permissions"`
 	}
+	// 权限管理模块
+	// 权限项详情
+	PermissionDetailItem {
+		ID         int64  `json:"id"`
+		Name       string `json:"name"`
+		ParentID   int64  `json:"parent_id"`
+		Type       int    `json:"type"`
+		Path       string `json:"path"`
+		Component  string `json:"component"`
+		Icon       string `json:"icon"`
+		Method     string `json:"method"`
+		ApiPath    string `json:"api_path"`
+		Permission string `json:"permission"`
+		IsActive   bool   `json:"is_active"`
+		Sort       int    `json:"sort"`
+		CreatedAt  string `json:"created_at"`
+		UpdatedAt  string `json:"updated_at"`
+	}
+	// 权限树结构
+	PermissionTreeItem {
+		ID         int64                `json:"id"`
+		Name       string               `json:"name"`
+		ParentID   int64                `json:"parent_id"`
+		Type       int                  `json:"type"`
+		Path       string               `json:"path"`
+		Component  string               `json:"component"`
+		Icon       string               `json:"icon"`
+		Method     string               `json:"method"`
+		ApiPath    string               `json:"api_path"`
+		Permission string               `json:"permission"`
+		IsActive   bool                 `json:"is_active"`
+		Sort       int                  `json:"sort"`
+		Children   []PermissionTreeItem `json:"children"`
+	}
+	// 权限列表请求
+	PermissionListReq {
+		Page     int    `form:"page,default=1"` // 页码
+		PageSize int    `form:"page_size,default=20"` // 每页数量
+		Keyword  string `form:"keyword,optional"` // 搜索关键词（权限名称/权限标识）
+		Type     int    `form:"type,optional"` // 权限类型：1 菜单 2 按钮 3 API
+		IsActive *bool  `form:"is_active,optional"` // 是否启用
+	}
+	// 权限列表响应
+	PermissionListResp {
+		Total    int64                  `json:"total"`
+		Page     int                    `json:"page"`
+		PageSize int                    `json:"page_size"`
+		List     []PermissionDetailItem `json:"list"`
+	}
+	// 创建权限请求
+	PermissionCreateReq {
+		Name       string `json:"name" validate:"required"` // 权限名称
+		ParentID   int64  `json:"parent_id"` // 父级ID
+		Type       int    `json:"type" validate:"required"` // 权限类型：1 菜单 2 按钮 3 API
+		Path       string `json:"path"` // 前端路由路径
+		Component  string `json:"component"` // 前端组件路径
+		Icon       string `json:"icon"` // 菜单图标
+		Method     string `json:"method"` // API 方法
+		ApiPath    string `json:"api_path"` // API 路径
+		Permission string `json:"permission"` // 权限标识
+		IsActive   bool   `json:"is_active" default:"true"` // 是否启用
+		Sort       int    `json:"sort" default:"0"` // 排序
+	}
+	// 更新权限请求
+	PermissionUpdateReq {
+		ID         int64   `path:"id"`
+		Name       *string `json:"name,optional"` // 权限名称
+		ParentID   *int64  `json:"parent_id,optional"` // 父级ID
+		Type       *int    `json:"type,optional"` // 权限类型
+		Path       *string `json:"path,optional"` // 前端路由路径
+		Component  *string `json:"component,optional"` // 前端组件路径
+		Icon       *string `json:"icon,optional"` // 菜单图标
+		Method     *string `json:"method,optional"` // API 方法
+		ApiPath    *string `json:"api_path,optional"` // API 路径
+		Permission *string `json:"permission,optional"` // 权限标识
+		IsActive   *bool   `json:"is_active,optional"` // 是否启用
+		Sort       *int    `json:"sort,optional"` // 排序
+	}
+	// 权限详情请求
+	PermissionDetailReq {
+		ID int64 `path:"id"`
+	}
+	// 删除权限请求
+	PermissionDeleteReq {
+		ID int64 `path:"id"`
+	}
+	// 权限详情响应
+	PermissionDetailResp {
+		PermissionDetailItem
+	}
 )
 
 @server (
@@ -345,5 +435,30 @@ service cms-api {
 	// 分配角色权限
 	@handler rolePermissionAssign
 	put /admin/roles/:id/permissions (RolePermissionAssignReq) returns (CommonResp)
+
+	// 权限管理模块
+	// 获取权限列表
+	@handler permissionList
+	get /admin/permissions (PermissionListReq) returns (PermissionListResp)
+
+	// 获取权限树结构
+	@handler permissionTree
+	get /admin/permissions/tree returns ([]PermissionTreeItem)
+
+	// 获取权限详情
+	@handler permissionDetail
+	get /admin/permissions/:id (PermissionDetailReq) returns (PermissionDetailResp)
+
+	// 创建权限
+	@handler permissionCreate
+	post /admin/permissions (PermissionCreateReq) returns (CommonResp)
+
+	// 更新权限
+	@handler permissionUpdate
+	put /admin/permissions/:id (PermissionUpdateReq) returns (CommonResp)
+
+	// 删除权限
+	@handler permissionDelete
+	delete /admin/permissions/:id (PermissionDeleteReq) returns (CommonResp)
 }
 
