@@ -4,11 +4,12 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
-	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 )
 
 func permissionTreeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -16,9 +17,14 @@ func permissionTreeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewPermissionTreeLogic(r.Context(), svcCtx)
 		resp, err := l.PermissionTree()
 		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			var bizErr *common.BizError
+			if errors.As(err, &bizErr) {
+				common.Fail(w, bizErr.Code, bizErr.Msg)
+			} else {
+				common.Fail(w, common.ErrInternalServer, err.Error())
+			}
+			return
 		}
+		common.Ok(w, resp)
 	}
 }
