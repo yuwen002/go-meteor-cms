@@ -13,6 +13,47 @@
       "enableSystemRule": true
     }
   },
+  "projectSetting": {
+    "id": "7442630",
+    "auth": {},
+    "securityScheme": {},
+    "gateway": [],
+    "language": "zh-CN",
+    "apiStatuses": [
+      "developing",
+      "testing",
+      "released",
+      "deprecated"
+    ],
+    "mockSettings": {},
+    "preProcessors": [],
+    "postProcessors": [],
+    "advancedSettings": {
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      }
+    },
+    "initialDisabledMockIds": [],
+    "servers": [
+      {
+        "id": "default",
+        "name": "默认服务",
+        "moduleId": 6547931
+      }
+    ],
+    "cloudMock": {
+      "security": "free",
+      "enable": false,
+      "tokenKey": "apifoxToken"
+    }
+  },
   "apiCollection": [
     {
       "name": "根目录",
@@ -84,6 +125,2958 @@
           "inheritPostProcessors": {},
           "inheritPreProcessors": {},
           "items": [
+            {
+              "name": "部门管理",
+              "id": 73242957,
+              "auth": {},
+              "securityScheme": {},
+              "parentId": 71122960,
+              "serverId": "",
+              "description": "",
+              "identityPattern": {
+                "httpApi": {
+                  "type": "inherit",
+                  "bodyType": "",
+                  "fields": []
+                }
+              },
+              "shareSettings": {},
+              "visibility": "INHERITED",
+              "moduleId": 6547931,
+              "preProcessors": [
+                {
+                  "id": "inheritProcessors",
+                  "type": "inheritProcessors",
+                  "data": {}
+                }
+              ],
+              "postProcessors": [
+                {
+                  "id": "inheritProcessors",
+                  "type": "inheritProcessors",
+                  "data": {}
+                }
+              ],
+              "inheritPostProcessors": {},
+              "inheritPreProcessors": {},
+              "items": [
+                {
+                  "name": "新增部门",
+                  "api": {
+                    "id": "388201691",
+                    "method": "post",
+                    "path": "/admin/departments",
+                    "parameters": {},
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "110952054",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "message"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "message"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 10,\r\n        \"message\": \"创建成功\"\r\n    }\r\n}",
+                        "responseId": 110952054
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "title": "部门名称"
+                          },
+                          "parent_id": {
+                            "type": "integer",
+                            "title": "父级部门ID"
+                          },
+                          "sort": {
+                            "type": "integer",
+                            "title": "排序"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "title": "是否启用"
+                          },
+                          "leader_id": {
+                            "type": "integer",
+                            "title": "负责人ID"
+                          }
+                        },
+                        "x-apifox-orders": [
+                          "name",
+                          "parent_id",
+                          "sort",
+                          "is_active",
+                          "leader_id"
+                        ],
+                        "required": [
+                          "name",
+                          "parent_id",
+                          "sort",
+                          "leader_id"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 10,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "maintainer": "yuwen002",
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "更新部门",
+                  "api": {
+                    "id": "388221559",
+                    "method": "put",
+                    "path": "/admin/departments/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "107643296",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "message"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "message"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 0,\r\n        \"message\": \"更新成功\"\r\n    }\r\n}",
+                        "responseId": 107643296
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "title": "部门名称"
+                          },
+                          "parent_id": {
+                            "type": "integer",
+                            "title": "父级部门ID"
+                          },
+                          "sort": {
+                            "type": "integer",
+                            "title": "排序"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "title": "是否启用"
+                          },
+                          "leader_id": {
+                            "type": "integer",
+                            "title": "负责人ID"
+                          }
+                        },
+                        "x-apifox-orders": [
+                          "name",
+                          "parent_id",
+                          "sort",
+                          "is_active",
+                          "leader_id"
+                        ],
+                        "required": [
+                          "name",
+                          "parent_id"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [
+                        {
+                          "name": "示例 1",
+                          "value": "{\r\n    \"name\": \"Meteor集团分总公司1-测试修改\",\r\n    \"parent_id\": 6,\r\n    \"sort\": 4,\r\n    \"is_active\": true,\r\n    \"leader_id\": 2\r\n}",
+                          "mediaType": "application/json"
+                        }
+                      ],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 20,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "maintainer": "yuwen002",
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "部门详情",
+                  "api": {
+                    "id": "388229606",
+                    "method": "get",
+                    "path": "/admin/departments/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "183968954",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "parent_id": {
+                                  "type": "integer"
+                                },
+                                "sort": {
+                                  "type": "integer"
+                                },
+                                "is_active": {
+                                  "type": "boolean"
+                                },
+                                "leader_id": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name",
+                                "parent_id",
+                                "sort",
+                                "is_active",
+                                "leader_id"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "name",
+                                "parent_id",
+                                "sort",
+                                "is_active",
+                                "leader_id"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 6,\r\n        \"name\": \"Meteor集团总公司\",\r\n        \"parent_id\": 0,\r\n        \"sort\": 0,\r\n        \"is_active\": false,\r\n        \"leader_id\": 2\r\n    }\r\n}",
+                        "responseId": 183968954
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 30,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "删除部门",
+                  "api": {
+                    "id": "388232024",
+                    "method": "delete",
+                    "path": "/admin/departments/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "144735525",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "message"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "message"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 0,\r\n        \"message\": \"删除成功\"\r\n    }\r\n}",
+                        "responseId": 144735525
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 40,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "部门树",
+                  "api": {
+                    "id": "388234476",
+                    "method": "get",
+                    "path": "/admin/departments/tree",
+                    "parameters": {},
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "186751267",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "sort": {
+                                    "type": "integer"
+                                  },
+                                  "is_active": {
+                                    "type": "boolean"
+                                  },
+                                  "children": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "integer"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "sort": {
+                                          "type": "integer"
+                                        },
+                                        "is_active": {
+                                          "type": "boolean"
+                                        },
+                                        "children": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "x-apifox-orders": [
+                                        "id",
+                                        "name",
+                                        "sort",
+                                        "is_active",
+                                        "children"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "sort",
+                                  "is_active",
+                                  "children"
+                                ],
+                                "x-apifox-orders": [
+                                  "id",
+                                  "name",
+                                  "sort",
+                                  "is_active",
+                                  "children"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": [\r\n        {\r\n            \"id\": 6,\r\n            \"name\": \"Meteor集团总公司\",\r\n            \"sort\": 0,\r\n            \"is_active\": true,\r\n            \"children\": [\r\n                {\r\n                    \"id\": 9,\r\n                    \"name\": \"Meteor集团分总公司1-测试修改\",\r\n                    \"sort\": 4,\r\n                    \"is_active\": true,\r\n                    \"children\": []\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"id\": 8,\r\n            \"name\": \"Meteor集团总公司2\",\r\n            \"sort\": 0,\r\n            \"is_active\": true,\r\n            \"children\": []\r\n        }\r\n    ]\r\n}",
+                        "responseId": 186751267
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 50,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                }
+              ]
+            },
+            {
+              "name": "角色管理",
+              "id": 75730760,
+              "auth": {},
+              "securityScheme": {},
+              "parentId": 71122960,
+              "serverId": "",
+              "description": "",
+              "identityPattern": {
+                "httpApi": {
+                  "type": "inherit",
+                  "bodyType": "",
+                  "fields": []
+                }
+              },
+              "shareSettings": {},
+              "visibility": "INHERITED",
+              "moduleId": 6547931,
+              "preProcessors": [
+                {
+                  "id": "inheritProcessors",
+                  "type": "inheritProcessors",
+                  "data": {}
+                }
+              ],
+              "postProcessors": [
+                {
+                  "id": "inheritProcessors",
+                  "type": "inheritProcessors",
+                  "data": {}
+                }
+              ],
+              "inheritPostProcessors": {},
+              "inheritPreProcessors": {},
+              "items": [
+                {
+                  "name": "新建角色",
+                  "api": {
+                    "id": "402460987",
+                    "method": "post",
+                    "path": "/admin/roles",
+                    "parameters": {},
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "122402175",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "message"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "message"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "message",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n  \"code\": 0,\r\n  \"message\": \"success\",\r\n  \"data\": {\r\n    \"id\": 1,\r\n    \"message\": \"创建角色成功\"\r\n  }\r\n}",
+                        "responseId": 122402175
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          },
+                          "desc": {
+                            "type": "string"
+                          },
+                          "data_scope": {
+                            "type": "integer"
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          },
+                          "sort": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "code",
+                          "desc",
+                          "data_scope",
+                          "is_active",
+                          "sort"
+                        ],
+                        "x-apifox-orders": [
+                          "name",
+                          "code",
+                          "desc",
+                          "data_scope",
+                          "is_active",
+                          "sort"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [
+                        {
+                          "mediaType": "application/json",
+                          "value": "{\r\n  \"name\": \"Administrator\",\r\n  \"code\": \"admin\",\r\n  \"desc\": \"System administrator with full access\",\r\n  \"data_scope\": 1,\r\n  \"is_active\": true,\r\n  \"sort\": 0\r\n}",
+                          "name": "示例 1"
+                        }
+                      ],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 10,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "角色列表",
+                  "api": {
+                    "id": "402533180",
+                    "method": "get",
+                    "path": "/admin/roles",
+                    "parameters": {
+                      "query": [
+                        {
+                          "required": false,
+                          "description": "页码",
+                          "type": "integer",
+                          "id": "niLAnSUoZT",
+                          "enable": true,
+                          "name": "page",
+                          "schema": {
+                            "type": "integer"
+                          },
+                          "example": "1"
+                        },
+                        {
+                          "required": false,
+                          "description": "每页数量，默认值20",
+                          "type": "integer",
+                          "id": "Jo7E8lCTgC",
+                          "enable": true,
+                          "name": "page_size",
+                          "schema": {
+                            "type": "integer"
+                          },
+                          "example": "20"
+                        },
+                        {
+                          "required": false,
+                          "description": "搜索关键词（角色名称/编码）",
+                          "type": "string",
+                          "id": "rIjtsUk8J2",
+                          "enable": true,
+                          "name": "keyword",
+                          "example": "admin"
+                        },
+                        {
+                          "required": false,
+                          "description": "是否启用",
+                          "type": "boolean",
+                          "id": "8UxguVxqKI",
+                          "enable": true,
+                          "name": "is_active",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "example": "true"
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "123841685",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "integer"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "code": {
+                                        "type": "string"
+                                      },
+                                      "desc": {
+                                        "type": "string"
+                                      },
+                                      "data_scope": {
+                                        "type": "integer"
+                                      },
+                                      "is_system": {
+                                        "type": "boolean"
+                                      },
+                                      "is_active": {
+                                        "type": "boolean"
+                                      },
+                                      "sort": {
+                                        "type": "integer"
+                                      },
+                                      "created_at": {
+                                        "type": "string"
+                                      },
+                                      "updated_at": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "x-apifox-orders": [
+                                      "id",
+                                      "name",
+                                      "code",
+                                      "desc",
+                                      "data_scope",
+                                      "is_system",
+                                      "is_active",
+                                      "sort",
+                                      "created_at",
+                                      "updated_at"
+                                    ]
+                                  }
+                                },
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "page": {
+                                  "type": "integer"
+                                },
+                                "page_size": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "list",
+                                "total",
+                                "page",
+                                "page_size"
+                              ],
+                              "x-apifox-orders": [
+                                "list",
+                                "total",
+                                "page",
+                                "page_size"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "message",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n  \"code\": 0,\r\n  \"message\": \"success\",\r\n  \"data\": {\r\n    \"list\": [\r\n      {\r\n        \"id\": 1,\r\n        \"name\": \"Administrator\",\r\n        \"code\": \"admin\",\r\n        \"desc\": \"System administrator\",\r\n        \"data_scope\": 1,\r\n        \"is_system\": true,\r\n        \"is_active\": true,\r\n        \"sort\": 0,\r\n        \"created_at\": \"2023-01-01T00:00:00Z\",\r\n        \"updated_at\": \"2023-01-01T00:00:00Z\"\r\n      }\r\n    ],\r\n    \"total\": 1,\r\n    \"page\": 1,\r\n    \"page_size\": 10\r\n  }\r\n}",
+                        "responseId": 123841685
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 20,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "角色详情",
+                  "api": {
+                    "id": "406241163",
+                    "method": "get",
+                    "path": "/admin/roles/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "integer",
+                          "enable": true,
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "135894879",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 40,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "更新角色",
+                  "api": {
+                    "id": "402558128",
+                    "method": "put",
+                    "path": "/admin/roles/{id}",
+                    "parameters": {
+                      "query": [],
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "integer",
+                          "enable": true,
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "185815034",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "title": "角色名称"
+                          },
+                          "code": {
+                            "type": "string",
+                            "title": "角色编码"
+                          },
+                          "desc": {
+                            "type": "string",
+                            "title": "角色描述"
+                          },
+                          "data_scope": {
+                            "type": "null",
+                            "title": "数据权限范围"
+                          },
+                          "is_active": {
+                            "type": "null",
+                            "title": "是否启用"
+                          },
+                          "sort": {
+                            "type": "null",
+                            "title": "排序"
+                          }
+                        },
+                        "x-apifox-orders": [
+                          "name",
+                          "code",
+                          "desc",
+                          "data_scope",
+                          "is_active",
+                          "sort"
+                        ],
+                        "required": [
+                          "code"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [
+                        {
+                          "mediaType": "application/json",
+                          "value": "{\r\n  \"name\": \"Administrator2\",\r\n  \"code\": \"\",\r\n  \"desc\": \"111\",\r\n  \"data_scope\": null,\r\n  \"is_active\": null,\r\n  \"sort\": null\r\n}",
+                          "name": "示例 1"
+                        }
+                      ],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 30,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "删除角色",
+                  "api": {
+                    "id": "406457526",
+                    "method": "delete",
+                    "path": "/admin/roles/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "175206702",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 50,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "角色权限ID列表",
+                  "api": {
+                    "id": "406576494",
+                    "method": "get",
+                    "path": "/admin/roles/{id}/permissions",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "110803239",
+                        "code": 200,
+                        "name": "成功",
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "contentType": "json"
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 60,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "分配角色权限",
+                  "api": {
+                    "id": "406603353",
+                    "method": "put",
+                    "path": "/admin/roles/{id}/permissions",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "integer",
+                          "enable": true,
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "183784792",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "permission_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "x-apifox-orders": [
+                          "permission_ids"
+                        ],
+                        "required": [
+                          "permission_ids"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 70,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "角色权限列表（包含权限名称）",
+                  "api": {
+                    "id": "406681861",
+                    "method": "get",
+                    "path": "/admin/roles/{id}/permissions-with-names",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "173738297",
+                        "code": 200,
+                        "name": "成功",
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "contentType": "json"
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 80,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                }
+              ]
+            },
+            {
+              "name": "权限管理",
+              "id": 76545593,
+              "auth": {},
+              "securityScheme": {},
+              "parentId": 71122960,
+              "serverId": "",
+              "description": "",
+              "identityPattern": {
+                "httpApi": {
+                  "type": "inherit",
+                  "bodyType": "",
+                  "fields": []
+                }
+              },
+              "shareSettings": {},
+              "visibility": "INHERITED",
+              "moduleId": 6547931,
+              "preProcessors": [
+                {
+                  "id": "inheritProcessors",
+                  "type": "inheritProcessors",
+                  "data": {}
+                }
+              ],
+              "postProcessors": [
+                {
+                  "id": "inheritProcessors",
+                  "type": "inheritProcessors",
+                  "data": {}
+                }
+              ],
+              "inheritPostProcessors": {},
+              "inheritPreProcessors": {},
+              "items": [
+                {
+                  "name": "创建权限",
+                  "api": {
+                    "id": "407572218",
+                    "method": "post",
+                    "path": "/admin/permissions",
+                    "parameters": {},
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "108981859",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "title": "权限名称"
+                          },
+                          "parent_id": {
+                            "type": "string",
+                            "title": "父级ID"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "权限类型",
+                            "description": "1 菜单 2 按钮 3 API"
+                          },
+                          "path": {
+                            "type": "string",
+                            "title": "前端路由路径"
+                          },
+                          "component": {
+                            "type": "string",
+                            "title": "前端组件路径"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "title": "菜单图标"
+                          },
+                          "method": {
+                            "type": "string",
+                            "title": "API 方法"
+                          },
+                          "api_path": {
+                            "type": "string",
+                            "title": "API 路径"
+                          },
+                          "permission": {
+                            "type": "string",
+                            "title": "权限标识"
+                          },
+                          "is_active": {
+                            "type": "string",
+                            "title": "是否启用"
+                          },
+                          "sort": {
+                            "type": "string",
+                            "title": "排序"
+                          }
+                        },
+                        "x-apifox-orders": [
+                          "name",
+                          "parent_id",
+                          "type",
+                          "path",
+                          "component",
+                          "icon",
+                          "method",
+                          "api_path",
+                          "permission",
+                          "is_active",
+                          "sort"
+                        ],
+                        "required": [
+                          "name",
+                          "parent_id",
+                          "type",
+                          "path",
+                          "component",
+                          "icon",
+                          "method",
+                          "api_path",
+                          "permission",
+                          "is_active",
+                          "sort"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 20,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "权限列表",
+                  "api": {
+                    "id": "406962774",
+                    "method": "get",
+                    "path": "/admin/permissions",
+                    "parameters": {
+                      "query": [
+                        {
+                          "required": false,
+                          "description": "",
+                          "type": "integer",
+                          "id": "TH0rLnrknN",
+                          "enable": true,
+                          "name": "page",
+                          "schema": {
+                            "type": "integer"
+                          }
+                        },
+                        {
+                          "required": false,
+                          "description": "",
+                          "type": "integer",
+                          "id": "9zaBExBzT4",
+                          "enable": true,
+                          "name": "page_size",
+                          "schema": {
+                            "type": "integer"
+                          }
+                        },
+                        {
+                          "required": false,
+                          "description": "",
+                          "type": "string",
+                          "id": "fv9cqPBE5f",
+                          "enable": true,
+                          "name": "keyword"
+                        },
+                        {
+                          "required": false,
+                          "description": "",
+                          "type": "integer",
+                          "id": "tDpWxJ4XJm",
+                          "enable": true,
+                          "name": "type",
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "121258898",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "total": {
+                                  "type": "integer"
+                                },
+                                "page": {
+                                  "type": "integer"
+                                },
+                                "page_size": {
+                                  "type": "integer"
+                                },
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "integer"
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "title": "权限名称"
+                                      },
+                                      "parent_id": {
+                                        "type": "integer",
+                                        "title": "父级ID"
+                                      },
+                                      "type": {
+                                        "type": "integer",
+                                        "title": "权限类型"
+                                      },
+                                      "path": {
+                                        "type": "string",
+                                        "title": "前端路由路径"
+                                      },
+                                      "component": {
+                                        "type": "string",
+                                        "title": "前端组件路径"
+                                      },
+                                      "icon": {
+                                        "type": "string",
+                                        "title": "菜单图标"
+                                      },
+                                      "method": {
+                                        "type": "string",
+                                        "title": "API 方法"
+                                      },
+                                      "api_path": {
+                                        "type": "string",
+                                        "title": "API 路径"
+                                      },
+                                      "permission": {
+                                        "type": "string",
+                                        "title": "权限标识"
+                                      },
+                                      "is_active": {
+                                        "type": "boolean",
+                                        "title": "是否启用"
+                                      },
+                                      "sort": {
+                                        "type": "integer",
+                                        "title": "排序"
+                                      },
+                                      "created_at": {
+                                        "type": "string"
+                                      },
+                                      "updated_at": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "parent_id",
+                                      "type",
+                                      "path",
+                                      "component",
+                                      "icon",
+                                      "method",
+                                      "api_path",
+                                      "permission",
+                                      "is_active",
+                                      "sort",
+                                      "created_at",
+                                      "updated_at"
+                                    ],
+                                    "x-apifox-orders": [
+                                      "id",
+                                      "name",
+                                      "parent_id",
+                                      "type",
+                                      "path",
+                                      "component",
+                                      "icon",
+                                      "method",
+                                      "api_path",
+                                      "permission",
+                                      "is_active",
+                                      "sort",
+                                      "created_at",
+                                      "updated_at"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "total",
+                                "page",
+                                "page_size",
+                                "list"
+                              ],
+                              "x-apifox-orders": [
+                                "total",
+                                "page",
+                                "page_size",
+                                "list"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "示例 1",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"total\": 5,\r\n        \"page\": 1,\r\n        \"page_size\": 20,\r\n        \"list\": [\r\n            {\r\n                \"id\": 1,\r\n                \"name\": \"控制台\",\r\n                \"parent_id\": 0,\r\n                \"type\": 1,\r\n                \"path\": \"/dashboard\",\r\n                \"component\": \"views/dashboard/index.vue\",\r\n                \"icon\": \"\",\r\n                \"method\": \"\",\r\n                \"api_path\": \"\",\r\n                \"permission\": \"dashboard:view\",\r\n                \"is_active\": true,\r\n                \"sort\": 0,\r\n                \"created_at\": \"2025-12-30 09:55:37\",\r\n                \"updated_at\": \"2025-12-30 09:55:37\"\r\n            },\r\n            {\r\n                \"id\": 2,\r\n                \"name\": \"管理员管理\",\r\n                \"parent_id\": 0,\r\n                \"type\": 1,\r\n                \"path\": \"/admin/admin-users\",\r\n                \"component\": \"views/user/list.vue\",\r\n                \"icon\": \"\",\r\n                \"method\": \"\",\r\n                \"api_path\": \"\",\r\n                \"permission\": \"system:admin_user:list\",\r\n                \"is_active\": true,\r\n                \"sort\": 0,\r\n                \"created_at\": \"2025-12-30 09:55:37\",\r\n                \"updated_at\": \"2025-12-30 09:55:37\"\r\n            }\r\n        ]\r\n    }\r\n}",
+                        "responseId": 121258898
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 10,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "权限详情",
+                  "api": {
+                    "id": "408744037",
+                    "method": "get",
+                    "path": "/admin/permissions/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "integer",
+                          "enable": true,
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "194020264",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "parent_id": {
+                                  "type": "integer"
+                                },
+                                "type": {
+                                  "type": "integer"
+                                },
+                                "path": {
+                                  "type": "string"
+                                },
+                                "component": {
+                                  "type": "string"
+                                },
+                                "icon": {
+                                  "type": "string"
+                                },
+                                "method": {
+                                  "type": "string"
+                                },
+                                "api_path": {
+                                  "type": "string"
+                                },
+                                "permission": {
+                                  "type": "string"
+                                },
+                                "is_active": {
+                                  "type": "boolean"
+                                },
+                                "sort": {
+                                  "type": "integer"
+                                },
+                                "created_at": {
+                                  "type": "string"
+                                },
+                                "updated_at": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name",
+                                "parent_id",
+                                "type",
+                                "path",
+                                "component",
+                                "icon",
+                                "method",
+                                "api_path",
+                                "permission",
+                                "is_active",
+                                "sort",
+                                "created_at",
+                                "updated_at"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "name",
+                                "parent_id",
+                                "type",
+                                "path",
+                                "component",
+                                "icon",
+                                "method",
+                                "api_path",
+                                "permission",
+                                "is_active",
+                                "sort",
+                                "created_at",
+                                "updated_at"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 1,\r\n        \"name\": \"控制台\",\r\n        \"parent_id\": 0,\r\n        \"type\": 1,\r\n        \"path\": \"/dashboard\",\r\n        \"component\": \"views/dashboard/index.vue\",\r\n        \"icon\": \"\",\r\n        \"method\": \"\",\r\n        \"api_path\": \"\",\r\n        \"permission\": \"dashboard:view\",\r\n        \"is_active\": true,\r\n        \"sort\": 0,\r\n        \"created_at\": \"2025-12-30 09:55:37\",\r\n        \"updated_at\": \"2025-12-30 09:55:37\"\r\n    }\r\n}",
+                        "responseId": 194020264
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 30,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "更新权限",
+                  "api": {
+                    "id": "408766096",
+                    "method": "put",
+                    "path": "/admin/permissions/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "string",
+                          "enable": true
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "101349224",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "message"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "message"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 6,\r\n        \"message\": \"权限更新成功\"\r\n    }\r\n}",
+                        "responseId": 101349224
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "application/json",
+                      "parameters": [],
+                      "jsonSchema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "parent_id": {
+                            "type": "integer"
+                          },
+                          "type": {
+                            "type": "integer"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "component": {
+                            "type": "string"
+                          },
+                          "icon": {
+                            "type": "string"
+                          },
+                          "method": {
+                            "type": "string"
+                          },
+                          "api_path": {
+                            "type": "string"
+                          },
+                          "permission": {
+                            "type": "string"
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          },
+                          "sort": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "parent_id",
+                          "type",
+                          "path",
+                          "component",
+                          "icon",
+                          "method",
+                          "api_path",
+                          "permission",
+                          "is_active",
+                          "sort"
+                        ],
+                        "x-apifox-orders": [
+                          "name",
+                          "parent_id",
+                          "type",
+                          "path",
+                          "component",
+                          "icon",
+                          "method",
+                          "api_path",
+                          "permission",
+                          "is_active",
+                          "sort"
+                        ]
+                      },
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [
+                        {
+                          "mediaType": "application/json",
+                          "value": "\r\n{\r\n  \"name\": \"权限名称\",\r\n  \"parent_id\": 1,\r\n  \"type\": 1,\r\n  \"path\": \"/admin/users\",\r\n  \"component\": \"pages/admin/UserList\",\r\n  \"icon\": \"user\",\r\n  \"method\": \"GET\",\r\n  \"api_path\": \"/api/admin/users\",\r\n  \"permission\": \"admin:user:list\",\r\n  \"is_active\": true,\r\n  \"sort\": 10\r\n}",
+                          "name": "示例 1"
+                        }
+                      ],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 40,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "删除权限",
+                  "api": {
+                    "id": "408810081",
+                    "method": "delete",
+                    "path": "/admin/permissions/{id}",
+                    "parameters": {
+                      "path": [
+                        {
+                          "id": "id#0",
+                          "name": "id",
+                          "required": true,
+                          "description": "",
+                          "type": "integer",
+                          "enable": true,
+                          "schema": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
+                    },
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "101680786",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "message": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "message"
+                              ],
+                              "x-apifox-orders": [
+                                "id",
+                                "message"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": {\r\n        \"id\": 6,\r\n        \"message\": \"权限删除成功\"\r\n    }\r\n}",
+                        "responseId": 101680786
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 50,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                },
+                {
+                  "name": "权限树",
+                  "api": {
+                    "id": "408967609",
+                    "method": "get",
+                    "path": "/admin/permissions/tree",
+                    "parameters": {},
+                    "auth": {},
+                    "securityScheme": {},
+                    "commonParameters": {
+                      "query": [],
+                      "body": [],
+                      "cookie": [],
+                      "header": [
+                        {
+                          "name": "Authorization"
+                        }
+                      ]
+                    },
+                    "responses": [
+                      {
+                        "id": "126242943",
+                        "code": 200,
+                        "name": "成功",
+                        "headers": [],
+                        "jsonSchema": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer"
+                            },
+                            "msg": {
+                              "type": "string"
+                            },
+                            "data": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "parent_id": {
+                                    "type": "integer"
+                                  },
+                                  "type": {
+                                    "type": "integer"
+                                  },
+                                  "path": {
+                                    "type": "string"
+                                  },
+                                  "component": {
+                                    "type": "string"
+                                  },
+                                  "icon": {
+                                    "type": "string"
+                                  },
+                                  "method": {
+                                    "type": "string"
+                                  },
+                                  "api_path": {
+                                    "type": "string"
+                                  },
+                                  "permission": {
+                                    "type": "string"
+                                  },
+                                  "is_active": {
+                                    "type": "boolean"
+                                  },
+                                  "sort": {
+                                    "type": "integer"
+                                  },
+                                  "children": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "integer"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "parent_id": {
+                                          "type": "integer"
+                                        },
+                                        "type": {
+                                          "type": "integer"
+                                        },
+                                        "path": {
+                                          "type": "string"
+                                        },
+                                        "component": {
+                                          "type": "string"
+                                        },
+                                        "icon": {
+                                          "type": "string"
+                                        },
+                                        "method": {
+                                          "type": "string"
+                                        },
+                                        "api_path": {
+                                          "type": "string"
+                                        },
+                                        "permission": {
+                                          "type": "string"
+                                        },
+                                        "is_active": {
+                                          "type": "boolean"
+                                        },
+                                        "sort": {
+                                          "type": "integer"
+                                        },
+                                        "children": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "name",
+                                        "parent_id",
+                                        "type",
+                                        "path",
+                                        "component",
+                                        "icon",
+                                        "method",
+                                        "api_path",
+                                        "permission",
+                                        "is_active",
+                                        "sort",
+                                        "children"
+                                      ],
+                                      "x-apifox-orders": [
+                                        "id",
+                                        "name",
+                                        "parent_id",
+                                        "type",
+                                        "path",
+                                        "component",
+                                        "icon",
+                                        "method",
+                                        "api_path",
+                                        "permission",
+                                        "is_active",
+                                        "sort",
+                                        "children"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "parent_id",
+                                  "type",
+                                  "path",
+                                  "component",
+                                  "icon",
+                                  "method",
+                                  "api_path",
+                                  "permission",
+                                  "is_active",
+                                  "sort",
+                                  "children"
+                                ],
+                                "x-apifox-orders": [
+                                  "id",
+                                  "name",
+                                  "parent_id",
+                                  "type",
+                                  "path",
+                                  "component",
+                                  "icon",
+                                  "method",
+                                  "api_path",
+                                  "permission",
+                                  "is_active",
+                                  "sort",
+                                  "children"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "msg",
+                            "data"
+                          ],
+                          "x-apifox-orders": [
+                            "code",
+                            "msg",
+                            "data"
+                          ]
+                        },
+                        "itemSchema": {},
+                        "description": "",
+                        "contentType": "json",
+                        "mediaType": ""
+                      }
+                    ],
+                    "responseExamples": [
+                      {
+                        "name": "成功示例",
+                        "data": "{\r\n    \"code\": 0,\r\n    \"msg\": \"success\",\r\n    \"data\": [\r\n        {\r\n            \"id\": 1,\r\n            \"name\": \"控制台\",\r\n            \"parent_id\": 0,\r\n            \"type\": 1,\r\n            \"path\": \"/dashboard\",\r\n            \"component\": \"views/dashboard/index.vue\",\r\n            \"icon\": \"\",\r\n            \"method\": \"\",\r\n            \"api_path\": \"\",\r\n            \"permission\": \"dashboard:view\",\r\n            \"is_active\": true,\r\n            \"sort\": 0,\r\n            \"children\": []\r\n        },\r\n        {\r\n            \"id\": 2,\r\n            \"name\": \"管理员管理\",\r\n            \"parent_id\": 0,\r\n            \"type\": 1,\r\n            \"path\": \"/admin/admin-users\",\r\n            \"component\": \"views/user/list.vue\",\r\n            \"icon\": \"\",\r\n            \"method\": \"\",\r\n            \"api_path\": \"\",\r\n            \"permission\": \"system:admin_user:list\",\r\n            \"is_active\": true,\r\n            \"sort\": 0,\r\n            \"children\": [\r\n                {\r\n                    \"id\": 3,\r\n                    \"name\": \"新增管理员\",\r\n                    \"parent_id\": 2,\r\n                    \"type\": 2,\r\n                    \"path\": \"\",\r\n                    \"component\": \"\",\r\n                    \"icon\": \"\",\r\n                    \"method\": \"POST\",\r\n                    \"api_path\": \"/admin/users\",\r\n                    \"permission\": \"system:admin_user:add\",\r\n                    \"is_active\": true,\r\n                    \"sort\": 0,\r\n                    \"children\": []\r\n                },\r\n                {\r\n                    \"id\": 4,\r\n                    \"name\": \"编辑管理员\",\r\n                    \"parent_id\": 2,\r\n                    \"type\": 2,\r\n                    \"path\": \"\",\r\n                    \"component\": \"\",\r\n                    \"icon\": \"\",\r\n                    \"method\": \"PUT\",\r\n                    \"api_path\": \"/admin/users/:id\",\r\n                    \"permission\": \"system:admin_user:edit\",\r\n                    \"is_active\": true,\r\n                    \"sort\": 0,\r\n                    \"children\": []\r\n                },\r\n                {\r\n                    \"id\": 5,\r\n                    \"name\": \"删除管理员\",\r\n                    \"parent_id\": 2,\r\n                    \"type\": 2,\r\n                    \"path\": \"\",\r\n                    \"component\": \"\",\r\n                    \"icon\": \"\",\r\n                    \"method\": \"DELETE\",\r\n                    \"api_path\": \"/admin/users/:id\",\r\n                    \"permission\": \"system:admin_user:delete\",\r\n                    \"is_active\": true,\r\n                    \"sort\": 0,\r\n                    \"children\": []\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+                        "responseId": 126242943
+                      }
+                    ],
+                    "requestBody": {
+                      "type": "none",
+                      "parameters": [],
+                      "required": true,
+                      "mediaType": "",
+                      "examples": [],
+                      "oasExtensions": ""
+                    },
+                    "description": "",
+                    "tags": [],
+                    "status": "developing",
+                    "serverId": "",
+                    "operationId": "",
+                    "sourceUrl": "",
+                    "ordering": 60,
+                    "cases": [],
+                    "mocks": [],
+                    "customApiFields": "{}",
+                    "advancedSettings": {
+                      "disabledSystemHeaders": {}
+                    },
+                    "mockScript": {},
+                    "codeSamples": [],
+                    "commonResponseStatus": {},
+                    "responseChildren": [],
+                    "visibility": "INHERITED",
+                    "moduleId": 6547931,
+                    "oasExtensions": "",
+                    "type": "http",
+                    "preProcessors": [],
+                    "postProcessors": [],
+                    "inheritPostProcessors": {},
+                    "inheritPreProcessors": {}
+                  }
+                }
+              ]
+            },
             {
               "name": "测试Token",
               "api": {
@@ -1233,7 +4226,7 @@
               }
             },
             {
-              "name": "新建管理员",
+              "name": "新增管理员",
               "api": {
                 "id": "382020186",
                 "method": "post",
@@ -1871,6 +4864,98 @@
                 "inheritPostProcessors": {},
                 "inheritPreProcessors": {}
               }
+            },
+            {
+              "name": "管理员绑定部门",
+              "api": {
+                "id": "388271574",
+                "method": "get",
+                "path": "/admin/admin-users/{id}/bind-department",
+                "parameters": {
+                  "path": [
+                    {
+                      "id": "id#0",
+                      "name": "id",
+                      "required": true,
+                      "description": "",
+                      "type": "string",
+                      "enable": true
+                    }
+                  ]
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {
+                  "query": [],
+                  "body": [],
+                  "cookie": [],
+                  "header": [
+                    {
+                      "name": "Authorization"
+                    }
+                  ]
+                },
+                "responses": [
+                  {
+                    "id": "125355387",
+                    "code": 200,
+                    "name": "成功",
+                    "jsonSchema": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "type": "object",
+                    "properties": {
+                      "dept_id": {
+                        "type": "integer"
+                      }
+                    },
+                    "x-apifox-orders": [
+                      "dept_id"
+                    ],
+                    "required": [
+                      "dept_id"
+                    ]
+                  },
+                  "required": true,
+                  "mediaType": "",
+                  "examples": [],
+                  "oasExtensions": ""
+                },
+                "description": "",
+                "tags": [],
+                "status": "developing",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 150,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6547931,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
             }
           ]
         }
@@ -1881,77 +4966,10 @@
   "docCollection": [],
   "webSocketCollection": [],
   "socketIOCollection": [],
-  "responseCollection": [
-    {
-      "_databaseId": 7858351,
-      "updatedAt": "2025-11-13T08:28:31.000Z",
-      "name": "根目录",
-      "type": "root",
-      "children": [],
-      "moduleId": 6547931,
-      "parentId": 0,
-      "id": 7858351,
-      "items": [
-        {
-          "name": "返回结果",
-          "moduleId": 6547931,
-          "contentType": "json",
-          "jsonSchema": {
-            "title": "",
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "integer"
-              },
-              "message": {
-                "type": "string"
-              },
-              "data": {
-                "type": "object",
-                "properties": {},
-                "x-apifox-orders": []
-              }
-            },
-            "x-apifox-orders": [
-              "code",
-              "message",
-              "data"
-            ],
-            "required": [
-              "code",
-              "message",
-              "data"
-            ]
-          },
-          "defaultEnable": false,
-          "folderId": 0,
-          "id": 341678471,
-          "databaseResponseExamples": [],
-          "code": "200",
-          "responseExamples": []
-        }
-      ]
-    }
-  ],
-  "schemaCollection": [
-    {
-      "id": 17227476,
-      "name": "根目录",
-      "visibility": "SHARED",
-      "moduleId": 6547931,
-      "items": [],
-      "ordering": []
-    }
-  ],
-  "securitySchemeCollection": [
-    {
-      "id": 2500710,
-      "moduleId": 6547931,
-      "name": "根目录",
-      "items": [],
-      "ordering": []
-    }
-  ],
+  "responseCollection": [],
+  "schemaCollection": [],
+  "securitySchemeCollection": [],
+  "oasComponentCollection": [],
   "requestCollection": [
     {
       "name": "根目录",
@@ -1962,17 +4980,8 @@
       "items": []
     }
   ],
-  "apiTestCaseCollection": [
-    {
-      "name": "Root",
-      "children": [],
-      "items": []
-    }
-  ],
-  "testCaseReferences": [],
   "environments": [],
   "commonScripts": [],
-  "databaseConnections": [],
   "globalVariables": [],
   "commonParameters": {
     "id": 886541,
@@ -1997,46 +5006,6 @@
     "projectId": 7403115,
     "creatorId": 439146,
     "editorId": 439146
-  },
-  "projectSetting": {
-    "id": "7442630",
-    "auth": {},
-    "securityScheme": {},
-    "gateway": [],
-    "language": "zh-CN",
-    "apiStatuses": [
-      "developing",
-      "testing",
-      "released",
-      "deprecated"
-    ],
-    "mockSettings": {},
-    "preProcessors": [],
-    "postProcessors": [],
-    "advancedSettings": {
-      "enableJsonc": false,
-      "enableBigint": false,
-      "responseValidate": true,
-      "enableTestScenarioSetting": false,
-      "enableYAPICompatScript": false,
-      "isDefaultUrlEncoding": 2,
-      "publishedDocUrlRules": {
-        "defaultRule": "RESOURCE_KEY_ONLY",
-        "resourceKeyStandard": "NEW"
-      }
-    },
-    "initialDisabledMockIds": [],
-    "servers": [
-      {
-        "id": "default",
-        "name": "默认服务"
-      }
-    ],
-    "cloudMock": {
-      "security": "free",
-      "enable": false,
-      "tokenKey": "apifoxToken"
-    }
   },
   "customFunctions": [],
   "projectTestCaseCategories": [
