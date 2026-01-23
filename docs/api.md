@@ -295,6 +295,248 @@ Authorization: Bearer <token>
 }
 ```
 
+### 获取角色权限名称列表
+获取指定角色拥有的权限名称列表（需要超级管理员权限）。
+
+**URL**: `GET /admin/roles/:id/permissions-with-names`
+
+**路径参数**:
+- `id`: 角色ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "permissions": [
+      {
+        "id": 1,
+        "name": "用户管理"
+      },
+      {
+        "id": 2,
+        "name": "角色管理"
+      }
+    ]
+  }
+}
+```
+
+### 权限管理
+
+#### 权限列表
+获取权限列表（需要超级管理员权限）。
+
+**URL**: `GET /admin/permissions`
+
+**查询参数**:
+- `page`: 页码（默认1）
+- `page_size`: 每页数量（默认20）
+- `keyword`: 搜索关键词（权限名称/权限标识，选填）
+- `type`: 权限类型过滤（1-菜单，2-按钮，3-API，选填）
+- `is_active`: 是否启用（选填）
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "total": 10,
+    "page": 1,
+    "page_size": 20,
+    "list": [
+      {
+        "id": 1,
+        "name": "用户管理",
+        "parent_id": 0,
+        "type": 1,
+        "path": "/users",
+        "component": "UsersView",
+        "icon": "user-icon",
+        "method": "GET",
+        "api_path": "/api/users",
+        "permission": "user:view",
+        "is_active": true,
+        "sort": 0,
+        "created_at": "2023-01-01T12:00:00Z",
+        "updated_at": "2023-01-01T12:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+#### 创建权限
+创建新的权限（需要超级管理员权限）。
+
+**URL**: `POST /admin/permissions`
+
+**请求参数**:
+```json
+{
+  "name": "新增用户",
+  "parent_id": 1,
+  "type": 2,
+  "path": "",
+  "component": "",
+  "icon": "",
+  "method": "POST",
+  "api_path": "/api/users",
+  "permission": "user:add",
+  "is_active": true,
+  "sort": 0
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "创建权限成功"
+  }
+}
+```
+
+#### 权限详情
+获取指定权限的详细信息（需要超级管理员权限）。
+
+**URL**: `GET /admin/permissions/:id`
+
+**路径参数**:
+- `id`: 权限ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "name": "用户管理",
+    "parent_id": 0,
+    "type": 1,
+    "path": "/users",
+    "component": "UsersView",
+    "icon": "user-icon",
+    "method": "GET",
+    "api_path": "/api/users",
+    "permission": "user:view",
+    "is_active": true,
+    "sort": 0,
+    "created_at": "2023-01-01T12:00:00Z",
+    "updated_at": "2023-01-01T12:00:00Z"
+  }
+}
+```
+
+#### 更新权限
+更新指定权限的信息（需要超级管理员权限）。
+
+**URL**: `PUT /admin/permissions/:id`
+
+**路径参数**:
+- `id`: 权限ID
+
+**请求参数**:
+```json
+{
+  "name": "更新的权限名称",
+  "parent_id": 0,
+  "type": 1,
+  "path": "/updated-path",
+  "component": "UpdatedComponent",
+  "icon": "updated-icon",
+  "method": "GET",
+  "api_path": "/api/updated",
+  "permission": "updated:permission",
+  "is_active": true,
+  "sort": 1
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "更新权限成功"
+  }
+}
+```
+
+#### 删除权限
+删除指定权限（需要超级管理员权限）。
+
+**URL**: `DELETE /admin/permissions/:id`
+
+**路径参数**:
+- `id`: 权限ID
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "message": "删除权限成功"
+  }
+}
+```
+
+#### 权限树
+获取权限树结构。
+
+**URL**: `GET /admin/permissions/tree`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "用户管理",
+      "parent_id": 0,
+      "type": 1,
+      "path": "/users",
+      "component": "UsersView",
+      "icon": "user-icon",
+      "method": "GET",
+      "api_path": "/api/users",
+      "permission": "user:view",
+      "is_active": true,
+      "sort": 0,
+      "children": [
+        {
+          "id": 2,
+          "name": "新增用户",
+          "parent_id": 1,
+          "type": 2,
+          "path": "",
+          "component": "",
+          "icon": "",
+          "method": "POST",
+          "api_path": "/api/users",
+          "permission": "user:add",
+          "is_active": true,
+          "sort": 0,
+          "children": []
+        }
+      ]
+    }
+  ]
+}
+```
+
 ### 管理员登出
 
 管理员登出接口。
