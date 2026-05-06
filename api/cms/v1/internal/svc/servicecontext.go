@@ -13,9 +13,10 @@ import (
 )
 
 type ServiceContext struct {
-	Config        config.Config
-	EntClient     *ent.Client
-	JwtMiddleware rest.Middleware
+	Config             config.Config
+	EntClient          *ent.Client
+	JwtMiddleware      rest.Middleware
+	PermissionMiddleware rest.Middleware
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -29,8 +30,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		panic(err)
 	}
 	return &ServiceContext{
-		Config:        c,
-		EntClient:     client,
-		JwtMiddleware: middleware.NewJwtMiddleware(&c, client),
+		Config:               c,
+		EntClient:            client,
+		JwtMiddleware:        middleware.NewJwtMiddleware(&c, client),
+		PermissionMiddleware:  middleware.NewPermissionMiddleware(&c, client),
 	}
 }

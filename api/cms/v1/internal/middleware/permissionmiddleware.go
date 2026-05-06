@@ -59,6 +59,7 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			Query().
 			Where(adminuser.IDEQ(userID)).
 			Only(r.Context())
+
 		if err != nil {
 			if ent.IsNotFound(err) {
 				common.Fail(w, common.ErrUnauthorized, common.GetErrorMessage(common.ErrUnauthorized))

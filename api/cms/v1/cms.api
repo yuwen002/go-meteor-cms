@@ -337,10 +337,36 @@ type (
 	PermissionDetailResp {
 		PermissionDetailItem
 	}
+	// 管理员角色项
+	AdminRoleItem {
+		ID        int64  `json:"id"`
+		Name      string `json:"name"`
+		Code      string `json:"code"`
+		Desc      string `json:"desc"`
+		DataScope int    `json:"data_scope"`
+		IsSystem  bool   `json:"is_system"`
+		IsActive  bool   `json:"is_active"`
+		Sort      int    `json:"sort"`
+		CreatedAt string `json:"created_at"`
+	}
+	// 管理员角色列表响应
+	AdminRoleListResp {
+		Roles []AdminRoleItem `json:"roles"`
+	}
+	// 分配管理员角色请求
+	AdminRoleAssignReq {
+		ID      int64   `path:"id"` // 管理员ID
+		RoleIDs []int64 `json:"role_ids"` // 角色ID列表
+	}
+	// 移除管理员角色请求
+	AdminRoleRemoveReq {
+		ID     int64 `path:"id"` // 管理员ID
+		RoleID int64 `path:"role_id"` // 角色ID
+	}
 )
 
 @server (
-	middleware: JwtMiddleware
+	middleware: JwtMiddleware,PermissionMiddleware
 )
 service cms-api {
 	@handler testToken
@@ -460,5 +486,18 @@ service cms-api {
 	// 删除权限
 	@handler permissionDelete
 	delete /admin/permissions/:id (PermissionDeleteReq) returns (CommonResp)
+
+	// 管理员角色管理
+	// 获取管理员角色列表
+	@handler adminRoleList
+	get /admin/admin-users/:id/roles (AdminDetailReq) returns (AdminRoleListResp)
+
+	// 分配管理员角色
+	@handler adminRoleAssign
+	put /admin/admin-users/:id/roles (AdminRoleAssignReq) returns (CommonResp)
+
+	// 移除管理员角色
+	@handler adminRoleRemove
+	delete /admin/admin-users/:id/roles/:role_id (AdminRoleRemoveReq) returns (CommonResp)
 }
 

@@ -10,6 +10,7 @@ const (
 	// Auth errors (2000-2999)
 	ErrUnauthorized       = 2001 // 未授权
 	ErrForbidden          = 2003 // 禁止访问
+	ErrPermissionDenied    = 2002 // 权限不足
 	ErrMissingUserContext = 2004 // 用户上下文信息缺失
 	ErrMissingCaptcha     = 2005 // 验证码不能为空
 	ErrInvalidCaptcha     = 2006 // 验证码错误
@@ -79,6 +80,7 @@ var errorMessages = map[int]string{
 	Success:                    "success",
 	ErrInternalServer:          "服务器内部错误",
 	ErrUnauthorized:            "用户名或密码错误",
+	ErrPermissionDenied:        "权限不足",
 	ErrForbidden:               "禁止访问",
 	ErrMissingUserContext:      "用户会话已过期，请重新登录",
 	ErrInvalidToken:            "无效的token",

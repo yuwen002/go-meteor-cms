@@ -48,6 +48,32 @@ type AdminListResp struct {
 	List     []AdminItem `json:"list"`
 }
 
+type AdminRoleAssignReq struct {
+	ID      int64   `path:"id"`       // 管理员ID
+	RoleIDs []int64 `json:"role_ids"` // 角色ID列表
+}
+
+type AdminRoleItem struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	Desc      string `json:"desc"`
+	DataScope int    `json:"data_scope"`
+	IsSystem  bool   `json:"is_system"`
+	IsActive  bool   `json:"is_active"`
+	Sort      int    `json:"sort"`
+	CreatedAt string `json:"created_at"`
+}
+
+type AdminRoleListResp struct {
+	Roles []AdminRoleItem `json:"roles"`
+}
+
+type AdminRoleRemoveReq struct {
+	ID     int64 `path:"id"`      // 管理员ID
+	RoleID int64 `path:"role_id"` // 角色ID
+}
+
 type CaptchaResp struct {
 	CaptchaID     string `json:"captcha_id"`     // 验证码ID
 	CaptchaBase64 string `json:"captcha_base64"` // 验证码图片base64
