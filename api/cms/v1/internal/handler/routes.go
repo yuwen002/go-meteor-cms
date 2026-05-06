@@ -39,7 +39,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.JwtMiddleware},
+			[]rest.Middleware{serverCtx.JwtMiddleware, serverCtx.PermissionMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -75,6 +75,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/admin/admin-users/:id/enable",
 					Handler: enableAdminHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/admin-users/:id/roles",
+					Handler: adminRoleListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/:id/roles",
+					Handler: adminRoleAssignHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/admin/admin-users/:id/roles/:role_id",
+					Handler: adminRoleRemoveHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
