@@ -1,0 +1,69 @@
+api/cms/v1/internal/logic/registeradminlogic.go
+  s_bbf609960902b0::t_d924dfd3c3e31d 11
+  s_bbf609960902b0::t_da3a70c08c580f 80-83
+api/cms/v1/internal/logic/rolepermissionassignlogic.go
+  s_bbf609960902b0::t_d017b858fc3e13 80,86-88
+  h_a3f313f3d96276 74
+  s_bbf609960902b0::t_cf4942a41b3b4b 116-117
+  s_bbf609960902b0::t_c6de307d3bf495 43-56
+  s_bbf609960902b0::t_48ef1af1529f8c 138
+api/cms/v1/internal/logic/changemypasswordlogic.go
+  s_bbf609960902b0::t_7cfde0fc73100c 36,39,44-49
+  s_bbf609960902b0::t_9b2bfa7971007e 8
+api/cms/v1/cms.api
+  s_bbf609960902b0::t_4096e7a967eeec 125-129
+internal/utils/password.go
+  s_bbf609960902b0::t_25541c64779cd8 7-14
+api/cms/v1/internal/logic/adminlogoutlogic.go
+  s_bbf609960902b0::t_a364ea4df99cef 40-41
+api/cms/v1/internal/logic/admindeletelogic.go
+  s_bbf609960902b0::t_ae745cb337c6f3 14
+  s_bbf609960902b0::t_2399d12e4033c2 35,44-53
+api/cms/v1/internal/logic/adminupdatelogic.go
+  s_bbf609960902b0::t_be535485456ba9 35-37,39-40,42-104
+  s_bbf609960902b0::t_53d22b64cc3096 11-14
+internal/utils/context.go
+  s_bbf609960902b0::t_1b4c3511795d74 3-6,10-15
+  s_bbf609960902b0::t_24e03b0423b654 44-100
+api/cms/v1/internal/middleware/jwtmiddleware.go
+  s_bbf609960902b0::t_2c8414b78945a1 75
+api/cms/v1/internal/logic/disableadminlogic.go
+  s_bbf609960902b0::t_9eb35ccec08722 14
+  s_bbf609960902b0::t_4b736a31f3c747 35,46-54
+README.md
+  s_bbf609960902b0::t_497f2c6084b73a 283-284
+  s_bbf609960902b0::t_4aff2797981109 264
+api/cms/v1/internal/logic/admincreatelogic.go
+  s_bbf609960902b0::t_227a58c514467e 11
+  s_bbf609960902b0::t_577ffb02751261 83-86
+  s_bbf609960902b0::t_fc38c59a8902c2 49-63
+api/cms/v1/internal/types/types.go
+  s_bbf609960902b0::t_11e24de54470ac 362-366
+api/cms/v1/internal/logic/resetadminpasswordlogic.go
+  s_bbf609960902b0::t_9fc384f391fe0c 35-36,38,41,43-46,49-52,54-60,62-69,72-77,79,86,90
+  s_bbf609960902b0::t_296d661a3f816e 8,12
+api/cms/v1/internal/middleware/permissionmiddleware.go
+  s_bbf609960902b0::t_c0e55f5389ee2a 45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "3fa4345911e547b5c3c29bf44fa472d501eb3f0d",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4-preview"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 280
+    }
+  }
+}
