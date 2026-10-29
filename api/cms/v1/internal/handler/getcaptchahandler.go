@@ -1,9 +1,10 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
+// goctl 1.10.2
 
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
@@ -16,7 +17,12 @@ func GetCaptchaHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewGetCaptchaLogic(r.Context(), svcCtx)
 		resp, err := l.GetCaptcha()
 		if err != nil {
-			common.Fail(w, common.ErrInternalServer, common.GetErrorMessage(common.ErrInternalServer))
+			var bizErr *common.BizError
+			if errors.As(err, &bizErr) {
+				common.Fail(w, bizErr.Code, bizErr.Msg)
+			} else {
+				common.Fail(w, common.ErrInternalServer, err.Error())
+			}
 			return
 		}
 		common.Ok(w, resp)

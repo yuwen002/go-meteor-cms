@@ -1,5 +1,5 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
+// goctl 1.10.2
 
 package handler
 
@@ -18,19 +18,19 @@ func adminDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.AdminDetailReq
 		if err := httpx.Parse(r, &req); err != nil {
-			common.Fail(w, 40000, "参数错误")
+			common.Fail(w, common.ErrInvalidParams, common.GetErrorMessage(common.ErrInvalidParams))
 			return
 		}
 
 		l := logic.NewAdminDetailLogic(r.Context(), svcCtx)
 		resp, err := l.AdminDetail(&req)
 		if err != nil {
-			var be *common.BizError
-			if errors.As(err, &be) {
-				common.Fail(w, be.Code, be.Msg)
-				return
+			var bizErr *common.BizError
+			if errors.As(err, &bizErr) {
+				common.Fail(w, bizErr.Code, bizErr.Msg)
+			} else {
+				common.Fail(w, common.ErrInternalServer, err.Error())
 			}
-			common.Fail(w, common.ErrAdminUserNotFound, common.GetErrorMessage(common.ErrAdminUserNotFound))
 			return
 		}
 		common.Ok(w, resp)

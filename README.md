@@ -25,22 +25,24 @@
 
 ## 技术栈
 
-- **框架**: [Go-Zero](https://go-zero.dev/) v1.9.2
-- **数据库**: MySQL (通过 [Ent ORM](https://entgo.io/) v0.14.5 支持)
-- **认证**: JWT (github.com/golang-jwt/jwt/v5 v5.3.0)
-- **密码加密**: bcrypt (golang.org/x/crypto)
-- **参数验证**: go-playground/validator
-- **图形验证码**: base64Captcha (github.com/mojocn/base64Captcha)
+- **框架**: [Go-Zero](https://go-zero.dev/) v1.10.3
+- **数据库**: MySQL (通过 [Ent ORM](https://entgo.io/) v0.14.6 支持)
+- **认证**: JWT (github.com/golang-jwt/jwt/v5 v5.3.1)
+- **密码加密**: bcrypt (golang.org/x/crypto v0.58.0)
+- **参数验证**: go-playground/validator/v10 v10.30.5
+- **图形验证码**: base64Captcha (github.com/mojocn/base64Captcha v1.3.8)
 - **API 规范**: RESTful API
-- **依赖管理**: Go Modules (Go 1.25.3)
+- **依赖管理**: Go Modules (Go 1.26.0)
+- **代码生成**: goctl 1.10.2 (项目级自定义模板位于 `.goctl/`)
 
 ## 快速开始
 
 ### 环境要求
 
-- Go 1.25+
+- Go 1.26+
 - MySQL 5.7+
 - Git
+- goctl 1.10.2（仅代码生成时需要）
 
 ### 安装
 
@@ -106,6 +108,19 @@ go run api/cms/v1/cms.go
 ## API 接口
 
 启动服务后，默认访问地址：`http://localhost:8888`
+
+所有接口统一返回下列结构，HTTP 状态码恒为 200，业务结果由 `code` 字段表示：
+
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {}
+}
+```
+
+- `code = 0`：成功
+- `code > 0`：业务错误，`msg` 为提示信息，完整错误码见 [`internal/common/error_code.go`](internal/common/error_code.go)
 
 ### 公共接口
 
@@ -298,13 +313,21 @@ Authorization: Bearer <token>
 
 ### 代码生成
 
-```bash
-# 生成 API 代码 (基于 api/cms/v1/cms.api)
-goctl api go -api api/cms/v1/cms.api -dir .
+项目在 `.goctl/` 下维护了自定义的 handler 模板（统一使用 `common.Ok` / `common.Fail` 响应），因此生成时必须用 `--home` 指定该目录，否则会退回内置模板产出风格不一致的代码：
 
-# 生成 Ent 代码 (基于 ent/schema/*.go)
-go generate ./ent
+```bash
+# 安装指定版本的 goctl
+go install github.com/zeromicro/go-zero/tools/goctl@v1.10.2
+
+# 生成 API 代码 (基于 api/cms/v1/cms.api)
+# 注意：goctl 不会覆盖已存在的 handler/logic 文件，只会新增缺失的文件
+goctl api go -api api/cms/v1/cms.api -dir api/cms/v1 --home .goctl
+
+# 生成 Ent 代码 (详见 docs/ent.md)
+go run -mod=mod entgo.io/ent/cmd/ent generate --feature intercept,schema/snapshot ./ent/schema
 ```
+
+> 不要执行 `goctl template init --home .goctl`，该命令会覆盖 `.goctl/api/handler.tpl` 中的自定义模板。
 
 ### 测试
 
@@ -318,20 +341,14 @@ go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 
 ## 部署
 
-### 使用 Docker
+项目暂未内置 Dockerfile 与 docker-compose.yml，容器化部署需自行补充，运行参数参考：
 
 ```bash
-# 构建镜像
+# 构建镜像（需自行提供 Dockerfile）
 docker build -t go-meteor-cms .
 
 # 运行容器
 docker run -d -p 8888:8888 go-meteor-cms
-```
-
-### 使用 Docker Compose
-
-```bash
-docker-compose up -d
 ```
 
 ## 贡献指南

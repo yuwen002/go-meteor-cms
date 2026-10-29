@@ -12,14 +12,20 @@ http://localhost:8888
 
 ## 状态码说明
 
-| 状态码 | 说明         |
-| ------ | ------------ |
-| 0      | 请求成功     |
-| 401    | 未授权       |
-| 40000  | 参数错误     |
-| 40001  | 用户名已存在 |
-| 40002  | 邮箱已注册   |
-| 50000  | 系统错误     |
+所有接口的 HTTP 状态码恒为 `200`，业务结果由响应体中的 `code` 字段表示。
+
+| 状态码 | 说明 |
+| ------ | ---- |
+| 0 | 请求成功 |
+| 1000 | 服务器内部错误 |
+| 2001～2009 | 认证与权限类错误（2001 未授权、2006 验证码错误等） |
+| 3001～3011 | 管理员相关错误（3002 管理员不存在、3003 密码错误等） |
+| 4001 | 参数错误 |
+| 5001～5011 | 部门相关错误（5001 部门不存在等） |
+| 5201～5212 | 角色相关错误（5201 角色不存在等） |
+| 5401～5412 | 权限相关错误（5401 权限不存在等） |
+
+完整错误码定义见 [`internal/common/error_code.go`](../internal/common/error_code.go)。
 
 ## 公共接口
 
@@ -1034,52 +1040,88 @@ Authorization: Bearer <token>
 }
 ```
 
-### 修改自己的密码
+### 管理员角色管理
 
-管理员修改自己的密码。
+> ⚠️ 以下 3 个接口的 logic 目前仍是 goctl 生成的空实现（`// todo: add your logic here`），调用会返回 `code: 0` 但不会产生实际效果，待实现后再接入前端。
 
-**URL**: `PUT /admin/admin-users/me/change-password`
+#### 获取管理员角色列表
 
-**请求参数**:
-```json
-{
-  "old_password": "oldpassword",
-  "new_password": "newpassword"
-}
-```
+获取指定管理员已绑定的角色列表。
 
-**响应示例**:
+**URL**: `GET /admin/admin-users/:id/roles`
+
+**路径参数**:
+- `id`: 管理员ID
+
+**响应示例（预期）**:
 ```json
 {
   "code": 0,
   "msg": "success",
   "data": {
-    "message": "密码修改成功"
+    "roles": [
+      {
+        "id": 1,
+        "name": "超级管理员",
+        "code": "super_admin",
+        "desc": "系统内置角色",
+        "data_scope": 1,
+        "is_system": true,
+        "is_active": true,
+        "sort": 0,
+        "created_at": "2023-01-01T12:00:00Z"
+      }
+    ]
   }
 }
 ```
 
-### 重置其他管理员的密码
+#### 分配管理员角色
 
-超级管理员重置其他管理员的密码。
+为指定管理员分配角色（覆盖式分配）。
 
-**URL**: `PUT /admin/admin-users/reset-password`
+**URL**: `PUT /admin/admin-users/:id/roles`
+
+**路径参数**:
+- `id`: 管理员ID
 
 **请求参数**:
 ```json
 {
-  "id": 2,
-  "new_password": "newpassword"
+  "role_ids": [1, 2]
 }
 ```
 
-**响应示例**:
+**响应示例（预期）**:
 ```json
 {
   "code": 0,
   "msg": "success",
   "data": {
-    "message": "密码已重置"
+    "id": 2,
+    "message": "分配角色成功"
+  }
+}
+```
+
+#### 移除管理员角色
+
+移除指定管理员的某个角色。
+
+**URL**: `DELETE /admin/admin-users/:id/roles/:role_id`
+
+**路径参数**:
+- `id`: 管理员ID
+- `role_id`: 角色ID
+
+**响应示例（预期）**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 2,
+    "message": "移除角色成功"
   }
 }
 ```

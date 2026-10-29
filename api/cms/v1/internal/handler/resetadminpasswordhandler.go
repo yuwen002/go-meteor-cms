@@ -1,5 +1,5 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
+// goctl 1.10.2
 
 package handler
 
@@ -25,12 +25,12 @@ func resetAdminPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewResetAdminPasswordLogic(r.Context(), svcCtx)
 		resp, err := l.ResetAdminPassword(&req)
 		if err != nil {
-			var be *common.BizError
-			if errors.As(err, &be) {
-				common.Fail(w, be.Code, be.Msg)
-				return
+			var bizErr *common.BizError
+			if errors.As(err, &bizErr) {
+				common.Fail(w, bizErr.Code, bizErr.Msg)
+			} else {
+				common.Fail(w, common.ErrInternalServer, err.Error())
 			}
-			common.Fail(w, common.ErrInternalServer, common.GetErrorMessage(common.ErrInternalServer))
 			return
 		}
 		common.Ok(w, resp)

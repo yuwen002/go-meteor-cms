@@ -1,5 +1,5 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
+// goctl 1.10.2
 
 package logic
 
@@ -41,7 +41,7 @@ func (l *AdminBindDepartmentLogic) AdminBindDepartment(req *types.AdminBindDeptR
 		if ent.IsNotFound(err) {
 			return nil, common.NewBizError(common.ErrAdminUserNotFound)
 		}
-		logx.Error("查询管理员信息失败，ID: %d, 错误: %v", req.Id, err)
+		logx.Errorf("查询管理员信息失败，ID: %d, 错误: %v", req.Id, err)
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
