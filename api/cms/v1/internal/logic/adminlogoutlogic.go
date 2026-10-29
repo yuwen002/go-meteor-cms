@@ -33,7 +33,7 @@ func (l *AdminLogoutLogic) AdminLogout() (resp *types.CommonResp, err error) {
 	// 从上下文中获取用户信息
 	userClaims := utils.GetUserFromCtx(l.ctx)
 	if userClaims == nil {
-		return nil, common.NewBizError(common.ErrUnauthorized)
+		return nil, common.NewBizError(common.ErrMissingUserContext)
 	}
 
 	// 从上下文中获取 token

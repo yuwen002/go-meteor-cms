@@ -46,7 +46,7 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID, ok := utils.CurrentUserID(r.Context())
 		if !ok {
-			common.Fail(w, common.ErrUnauthorized, common.GetErrorMessage(common.ErrUnauthorized))
+			common.Fail(w, common.ErrMissingUserContext, common.GetErrorMessage(common.ErrMissingUserContext))
 			return
 		}
 
@@ -57,7 +57,7 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 
 		if err != nil {
 			if ent.IsNotFound(err) {
-				common.Fail(w, common.ErrUnauthorized, common.GetErrorMessage(common.ErrUnauthorized))
+				common.Fail(w, common.ErrMissingUserContext, common.GetErrorMessage(common.ErrMissingUserContext))
 				return
 			}
 			logx.Errorf("query admin user failed: %v", err)

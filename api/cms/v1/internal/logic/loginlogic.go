@@ -46,14 +46,15 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, common.NewBizError(common.ErrUnauthorized)
+			// 用户名不存在与密码错误返回同一错误，避免账号枚举
+			return nil, common.NewBizError(common.ErrLoginFailed)
 		}
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
 	// 验证密码
 	if !utils.CheckPassword(user.PasswordHash, req.Password) {
-		return nil, common.NewBizError(common.ErrUnauthorized)
+		return nil, common.NewBizError(common.ErrLoginFailed)
 	}
 
 	// 检查用户账号是否激活

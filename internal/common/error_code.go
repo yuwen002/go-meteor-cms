@@ -8,7 +8,7 @@ const (
 	ErrInternalServer = 1000 // 服务器内部错误
 
 	// Auth errors (2000-2999)
-	ErrUnauthorized       = 2001 // 未授权
+	ErrUnauthorized       = 2001 // 未授权（缺少认证凭证）
 	ErrForbidden          = 2003 // 禁止访问
 	ErrPermissionDenied   = 2002 // 权限不足
 	ErrMissingUserContext = 2004 // 用户上下文信息缺失
@@ -17,6 +17,7 @@ const (
 	ErrAccountInactive    = 2007 // 账号未激活
 	ErrCaptchaGenerate    = 2008 // 验证码生成失败
 	ErrInvalidToken       = 2009 // 无效的token
+	ErrLoginFailed        = 2010 // 登录失败（用户名或密码错误）
 
 	// Admin user errors (3000-3999)
 	ErrAdminUserAlreadyExists  = 3001 // 管理员已存在
@@ -82,11 +83,12 @@ const (
 var errorMessages = map[int]string{
 	Success:                    "success",
 	ErrInternalServer:          "服务器内部错误",
-	ErrUnauthorized:            "用户名或密码错误",
+	ErrUnauthorized:            "请先登录",
 	ErrPermissionDenied:        "权限不足",
 	ErrForbidden:               "禁止访问",
 	ErrMissingUserContext:      "用户会话已过期，请重新登录",
 	ErrInvalidToken:            "无效的token",
+	ErrLoginFailed:             "用户名或密码错误",
 	ErrMissingCaptcha:          "验证码不能为空",
 	ErrInvalidCaptcha:          "验证码错误",
 	ErrAccountInactive:         "账号未激活，请联系管理员",
