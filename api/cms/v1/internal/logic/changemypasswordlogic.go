@@ -5,6 +5,7 @@ package logic
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
@@ -32,12 +33,18 @@ func NewChangeMyPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 func (l *ChangeMyPasswordLogic) ChangeMyPassword(req *types.ChangeMyPasswordReq) (resp *types.CommonResp, err error) {
 	claims := utils.GetUserFromCtx(l.ctx)
 	if claims == nil {
-		return nil, common.NewBizError(common.ErrUnauthorized)
+		return nil, common.NewBizError(common.ErrMissingUserContext)
 	}
 
-	userID, ok := claims["user_id"].(int64)
+	userID, ok := utils.ExtractUserID(claims)
 	if !ok {
 		return nil, common.NewBizError(common.ErrUserIDFormat)
+	}
+
+	// 校验新密码
+	if !utils.ValidatePassword(req.NewPassword) {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams,
+			"新密码长度不能少于 "+strconv.Itoa(utils.MinPasswordLength)+" 位")
 	}
 
 	// 查询当前用户

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"strings"
 
@@ -63,21 +62,6 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// 测试令牌，直接放行
-		if tokenStr == "123456" {
-			// 创建一个默认的 claims 对象，避免空指针
-			claims := map[string]interface{}{
-				"user_id":  int64(1), // 测试用户ID
-				"username": "admin",
-			}
-			ctx := utils.WithUserCtx(r.Context(), claims)
-			// 存储token到context
-			ctx = context.WithValue(ctx, "token", tokenStr)
-			r = r.WithContext(ctx)
-			next(w, r)
-			return
-		}
-
 		// 解析 token（使用你自己的 utils.ParseToken）
 		claims, err := utils.ParseToken(m.config.Auth.AccessSecret, tokenStr)
 		if err != nil {
@@ -88,7 +72,7 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		// 把用户信息和token塞进 context，后面所有 logic 都能直接拿
 		ctx := utils.WithUserCtx(r.Context(), claims)
 		// 存储token到context
-		ctx = context.WithValue(ctx, "token", tokenStr)
+		ctx = utils.WithTokenCtx(ctx, tokenStr)
 		r = r.WithContext(ctx)
 
 		// 放行

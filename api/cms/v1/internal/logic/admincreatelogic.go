@@ -8,6 +8,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"golang.org/x/crypto/bcrypt"
@@ -45,6 +46,21 @@ func (l *AdminCreateLogic) AdminCreate(req *types.CreateAdminReq) (resp *types.C
 		return nil, common.NewBizError(common.ErrAdminUserAlreadyExists)
 	}
 
+	// 检查邮箱是否存在
+	if req.Email != "" {
+		emailExists, err := l.svcCtx.EntClient.AdminUser.
+			Query().
+			Where(adminuser.EmailEQ(req.Email)).
+			Exist(l.ctx)
+		if err != nil {
+			logx.Errorf("查询管理员邮箱失败: %v", err)
+			return nil, common.NewBizError(common.ErrInternalServer)
+		}
+		if emailExists {
+			return nil, common.NewBizError(common.ErrAdminEmailAlreadyExists)
+		}
+	}
+
 	// 密码加密
 	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -64,6 +80,10 @@ func (l *AdminCreateLogic) AdminCreate(req *types.CreateAdminReq) (resp *types.C
 
 	if err != nil {
 		logx.Errorf("创建管理员失败: %v", err)
+		// 已被软删除的同名/同邮箱账号仍占用唯一索引，这里还原正确的业务语义
+		if ent.IsConstraintError(err) {
+			return nil, common.NewBizError(common.ErrAdminUserAlreadyExists)
+		}
 		return nil, common.NewBizError(common.ErrAdminCreateFailed)
 	}
 

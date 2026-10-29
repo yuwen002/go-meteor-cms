@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,7 +32,7 @@ func NewDisableAdminLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Disa
 
 func (l *DisableAdminLogic) DisableAdmin(req *types.DisableAdminReq) (resp *types.CommonResp, err error) {
 	// 1. 检查管理员是否存在
-	_, err = l.svcCtx.EntClient.AdminUser.Query().Where(
+	target, err := l.svcCtx.EntClient.AdminUser.Query().Where(
 		adminuser.IDEQ(req.ID),
 	).Only(l.ctx)
 	if err != nil {
@@ -42,7 +43,15 @@ func (l *DisableAdminLogic) DisableAdmin(req *types.DisableAdminReq) (resp *type
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
-	// 2. 更新管理员状态为禁用
+	// 2. 不能禁用自己，也不能禁用超级管理员
+	if currentUserID, ok := utils.CurrentUserID(l.ctx); ok && currentUserID == req.ID {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams, "不能禁用自己")
+	}
+	if target.IsSuper {
+		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "超级管理员不可禁用")
+	}
+
+	// 3. 更新管理员状态为禁用
 	_, err = l.svcCtx.EntClient.AdminUser.UpdateOneID(req.ID).
 		SetIsActive(false).
 		Save(l.ctx)

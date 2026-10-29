@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,13 +32,23 @@ func NewAdminDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Admin
 
 func (l *AdminDeleteLogic) AdminDelete(req *types.DeleteAdminReq) (resp *types.CommonResp, err error) {
 	// 检查用户是否存在
-	_, err = l.svcCtx.EntClient.AdminUser.Get(l.ctx, req.Id)
+	target, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, req.Id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, common.NewBizError(common.ErrAdminUserNotFound)
 		}
 		l.Logger.Errorf("查询管理员失败: %v", err)
 		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	// 不能删除自己
+	if currentUserID, ok := utils.CurrentUserID(l.ctx); ok && currentUserID == req.Id {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams, "不能删除自己")
+	}
+
+	// 超级管理员不能被删除
+	if target.IsSuper {
+		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "超级管理员不可删除")
 	}
 
 	// 执行软删除：更新 deleted_at 字段

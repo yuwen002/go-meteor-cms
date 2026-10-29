@@ -8,6 +8,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"golang.org/x/crypto/bcrypt"
@@ -76,6 +77,10 @@ func (l *RegisterAdminLogic) RegisterAdmin(req *types.RegisterReq) (resp *types.
 
 	if err != nil {
 		l.Logger.Errorf("创建管理员失败: %v", err)
+		// 已被软删除的账号仍占用 username/email 唯一索引
+		if ent.IsConstraintError(err) {
+			return nil, common.NewBizError(common.ErrAdminUserAlreadyExists)
+		}
 		return nil, common.NewBizError(common.ErrAdminCreateFailed)
 	}
 

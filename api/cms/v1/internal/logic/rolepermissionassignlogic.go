@@ -40,6 +40,20 @@ func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.RolePermissi
 		return nil, common.NewBizError(common.ErrInvalidParams)
 	}
 
+	// 权限ID去重且必须为正数
+	permissionIDs := make([]int64, 0, len(req.PermissionIDs))
+	seen := make(map[int64]struct{}, len(req.PermissionIDs))
+	for _, permissionID := range req.PermissionIDs {
+		if permissionID <= 0 {
+			return nil, common.NewBizError(common.ErrInvalidParams)
+		}
+		if _, ok := seen[permissionID]; ok {
+			continue
+		}
+		seen[permissionID] = struct{}{}
+		permissionIDs = append(permissionIDs, permissionID)
+	}
+
 	// 2. 检查角色是否存在
 	role, err := l.svcCtx.EntClient.AdminRole.
 		Query().
@@ -57,21 +71,21 @@ func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.RolePermissi
 	// 3. 检查是否为系统内置角色
 	if role.IsSystem {
 		l.Logger.Errorf("尝试修改系统内置角色权限，ID: %d", req.RoleID)
-		return nil, common.NewBizError(common.ErrRoleUpdateFail)
+		return nil, common.NewBizError(common.ErrRoleIsSystemRole)
 	}
 
 	// 4. 验证权限是否存在
 	permissionCount, err := l.svcCtx.EntClient.AdminPermission.
 		Query().
-		Where(adminpermission.IDIn(req.PermissionIDs...)).
+		Where(adminpermission.IDIn(permissionIDs...)).
 		Count(l.ctx)
 	if err != nil {
 		l.Logger.Errorf("查询权限失败，错误: %v", err)
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
-	if permissionCount != len(req.PermissionIDs) {
-		l.Logger.Errorf("部分权限不存在，请求权限数量: %d, 实际存在: %d", len(req.PermissionIDs), permissionCount)
-		return nil, common.NewBizError(common.ErrInvalidParams)
+	if permissionCount != len(permissionIDs) {
+		l.Logger.Errorf("部分权限不存在，请求权限数量: %d, 实际存在: %d", len(permissionIDs), permissionCount)
+		return nil, common.NewBizErrorWithMsg(common.ErrPermissionNotFound, "部分权限不存在或已被删除")
 	}
 
 	// 5. 开启事务
@@ -99,8 +113,8 @@ func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.RolePermissi
 	}
 
 	// 7. 批量创建新的角色权限关联
-	bulk := make([]*ent.AdminRolePermissionCreate, 0, len(req.PermissionIDs))
-	for _, permissionID := range req.PermissionIDs {
+	bulk := make([]*ent.AdminRolePermissionCreate, 0, len(permissionIDs))
+	for _, permissionID := range permissionIDs {
 		bulk = append(bulk, tx.AdminRolePermission.
 			Create().
 			SetRoleID(req.RoleID).
@@ -121,7 +135,7 @@ func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.RolePermissi
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
-	l.Logger.Infof("角色权限分配成功，角色ID: %d, 角色名称: %s, 权限数量: %d", 
+	l.Logger.Infof("角色权限分配成功，角色ID: %d, 角色名称: %s, 权限数量: %d",
 		req.RoleID, role.Name, len(req.PermissionIDs))
 
 	// 9. 返回成功响应

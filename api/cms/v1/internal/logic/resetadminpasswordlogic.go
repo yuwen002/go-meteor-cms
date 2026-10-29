@@ -5,9 +5,11 @@ package logic
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -30,39 +32,60 @@ func NewResetAdminPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *ResetAdminPasswordLogic) ResetAdminPassword(req *types.ResetAdminPasswordReq) (resp *types.CommonResp, err error) {
-	// 获取当前登录用户信息
-	claims, ok := l.ctx.Value(utils.UserKey).(map[string]interface{})
+	// 1. 获取当前登录用户信息
+	currentUserID, ok := utils.CurrentUserID(l.ctx)
 	if !ok {
-		return nil, common.NewBizError(common.ErrUnauthorized)
-	}
-	currentUserID, ok := claims["user_id"].(int64)
-	if !ok {
-		return nil, common.NewBizError(common.ErrUserIDFormat)
+		return nil, common.NewBizError(common.ErrMissingUserContext)
 	}
 
+	// 2. 参数校验
 	targetID := req.ID
-
-	// 检查是否尝试修改自己的密码
-	if currentUserID == targetID {
+	if targetID <= 0 {
+		return nil, common.NewBizError(common.ErrInvalidParams)
+	}
+	if targetID == currentUserID {
 		return nil, common.NewBizError(common.ErrCannotResetOwnPassword)
 	}
-
-	// 检查目标用户是否存在
-	_, err = l.svcCtx.EntClient.AdminUser.Get(l.ctx, targetID)
-	if err != nil {
-		return nil, common.NewBizError(common.ErrAdminUserNotFound)
+	if !utils.ValidatePassword(req.NewPassword) {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams,
+			"新密码长度不能少于 "+strconv.Itoa(utils.MinPasswordLength)+" 位")
 	}
 
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	// 3. 只有超级管理员可以重置他人密码
+	if !utils.IsSuperAdmin(l.ctx) {
+		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "只有超级管理员可以重置其他管理员的密码")
+	}
 
+	// 4. 检查目标用户是否存在，且不能重置超级管理员
+	target, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, targetID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, common.NewBizError(common.ErrAdminUserNotFound)
+		}
+		l.Logger.Errorf("查询目标管理员失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if target.IsSuper {
+		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "不能重置超级管理员的密码")
+	}
+
+	// 5. 加密新密码
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		l.Logger.Errorf("密码加密失败: %v", err)
+		return nil, common.NewBizError(common.ErrAdminPasswordHashFail)
+	}
+
+	// 6. 更新密码
 	_, err = l.svcCtx.EntClient.AdminUser.
 		UpdateOneID(targetID).
 		SetPasswordHash(string(hashed)).
 		Save(l.ctx)
 
 	if err != nil {
+		l.Logger.Errorf("重置密码失败: %v", err)
 		return nil, common.NewBizError(common.ErrPasswordUpdateFailed)
 	}
 
-	return &types.CommonResp{Message: "密码已重置"}, nil
+	return &types.CommonResp{ID: targetID, Message: "密码已重置"}, nil
 }

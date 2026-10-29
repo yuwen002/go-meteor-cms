@@ -359,9 +359,9 @@ type TestTokenResp struct {
 }
 
 type UpdateAdminReq struct {
-	ID       int64  `path:"id"`
-	Nickname string `json:"nickname,optional"`
-	Email    string `json:"email,optional"`
-	Phone    string `json:"phone,optional"`
-	IsActive bool   `json:"is_active,optional"`
+	ID       int64   `path:"id"`
+	Nickname *string `json:"nickname,optional"`
+	Email    *string `json:"email,optional"`
+	Phone    *string `json:"phone,optional"`
+	IsActive *bool   `json:"is_active,optional"`
 }

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"math"
 	"net/http"
 	"strings"
 
@@ -43,13 +42,7 @@ func NewPermissionMiddleware(c *config.Config, db *ent.Client) rest.Middleware {
 
 func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userClaims := utils.GetUserFromCtx(r.Context())
-		if userClaims == nil {
-			common.Fail(w, common.ErrUnauthorized, common.GetErrorMessage(common.ErrUnauthorized))
-			return
-		}
-
-		userID, ok := extractUserID(userClaims)
+		userID, ok := utils.CurrentUserID(r.Context())
 		if !ok {
 			common.Fail(w, common.ErrUnauthorized, common.GetErrorMessage(common.ErrUnauthorized))
 			return
@@ -231,25 +224,4 @@ func normalizePath(path string) string {
 
 func isPathParamSegment(segment string) bool {
 	return strings.HasPrefix(segment, ":") && len(segment) > 1
-}
-
-func extractUserID(claims map[string]interface{}) (int64, bool) {
-	value, ok := claims["user_id"]
-	if !ok {
-		return 0, false
-	}
-
-	switch v := value.(type) {
-	case int64:
-		return v, true
-	case int:
-		return int64(v), true
-	case float64:
-		if math.Trunc(v) != v {
-			return 0, false
-		}
-		return int64(v), true
-	default:
-		return 0, false
-	}
 }

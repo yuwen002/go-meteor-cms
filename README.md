@@ -261,7 +261,7 @@ Authorization: Bearer <token>
      ```
 
 3. **修改自己的密码**
-   - URL: `PUT /admin/change-password`
+   - URL: `PUT /admin/admin-users/me/change-password`
    - 参数:
      ```json
      {
@@ -280,8 +280,8 @@ Authorization: Bearer <token>
      }
      ```
 
-4. **重置其他管理员的密码** (需要超级管理员权限)
-   - URL: `PUT /admin/users/:id/reset-password`
+4. **重置其他管理员的密码** (需要超级管理员权限，且目标不能是超级管理员)
+   - URL: `PUT /admin/admin-users/reset-password`
    - 参数:
      ```json
      {

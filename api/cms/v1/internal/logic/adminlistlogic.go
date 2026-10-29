@@ -5,7 +5,6 @@ package logic
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
@@ -80,7 +79,6 @@ func (l *AdminListLogic) AdminList(req *types.AdminListReq) (resp *types.AdminLi
 		l.Logger.Errorf("获取管理员列表失败: %v", err)
 		return nil, common.NewBizError(common.ErrAdminListFailed)
 	}
-	fmt.Println("list:", list)
 
 	// 转换结构
 	items := make([]types.AdminItem, 0, len(list))

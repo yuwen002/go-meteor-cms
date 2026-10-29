@@ -37,8 +37,8 @@ func (l *AdminLogoutLogic) AdminLogout() (resp *types.CommonResp, err error) {
 	}
 
 	// 从上下文中获取 token
-	token, ok := l.ctx.Value("token").(string)
-	if !ok || token == "" {
+	token := utils.GetTokenFromCtx(l.ctx)
+	if token == "" {
 		return nil, common.NewBizError(common.ErrInvalidToken)
 	}
 
