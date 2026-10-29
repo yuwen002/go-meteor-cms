@@ -13,8 +13,8 @@ import (
 // >0  - 已知业务错误（如：参数错误、权限不足等）
 // <0  - 系统错误（如：数据库错误、第三方服务错误等）
 type Response struct {
-	Code int         `json:"code"` // 状态码
-	Msg  string      `json:"msg"`  // 提示信息
+	Code int         `json:"code"`           // 状态码
+	Msg  string      `json:"msg"`            // 提示信息
 	Data interface{} `json:"data,omitempty"` // 返回数据
 }
 
@@ -24,12 +24,13 @@ type Response struct {
 //   - data: 需要返回的数据，可以是任意类型
 //
 // 示例：
-//   common.Ok(w, userInfo)
+//
+//	common.Ok(w, userInfo)
 func Ok(w http.ResponseWriter, data interface{}) {
 	httpx.OkJson(w, Response{
-		Code: 0,           // 0 表示成功
-		Msg:  "success",   // 成功提示信息
-		Data: data,        // 返回的数据
+		Code: 0,         // 0 表示成功
+		Msg:  "success", // 成功提示信息
+		Data: data,      // 返回的数据
 	})
 }
 
@@ -40,11 +41,12 @@ func Ok(w http.ResponseWriter, data interface{}) {
 //   - msg: 错误信息
 //
 // 示例：
-//   common.Fail(w, 1001, "用户不存在")
+//
+//	common.Fail(w, 1001, "用户不存在")
 func Fail(w http.ResponseWriter, code int, msg string) {
 	httpx.OkJson(w, Response{
-		Code: code,    // 错误码
-		Msg:  msg,     // 错误信息
-		Data: nil,     // 错误时一般不返回数据
+		Code: code, // 错误码
+		Msg:  msg,  // 错误信息
+		Data: nil,  // 错误时一般不返回数据
 	})
 }

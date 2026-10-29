@@ -12,6 +12,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -48,25 +49,29 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 		query = query.Where(adminrole.IsActive(*req.IsActive))
 	}
 
-	// 4. 获取总数
+	// 4. 规范化分页参数（每页上限 MaxPageSize，默认 20 条）
+	offset, pageSize := utils.NormalizePage(req.Page, req.PageSize, 20)
+	page := offset/pageSize + 1
+
+	// 5. 获取总数
 	total, err := query.Count(l.ctx)
 	if err != nil {
 		l.Logger.Errorf("获取角色总数失败: %v", err)
 		return nil, common.NewBizError(common.ErrRoleListFail)
 	}
 
-	// 5. 分页查询
+	// 6. 分页查询
 	roles, err := query.
 		Order(ent.Asc(adminrole.FieldSort), ent.Desc(adminrole.FieldID)). // 按sort升序，ID降序
-		Offset((req.Page - 1) * req.PageSize).
-		Limit(req.PageSize).
+		Offset(offset).
+		Limit(pageSize).
 		All(l.ctx)
 	if err != nil {
 		l.Logger.Errorf("查询角色列表失败: %v", err)
 		return nil, common.NewBizError(common.ErrRoleListFail)
 	}
 
-	// 6. 构建响应数据
+	// 7. 构建响应数据
 	list := make([]types.RoleItem, 0, len(roles))
 	for _, role := range roles {
 		list = append(list, types.RoleItem{
@@ -83,11 +88,11 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 		})
 	}
 
-	// 7. 返回分页结果
+	// 8. 返回分页结果
 	return &types.RoleListResp{
 		List:     list,
 		Total:    int64(total),
-		Page:     req.Page,
-		PageSize: req.PageSize,
+		Page:     page,
+		PageSize: pageSize,
 	}, nil
 }

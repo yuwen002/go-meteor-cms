@@ -1,0 +1,152 @@
+// Package datascope 处理 RBAC 的数据权限（行级可见范围）。
+//
+// 取值范围定义见 AdminRole.data_scope：
+//
+//	1 全部数据 / 2 本部门 / 3 本部门及子部门 / 4 仅自己 / 5 自定义部门（读取 admin_role_depts）
+//
+// 安全原则：无法确定可见范围时按最严格处理（不返回数据），而不是退回全量。
+package datascope
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminroledept"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+)
+
+// 数据范围取值，与 AdminRole.data_scope 保持一致
+const (
+	// ScopeAll 全部数据，不做行级过滤
+	ScopeAll = 1
+	// ScopeDept 仅本部门
+	ScopeDept = 2
+	// ScopeDeptAndChildren 本部门及全部子部门
+	ScopeDeptAndChildren = 3
+	// ScopeSelf 仅自己的数据
+	ScopeSelf = 4
+	// ScopeCustom 自定义部门集合，读取 admin_role_depts
+	ScopeCustom = 5
+)
+
+// Filter 当前用户的数据可见范围
+type Filter struct {
+	// Restricted 是否需要进行行级过滤，false 表示可见全部数据
+	Restricted bool
+	// DeptIDs 允许访问的部门集合
+	DeptIDs []int64
+	// OnlySelf 是否允许看到自己的数据
+	OnlySelf bool
+	// UserID 当前用户 ID
+	UserID int64
+}
+
+// Empty 是否无任何可见范围，true 时调用方应直接返回空结果集（fail-closed）
+func (f *Filter) Empty() bool {
+	return f.Restricted && len(f.DeptIDs) == 0 && !f.OnlySelf
+}
+
+// Resolve 解析指定用户的数据范围。
+//
+// 超级管理员与拥有 ScopeAll 角色的用户不做行级过滤；
+// 拥有多个角色时取各角色可见范围的并集；
+// 未分配任何启用角色的用户只能看到自己的数据。
+func Resolve(ctx context.Context, client *ent.Client, userID int64) (*Filter, error) {
+	user, err := client.AdminUser.Get(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 超级管理员不受数据范围限制
+	if user.IsSuper {
+		return &Filter{Restricted: false, UserID: userID}, nil
+	}
+
+	roles, err := client.AdminUser.
+		Query().
+		Where(adminuser.IDEQ(userID)).
+		QueryRoles().
+		Where(adminrole.IsActive(true)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 没有任何启用角色时按最严格处理：仅自己
+	if len(roles) == 0 {
+		return &Filter{Restricted: true, OnlySelf: true, UserID: userID}, nil
+	}
+
+	filter := &Filter{Restricted: true, UserID: userID}
+	deptSet := make(map[int64]struct{})
+	needChildren := false
+	var departments []*ent.Department
+
+	for _, role := range roles {
+		switch role.DataScope {
+		case ScopeAll:
+			// 任一角色为「全部数据」即不做限制
+			return &Filter{Restricted: false, UserID: userID}, nil
+
+		case ScopeDept, ScopeDeptAndChildren:
+			if user.DeptID == nil {
+				// 未分配部门却要求按部门过滤，该角色贡献的可见范围为空
+				continue
+			}
+			deptSet[*user.DeptID] = struct{}{}
+			if role.DataScope == ScopeDeptAndChildren {
+				needChildren = true
+			}
+
+		case ScopeSelf:
+			filter.OnlySelf = true
+
+		case ScopeCustom:
+			roleDepts, err := client.AdminRoleDept.
+				Query().
+				Where(adminroledept.RoleID(role.ID)).
+				All(ctx)
+			if err != nil {
+				return nil, err
+			}
+			for _, rd := range roleDepts {
+				deptSet[rd.DeptID] = struct{}{}
+			}
+
+		default:
+			// 未知取值不做猜测，交由上层按解析失败处理
+			return nil, fmt.Errorf("unsupported data_scope: %d", role.DataScope)
+		}
+	}
+
+	// 展开「本部门及子部门」：把子孙部门并入可见集合
+	if needChildren && len(deptSet) > 0 {
+		if departments == nil {
+			all, err := client.Department.Query().All(ctx)
+			if err != nil {
+				return nil, err
+			}
+			departments = all
+		}
+		roots := make([]int64, 0, len(deptSet))
+		for id := range deptSet {
+			roots = append(roots, id)
+		}
+		for _, id := range CollectDescendantIDs(departments, roots) {
+			deptSet[id] = struct{}{}
+		}
+	}
+
+	for id := range deptSet {
+		filter.DeptIDs = append(filter.DeptIDs, id)
+	}
+
+	return filter, nil
+}
+
+// BuildFallbackFilter 解析失败时的兜底范围：仅自己，遵循 fail-closed 原则
+func BuildFallbackFilter(userID int64) *Filter {
+	return &Filter{Restricted: true, OnlySelf: true, UserID: userID}
+}

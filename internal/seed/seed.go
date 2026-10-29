@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/yuwen002/go-meteor-cms/ent"
-	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminrole"
+	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 )
 
@@ -30,22 +31,50 @@ func InitSeed(ctx context.Context, client *ent.Client) error {
 		return err
 	}
 
-	// 4️⃣ 用户角色关联
-	_, err = client.AdminUserRole.Create().
-		SetUserID(user.ID).
-		SetRoleID(role.ID).
-		Save(ctx)
+	// 4️⃣ 用户角色关联（已存在则跳过，保证重复执行不报错）
+	userRoleExists, err := client.AdminUserRole.
+		Query().
+		Where(
+			adminuserrole.UserID(user.ID),
+			adminuserrole.RoleID(role.ID),
+		).
+		Exist(ctx)
 	if err != nil {
 		return err
 	}
+	if !userRoleExists {
+		if _, err = client.AdminUserRole.Create().
+			SetUserID(user.ID).
+			SetRoleID(role.ID).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
 
-	// 5️⃣ 角色权限关联
+	// 5️⃣ 角色权限关联（同上，幂等）
 	for _, perm := range perms {
-		_, err = client.AdminRolePermission.Create().
+		if perm == nil {
+			continue
+		}
+
+		rolePermExists, err := client.AdminRolePermission.
+			Query().
+			Where(
+				adminrolepermission.RoleID(role.ID),
+				adminrolepermission.PermissionID(perm.ID),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if rolePermExists {
+			continue
+		}
+
+		if _, err = client.AdminRolePermission.Create().
 			SetRoleID(role.ID).
 			SetPermissionID(perm.ID).
-			Save(ctx)
-		if err != nil {
+			Save(ctx); err != nil {
 			return err
 		}
 	}
@@ -114,104 +143,14 @@ func initSuperAdminRole(ctx context.Context, client *ent.Client) (*ent.AdminRole
 	return role, nil
 }
 
+// initDefaultPermissions 幂等写入系统内置权限清单
+// 清单定义在 permissions.go 的 DefaultPermissions 中：
+// Type=1 菜单、Type=2 按钮、Type=3 后端 API（权限中间件据此鉴权）
 func initDefaultPermissions(ctx context.Context, client *ent.Client) ([]*ent.AdminPermission, error) {
-	var result []*ent.AdminPermission
-
-	// 定义权限列表（先建菜单，再建按钮/API）
-	menus := []struct {
-		Name       string
-		Permission string
-		Type       int // 1 菜单 2 按钮 3 API
-		Path       string
-		Component  string
-		Method     string
-		APIPath    string
-	}{
-		{"控制台", "dashboard:view", 1, "/dashboard", "views/dashboard/index.vue", "", ""},
-		{"管理员管理", "system:admin_user:list", 1, "/admin/admin-users", "views/user/list.vue", "", ""},
+	// 先清理历史遗留的废弃权限，避免脏数据混入权限列表
+	if err := CleanupLegacyPermissions(ctx, client); err != nil {
+		return nil, err
 	}
 
-	buttons := []struct {
-		Name       string
-		Permission string
-		Type       int
-		ParentName string
-		Method     string
-		APIPath    string
-	}{
-		{"新增管理员", "system:admin_user:add", 2, "管理员管理", "POST", "/admin/users"},
-		{"编辑管理员", "system:admin_user:edit", 2, "管理员管理", "PUT", "/admin/users/:id"},
-		{"删除管理员", "system:admin_user:delete", 2, "管理员管理", "DELETE", "/admin/users/:id"},
-	}
-
-	// 1️⃣ 创建或获取菜单
-	menuMap := make(map[string]*ent.AdminPermission)
-	for _, m := range menus {
-		// 1. 尝试查询是否已存在
-		p, err := client.AdminPermission.Query().
-			Where(
-				adminpermission.TypeEQ(m.Type),
-				adminpermission.PermissionEQ(m.Permission),
-			).
-			First(ctx)
-
-		if ent.IsNotFound(err) {
-			// 2. 不存在则创建
-			p, err = client.AdminPermission.Create().
-				SetName(m.Name).
-				SetPermission(m.Permission).
-				SetType(m.Type).
-				SetPath(m.Path).
-				SetComponent(m.Component).
-				SetIsActive(true).
-				Save(ctx)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			return nil, err
-		}
-
-		// 3. 统一收集
-		menuMap[m.Name] = p
-		result = append(result, p)
-	}
-
-	// 2️⃣ 创建或获取按钮/API
-	for _, b := range buttons {
-		parent, ok := menuMap[b.ParentName]
-		if !ok {
-			continue // 如果父菜单不存在，跳过
-		}
-
-		// 检查是否已存在
-		p, err := client.AdminPermission.Query().
-			Where(
-				adminpermission.TypeEQ(b.Type),
-				adminpermission.PermissionEQ(b.Permission),
-			).
-			First(ctx)
-
-		if ent.IsNotFound(err) {
-			p, err = client.AdminPermission.Create().
-				SetName(b.Name).
-				SetPermission(b.Permission).
-				SetType(b.Type).
-				SetParentID(parent.ID).
-				SetMethod(b.Method).
-				SetAPIPath(b.APIPath).
-				SetIsActive(true).
-				Save(ctx)
-			if err != nil {
-				return nil, err
-			}
-		} else if err != nil {
-			return nil, err
-		}
-
-		result = append(result, p)
-	}
-
-	return result, nil
-
+	return UpsertPermissions(ctx, client, DefaultPermissions)
 }

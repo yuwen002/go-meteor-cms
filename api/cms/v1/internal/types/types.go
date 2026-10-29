@@ -172,6 +172,24 @@ type LoginResp struct {
 	Token string `json:"token"` // 登录成功返回 token
 }
 
+type MyMenuItem struct {
+	ID         int64        `json:"id"`
+	Name       string       `json:"name"`
+	ParentID   int64        `json:"parent_id"`
+	Path       string       `json:"path"`
+	Component  string       `json:"component"`
+	Icon       string       `json:"icon"`
+	Permission string       `json:"permission"`
+	Sort       int          `json:"sort"`
+	Children   []MyMenuItem `json:"children"`
+}
+
+type MyPermissionResp struct {
+	IsSuper     bool         `json:"is_super"`
+	Menus       []MyMenuItem `json:"menus"`
+	Permissions []string     `json:"permissions"`
+}
+
 type PermissionCreateReq struct {
 	Name       string `json:"name" validate:"required"` // 权限名称
 	ParentID   int64  `json:"parent_id"`                // 父级ID
@@ -282,6 +300,11 @@ type ResetAdminPasswordReq struct {
 	NewPassword string `json:"new_password"`
 }
 
+type ResetPasswordByTokenReq struct {
+	Token       string `json:"token" validate:"required"`              // 重置令牌
+	NewPassword string `json:"new_password" validate:"required,min=6"` // 新密码，至少 6 位
+}
+
 type RoleCreateReq struct {
 	Name      string `json:"name" validate:"required"` // 角色名称
 	Code      string `json:"code" validate:"required"` // 角色编码
@@ -293,6 +316,15 @@ type RoleCreateReq struct {
 
 type RoleDeleteReq struct {
 	ID int64 `path:"id"`
+}
+
+type RoleDeptReq struct {
+	ID      int64   `path:"id"`       // 角色ID
+	DeptIDs []int64 `json:"dept_ids"` // 部门ID列表，data_scope=5 时生效
+}
+
+type RoleDeptResp struct {
+	DeptIDs []int64 `json:"dept_ids"`
 }
 
 type RoleDetailReq struct {

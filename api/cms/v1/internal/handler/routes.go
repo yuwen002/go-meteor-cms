@@ -30,6 +30,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: registerAdminHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/admin/reset-password",
+				Handler: resetPasswordByTokenHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/api/captcha",
 				Handler: GetCaptchaHandler(serverCtx),
@@ -168,6 +173,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodGet,
+					Path:    "/admin/profile/permissions",
+					Handler: myPermissionsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
 					Path:    "/admin/roles",
 					Handler: roleListHandler(serverCtx),
 				},
@@ -190,6 +200,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodDelete,
 					Path:    "/admin/roles/:id",
 					Handler: roleDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/roles/:id/departments",
+					Handler: roleDeptListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/roles/:id/departments",
+					Handler: roleDeptAssignHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,

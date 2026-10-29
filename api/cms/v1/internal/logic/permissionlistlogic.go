@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminpermission"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,16 +31,9 @@ func NewPermissionListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pe
 }
 
 func (l *PermissionListLogic) PermissionList(req *types.PermissionListReq) (resp *types.PermissionListResp, err error) {
-	// 1. 参数验证
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	// 1. 规范化分页参数（每页上限 MaxPageSize，默认 20 条）
+	offset, pageSize := utils.NormalizePage(req.Page, req.PageSize, 20)
+	page := offset/pageSize + 1
 
 	// 2. 构建查询条件
 	query := l.svcCtx.EntClient.AdminPermission.Query()
@@ -75,8 +69,8 @@ func (l *PermissionListLogic) PermissionList(req *types.PermissionListReq) (resp
 	permissions, err := query.
 		Order(ent.Asc(adminpermission.FieldSort)).
 		Order(ent.Desc(adminpermission.FieldCreatedAt)).
-		Offset((req.Page - 1) * req.PageSize).
-		Limit(req.PageSize).
+		Offset(offset).
+		Limit(pageSize).
 		All(l.ctx)
 	if err != nil {
 		l.Logger.Errorf("查询权限列表失败，错误: %v", err)
@@ -109,13 +103,13 @@ func (l *PermissionListLogic) PermissionList(req *types.PermissionListReq) (resp
 		}
 	}
 
-	l.Logger.Infof("查询权限列表成功，页码: %d, 每页数量: %d, 总数: %d", req.Page, req.PageSize, total)
+	l.Logger.Infof("查询权限列表成功，页码: %d, 每页数量: %d, 总数: %d", page, pageSize, total)
 
 	// 6. 返回结果
 	return &types.PermissionListResp{
 		Total:    int64(total),
-		Page:     req.Page,
-		PageSize: req.PageSize,
+		Page:     page,
+		PageSize: pageSize,
 		List:     list,
 	}, nil
 }

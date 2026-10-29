@@ -11,7 +11,10 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/datascope"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,15 +34,8 @@ func NewAdminListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AdminLi
 }
 
 func (l *AdminListLogic) AdminList(req *types.AdminListReq) (resp *types.AdminListResp, err error) {
-	page := req.Page
-	if page <= 0 {
-		page = 1
-	}
-
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = 10 // 默认每页 10 条
-	}
+	offset, pageSize := utils.NormalizePage(req.Page, req.PageSize, utils.DefaultPageSize)
+	page := offset/pageSize + 1
 
 	// ent 查询器
 	query := l.svcCtx.EntClient.AdminUser.Query()
@@ -62,6 +58,40 @@ func (l *AdminListLogic) AdminList(req *types.AdminListReq) (resp *types.AdminLi
 		query = query.Where(adminuser.IsActive(false))
 	}
 
+	// 数据权限过滤：按当前用户所属角色的数据范围收敛可见管理员
+	userID, ok := utils.CurrentUserID(l.ctx)
+	if !ok {
+		return nil, common.NewBizError(common.ErrMissingUserContext)
+	}
+
+	scope, err := datascope.Resolve(l.ctx, l.svcCtx.EntClient, userID)
+	if err != nil {
+		// 解析失败一律按最严格处理，绝不退回全量
+		l.Logger.Errorf("解析数据权限失败，用户ID: %d, 错误: %v", userID, err)
+		scope = datascope.BuildFallbackFilter(userID)
+	}
+
+	if scope.Restricted {
+		// 可见范围为空时直接返回空结果，不查库
+		if scope.Empty() {
+			return &types.AdminListResp{
+				Total:    0,
+				Page:     page,
+				PageSize: pageSize,
+				List:     []types.AdminItem{},
+			}, nil
+		}
+
+		conds := make([]predicate.AdminUser, 0, 2)
+		if len(scope.DeptIDs) > 0 {
+			conds = append(conds, adminuser.DeptIDIn(scope.DeptIDs...))
+		}
+		if scope.OnlySelf {
+			conds = append(conds, adminuser.IDEQ(scope.UserID))
+		}
+		query = query.Where(adminuser.Or(conds...))
+	}
+
 	// 总数
 	total, err := query.Count(l.ctx)
 	if err != nil {
@@ -72,7 +102,7 @@ func (l *AdminListLogic) AdminList(req *types.AdminListReq) (resp *types.AdminLi
 	// 分页数据
 	list, err := query.
 		Order(ent.Desc(adminuser.FieldCreatedAt)).
-		Offset((page - 1) * pageSize).
+		Offset(offset).
 		Limit(pageSize).
 		All(l.ctx)
 	if err != nil {

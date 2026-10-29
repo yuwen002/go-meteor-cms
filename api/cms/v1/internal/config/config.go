@@ -15,4 +15,12 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	}
+	Mail struct {
+		Enabled  bool
+		Host     string
+		Port     int
+		Username string
+		Password string
+		From     string
+	}
 }

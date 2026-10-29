@@ -22,6 +22,11 @@
 - 🖼️ 图形验证码功能
 - 🔐 管理员密码修改功能
 - 🔁 管理员密码重置功能
+- 🎯 RBAC 权限模型（菜单 / 按钮 / API 三级鉴权）
+- 🧭 我的菜单接口（按角色动态下发菜单树与权限码）
+- 🔒 数据权限（按部门范围收敛可见数据）
+- ✉️ 忘记密码闭环（邮件令牌 + 一次性重置）
+- 📄 统一分页参数（每页上限 100）
 
 ## 技术栈
 
@@ -66,19 +71,35 @@ go mod tidy
 CREATE DATABASE go_meteor_cms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-修改数据库连接配置：
+数据库连接信息按以下优先级获取（API 服务与迁移工具共用同一份配置）：
+
+1. 环境变量 `MYSQL_DSN`（推荐用于 CI / 生产）
+2. `api/cms/v1/etc/cms-api.yaml` 中的 `Database.Source`
+
 ```bash
-# 数据库连接信息在以下文件中配置
-api/cms/v1/etc/cms-api.yaml
-cmd/migrate/main.go
+export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&loc=Local"
+```
+
+邮件配置（`etc/cms-api.yaml` 的 `Mail` 节点）用于忘记密码时投递重置令牌：
+
+```yaml
+Mail:
+  Enabled: false                  # false 时只输出到服务日志，不发真实邮件
+  Host: "smtp.example.com"
+  Port: 587                       # 587(STARTTLS) / 465(SSL) / 25
+  Username: "noreply@example.com"
+  Password: ""                    # 密码或授权码
+  From: "Go Meteor CMS <noreply@example.com>"
 ```
 
 4. 数据库迁移
 
 ```bash
-# 执行数据库迁移和初始化数据
+# 执行数据库迁移和初始化数据（幂等，可重复执行）
 go run cmd/migrate/main.go
 ```
+
+迁移完成后会输出权限统计，形如 `菜单 5 / 按钮 31 / API 31`，其中 API 权限直接决定非超级管理员能否访问各接口。
 
 5. 启动服务
 
@@ -99,9 +120,10 @@ go run api/cms/v1/cms.go
 ├── ent/                   # Ent ORM 实体
 │   └── schema/            # 数据库表结构定义
 ├── internal/              # 内部包
-│   ├── common/            # 通用组件
-│   ├── seed/              # 初始化数据
-│   └── utils/             # 工具函数
+│   ├── common/            # 通用组件（响应、错误码、权限类型）
+│   ├── pkg/               # 可复用子包（mail 邮件、datascope 数据权限）
+│   ├── seed/              # 初始化数据（含权限清单）
+│   └── utils/             # 工具函数（jwt、password、captcha、page）
 └── rpc/                   # RPC 服务定义
 ```
 
@@ -121,6 +143,9 @@ go run api/cms/v1/cms.go
 
 - `code = 0`：成功
 - `code > 0`：业务错误，`msg` 为提示信息，完整错误码见 [`internal/common/error_code.go`](internal/common/error_code.go)
+
+> 分页参数通用约定：`page` 小于 1 时按 1 处理，`page_size` 小于 1 时取接口默认值，大于 100 一律截断为 100，响应中的 `page_size` 为实际生效值。
+> 完整的接口清单（含角色、权限、部门模块）见 [`docs/api.md`](docs/api.md) 与 `docs/api-docs/go-meteor-cms.apifox.json`。
 
 ### 公共接口
 
@@ -160,8 +185,9 @@ go run api/cms/v1/cms.go
      }
      ```
 
-3. **忘记密码**
+3. **忘记密码（第一步：申请重置令牌）**
    - URL: `POST /admin/forgot-password`
+   - 说明：无论账号是否存在均返回成功，避免账号枚举；令牌 1 小时内有效
    - 参数:
      ```json
      {
@@ -179,7 +205,28 @@ go run api/cms/v1/cms.go
      }
      ```
 
-4. **管理员注册**
+4. **忘记密码（第二步：用令牌重置密码）**
+   - URL: `POST /admin/reset-password`
+   - 说明：令牌一次性，使用后立即失效；新密码不少于 6 位
+   - 参数:
+     ```json
+     {
+       "token": "邮件中的重置令牌",
+       "new_password": "newpassword123"
+     }
+     ```
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "message": "密码重置成功，请使用新密码登录"
+       }
+     }
+     ```
+
+5. **管理员注册**
    - URL: `POST /admin/register`
    - 参数:
      ```json
@@ -209,7 +256,43 @@ go run api/cms/v1/cms.go
 Authorization: Bearer <token>
 ```
 
-1. **Token 验证测试**
+除管理员列表接口会额外按数据权限收敛结果外，认证接口的可见性由 RBAC 决定，详见下方「权限模型」与「数据权限」两节。
+
+1. **获取当前用户的菜单与权限**（前端据此渲染菜单与按钮）
+   - URL: `GET /admin/profile/permissions`
+   - 响应:
+     ```json
+     {
+       "code": 0,
+       "msg": "success",
+       "data": {
+         "is_super": false,
+         "menus": [
+           {
+             "id": 3,
+             "name": "部门管理",
+             "path": "/admin/departments",
+             "component": "views/admin/dept/list.vue",
+             "icon": "dept",
+             "permission": "system:dept:list",
+             "children": []
+           }
+         ],
+         "permissions": ["system:dept:list", "system:dept:add"]
+       }
+     }
+     ```
+
+2. **角色部门范围**
+   - URL: `GET /admin/roles/:id/departments`
+   - URL: `PUT /admin/roles/:id/departments`
+   - 说明：仅 `data_scope=5`（自定义部门）的角色支持设置，系统内置角色不可修改
+   - PUT 参数:
+     ```json
+     { "dept_ids": [1, 2] }
+     ```
+
+3. **Token 验证测试**
    - URL: `GET /admin/test-token`
    - 响应:
      ```json
@@ -226,7 +309,7 @@ Authorization: Bearer <token>
      }
      ```
 
-2. **获取管理员列表**
+4. **获取管理员列表**（按当前用户的数据权限收敛结果）
    - URL: `GET /admin/admin-users`
    - 查询参数:
      - `page`: 页码（必填）
@@ -260,7 +343,7 @@ Authorization: Bearer <token>
      }
      ```
 
-3. **修改自己的密码**
+5. **修改自己的密码**
    - URL: `PUT /admin/admin-users/me/change-password`
    - 参数:
      ```json
@@ -280,7 +363,7 @@ Authorization: Bearer <token>
      }
      ```
 
-4. **重置其他管理员的密码** (需要超级管理员权限，且目标不能是超级管理员)
+6. **重置其他管理员的密码** (需要超级管理员权限，且目标不能是超级管理员)
    - URL: `PUT /admin/admin-users/reset-password`
    - 参数:
      ```json
@@ -309,6 +392,40 @@ Authorization: Bearer <token>
 
 请在生产环境中及时修改默认密码。
 
+## 权限模型
+
+权限记录存放在 `admin_permissions` 表，由迁移时的种子写入，分三类：
+
+| 类型 | 取值 | 用途 |
+| --- | --- | --- |
+| 菜单 | 1 | 前端路由菜单，`GET /admin/profile/permissions` 据此下发菜单树 |
+| 按钮 | 2 | 前端功能点，同 `permissions` 字段下发，用于控制按钮显隐 |
+| API | 3 | 后端接口，权限中间件按 `method + api_path` 匹配后校验角色是否拥有对应标识 |
+
+关键约定：
+
+- **按钮与 API 使用相同的权限标识**（如 `system:role:add`），因此授权一次即可同时让按钮可见、接口可调用
+- **API 权限的 `api_path` 必须与 `cms.api` 中的真实路由一致**，否则非超级管理员访问时会被判定为「未配置权限」而拒绝；新增受保护接口后请同步追加一条 Type=3 权限
+- 路由匹配按「静态段命中数最多者优先」，`/admin/departments/tree` 不会被 `/admin/departments/:id` 抢占
+- 以下路由不参与 API 鉴权：`/admin/logout`、`/admin/test-token`、`/admin/admin-users/me/change-password`、`/admin/profile/permissions`
+- 超级管理员（`admin_users.is_super`）跳过全部鉴权与数据范围过滤
+
+## 数据权限
+
+角色通过 `data_scope` 声明可见数据范围：
+
+| data_scope | 含义 | 说明 |
+| --- | --- | --- |
+| 1 | 全部数据 | 不做行级过滤 |
+| 2 | 本部门 | 与当前管理员的 `dept_id` 一致 |
+| 3 | 本部门及子部门 | 沿部门树展开全部子孙部门 |
+| 4 | 仅自己 | 只能看到自己的记录 |
+| 5 | 自定义部门 | 读取 `admin_role_depts`，通过 `PUT /admin/roles/:id/departments` 维护 |
+
+- 多个角色时取各角色可见范围的并集；任一角色为「全部数据」时不过滤
+- **安全原则（fail-closed）**：范围解析失败、用户未分配任何启用角色、或要求按部门过滤但未分配部门时，一律按最严格处理（不返回数据），绝不退回全量
+- 当前仅在管理员列表接口落地，其他列表接口暂不过滤
+
 ## 开发指南
 
 ### 代码生成
@@ -332,12 +449,22 @@ go run -mod=mod entgo.io/ent/cmd/ent generate --feature intercept,schema/snapsho
 ### 测试
 
 ```bash
-# 运行测试
+# 运行全部测试
 go test ./...
+
+# 只跑带用例的包（其余包显示 no test files）
+go test ./internal/... ./api/cms/v1/internal/middleware/...
 
 # 运行测试并生成覆盖率报告
 go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 ```
+
+当前已覆盖的纯逻辑单测：
+
+- `internal/utils`：分页参数规范化（默认值、负值纠正、上限截断）
+- `internal/pkg/datascope`：部门树子孙收集，含脏数据成环时不死循环
+- `internal/pkg/mail`：邮件报文构造（UTF-8 主题与正文编码）、SMTP 参数校验
+- `api/cms/v1/internal/middleware`：路由匹配规则、静态路由优先于动态路由、免鉴权路由判定
 
 ## 部署
 

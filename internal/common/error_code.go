@@ -10,7 +10,7 @@ const (
 	// Auth errors (2000-2999)
 	ErrUnauthorized       = 2001 // 未授权
 	ErrForbidden          = 2003 // 禁止访问
-	ErrPermissionDenied    = 2002 // 权限不足
+	ErrPermissionDenied   = 2002 // 权限不足
 	ErrMissingUserContext = 2004 // 用户上下文信息缺失
 	ErrMissingCaptcha     = 2005 // 验证码不能为空
 	ErrInvalidCaptcha     = 2006 // 验证码错误
@@ -30,6 +30,9 @@ const (
 	ErrUserIDFormat            = 3009 // 用户ID格式错误
 	ErrPasswordUpdateFailed    = 3010 // 密码更新失败
 	ErrCannotResetOwnPassword  = 3011 // 不能重置自己的密码
+	ErrResetTokenInvalid       = 3012 // 密码重置令牌无效
+	ErrResetTokenExpired       = 3013 // 密码重置令牌已过期
+	ErrMailSendFailed          = 3014 // 邮件发送失败
 
 	// Request validation errors (4000-4999)
 	ErrInvalidParams = 4001 // 参数错误
@@ -48,32 +51,32 @@ const (
 	ErrDepartmentParentNotActive = 5011 // 父部门未启用
 
 	// Role errors (5200-5399)
-	ErrRoleNotFound         = 5201 // 角色不存在
-	ErrRoleCreateFail       = 5202 // 创建角色失败
-	ErrRoleUpdateFail       = 5203 // 更新角色失败
-	ErrRoleDeleteFail       = 5204 // 删除角色失败
-	ErrRoleListFail         = 5205 // 获取角色列表失败
-	ErrRoleCodeExists       = 5206 // 角色编码已存在
-	ErrRoleNameExists       = 5207 // 角色名称已存在
-	ErrRoleIsSystemRole     = 5208 // 系统内置角色，禁止修改
-	ErrRoleIsInUse          = 5209 // 角色正在使用中，禁止删除
-	ErrRolePermissionDenied = 5210 // 没有操作该角色的权限
+	ErrRoleNotFound          = 5201 // 角色不存在
+	ErrRoleCreateFail        = 5202 // 创建角色失败
+	ErrRoleUpdateFail        = 5203 // 更新角色失败
+	ErrRoleDeleteFail        = 5204 // 删除角色失败
+	ErrRoleListFail          = 5205 // 获取角色列表失败
+	ErrRoleCodeExists        = 5206 // 角色编码已存在
+	ErrRoleNameExists        = 5207 // 角色名称已存在
+	ErrRoleIsSystemRole      = 5208 // 系统内置角色，禁止修改
+	ErrRoleIsInUse           = 5209 // 角色正在使用中，禁止删除
+	ErrRolePermissionDenied  = 5210 // 没有操作该角色的权限
 	ErrRoleCodeCannotBeEmpty = 5211 // 角色编码不能为空
 	ErrRoleNameCannotBeEmpty = 5212 // 角色名称不能为空
 
 	// Permission errors (5400-5599)
-	ErrPermissionNotFound        = 5401 // 权限不存在
-	ErrPermissionCreateFail      = 5402 // 创建权限失败
-	ErrPermissionUpdateFail      = 5403 // 更新权限失败
-	ErrPermissionDeleteFail      = 5404 // 删除权限失败
-	ErrPermissionListFail        = 5405 // 获取权限列表失败
-	ErrPermissionExists          = 5406 // 权限标识已存在
-	ErrPermissionNameExists      = 5407 // 权限名称已存在
-	ErrParentPermissionNotFound  = 5408 // 父级权限不存在
-	ErrPermissionIsSystem        = 5409 // 系统内置权限，禁止修改
-	ErrPermissionInUse           = 5410 // 权限正在使用中，禁止删除
+	ErrPermissionNotFound          = 5401 // 权限不存在
+	ErrPermissionCreateFail        = 5402 // 创建权限失败
+	ErrPermissionUpdateFail        = 5403 // 更新权限失败
+	ErrPermissionDeleteFail        = 5404 // 删除权限失败
+	ErrPermissionListFail          = 5405 // 获取权限列表失败
+	ErrPermissionExists            = 5406 // 权限标识已存在
+	ErrPermissionNameExists        = 5407 // 权限名称已存在
+	ErrParentPermissionNotFound    = 5408 // 父级权限不存在
+	ErrPermissionIsSystem          = 5409 // 系统内置权限，禁止修改
+	ErrPermissionInUse             = 5410 // 权限正在使用中，禁止删除
 	ErrPermissionNameCannotBeEmpty = 5411 // 权限名称不能为空
-	ErrPermissionTypeInvalid      = 5412 // 权限类型无效
+	ErrPermissionTypeInvalid       = 5412 // 权限类型无效
 )
 
 var errorMessages = map[int]string{
@@ -99,6 +102,9 @@ var errorMessages = map[int]string{
 	ErrUserIDFormat:            "用户ID格式错误",
 	ErrPasswordUpdateFailed:    "密码更新失败",
 	ErrCannotResetOwnPassword:  "不能重置自己的密码，请使用修改密码功能",
+	ErrResetTokenInvalid:       "重置链接无效",
+	ErrResetTokenExpired:       "重置链接已过期，请重新申请",
+	ErrMailSendFailed:          "邮件发送失败，请稍后重试",
 	ErrInvalidParams:           "参数错误",
 	// Department error messages
 	ErrDepartmentNotFound:        "部门不存在",
@@ -113,31 +119,31 @@ var errorMessages = map[int]string{
 	ErrDepartmentNameExists:      "部门名称已存在",
 	ErrDepartmentParentNotActive: "父部门未启用，无法添加子部门",
 	// Role error messages
-	ErrRoleNotFound:         "角色不存在",
-	ErrRoleCreateFail:       "创建角色失败",
-	ErrRoleUpdateFail:       "更新角色失败",
-	ErrRoleDeleteFail:       "删除角色失败",
-	ErrRoleListFail:         "获取角色列表失败",
-	ErrRoleCodeExists:       "角色编码已存在",
-	ErrRoleNameExists:       "角色名称已存在",
-	ErrRoleIsSystemRole:     "系统内置角色，禁止修改",
-	ErrRoleIsInUse:          "角色正在使用中，禁止删除",
-	ErrRolePermissionDenied: "没有操作该角色的权限",
+	ErrRoleNotFound:          "角色不存在",
+	ErrRoleCreateFail:        "创建角色失败",
+	ErrRoleUpdateFail:        "更新角色失败",
+	ErrRoleDeleteFail:        "删除角色失败",
+	ErrRoleListFail:          "获取角色列表失败",
+	ErrRoleCodeExists:        "角色编码已存在",
+	ErrRoleNameExists:        "角色名称已存在",
+	ErrRoleIsSystemRole:      "系统内置角色，禁止修改",
+	ErrRoleIsInUse:           "角色正在使用中，禁止删除",
+	ErrRolePermissionDenied:  "没有操作该角色的权限",
 	ErrRoleCodeCannotBeEmpty: "角色编码不能为空",
 	ErrRoleNameCannotBeEmpty: "角色名称不能为空",
 	// Permission error messages
-	ErrPermissionNotFound:        "权限不存在",
-	ErrPermissionCreateFail:      "创建权限失败",
-	ErrPermissionUpdateFail:      "更新权限失败",
-	ErrPermissionDeleteFail:      "删除权限失败",
-	ErrPermissionListFail:        "获取权限列表失败",
-	ErrPermissionExists:          "权限标识已存在",
-	ErrPermissionNameExists:      "权限名称已存在",
-	ErrParentPermissionNotFound:  "父级权限不存在",
-	ErrPermissionIsSystem:        "系统内置权限，禁止修改",
-	ErrPermissionInUse:           "权限正在使用中，禁止删除",
+	ErrPermissionNotFound:          "权限不存在",
+	ErrPermissionCreateFail:        "创建权限失败",
+	ErrPermissionUpdateFail:        "更新权限失败",
+	ErrPermissionDeleteFail:        "删除权限失败",
+	ErrPermissionListFail:          "获取权限列表失败",
+	ErrPermissionExists:            "权限标识已存在",
+	ErrPermissionNameExists:        "权限名称已存在",
+	ErrParentPermissionNotFound:    "父级权限不存在",
+	ErrPermissionIsSystem:          "系统内置权限，禁止修改",
+	ErrPermissionInUse:             "权限正在使用中，禁止删除",
 	ErrPermissionNameCannotBeEmpty: "权限名称不能为空",
-	ErrPermissionTypeInvalid:      "权限类型无效",
+	ErrPermissionTypeInvalid:       "权限类型无效",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

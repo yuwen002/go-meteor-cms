@@ -40,6 +40,11 @@ type (
 	RegisterResp {
 		Message string `json:"message"` // 注册成功提示
 	}
+	// 通过邮件中的重置令牌设置新密码
+	ResetPasswordByTokenReq {
+		Token       string `json:"token" validate:"required"` // 重置令牌
+		NewPassword string `json:"new_password" validate:"required,min=6"` // 新密码，至少 6 位
+	}
 )
 
 service cms-api {
@@ -56,6 +61,10 @@ service cms-api {
 
 	@handler registerAdmin
 	post /admin/register (RegisterReq) returns (RegisterResp)
+
+	// 通过邮件中的重置令牌设置新密码（忘记密码流程的第二步）
+	@handler resetPasswordByToken
+	post /admin/reset-password (ResetPasswordByTokenReq) returns (RegisterResp)
 }
 
 type (
@@ -337,6 +346,15 @@ type (
 	PermissionDetailResp {
 		PermissionDetailItem
 	}
+	// 角色自定义数据范围的部门
+	RoleDeptReq {
+		ID      int64   `path:"id"` // 角色ID
+		DeptIDs []int64 `json:"dept_ids"` // 部门ID列表，data_scope=5 时生效
+	}
+	// 角色绑定的部门列表响应
+	RoleDeptResp {
+		DeptIDs []int64 `json:"dept_ids"`
+	}
 	// 管理员角色项
 	AdminRoleItem {
 		ID        int64  `json:"id"`
@@ -362,6 +380,24 @@ type (
 	AdminRoleRemoveReq {
 		ID     int64 `path:"id"` // 管理员ID
 		RoleID int64 `path:"role_id"` // 角色ID
+	}
+	// 当前登录用户的菜单项（Type=1 菜单）
+	MyMenuItem {
+		ID         int64        `json:"id"`
+		Name       string       `json:"name"`
+		ParentID   int64        `json:"parent_id"`
+		Path       string       `json:"path"`
+		Component  string       `json:"component"`
+		Icon       string       `json:"icon"`
+		Permission string       `json:"permission"`
+		Sort       int          `json:"sort"`
+		Children   []MyMenuItem `json:"children"`
+	}
+	// 当前登录用户的菜单与权限
+	MyPermissionResp {
+		IsSuper     bool         `json:"is_super"`
+		Menus       []MyMenuItem `json:"menus"`
+		Permissions []string     `json:"permissions"`
 	}
 )
 
@@ -499,5 +535,17 @@ service cms-api {
 	// 移除管理员角色
 	@handler adminRoleRemove
 	delete /admin/admin-users/:id/roles/:role_id (AdminRoleRemoveReq) returns (CommonResp)
+
+	// 获取角色自定义数据范围的部门列表
+	@handler roleDeptList
+	get /admin/roles/:id/departments (RoleDetailReq) returns (RoleDeptResp)
+
+	// 设置角色自定义数据范围的部门列表
+	@handler roleDeptAssign
+	put /admin/roles/:id/departments (RoleDeptReq) returns (CommonResp)
+
+	// 获取当前登录用户的菜单树与功能权限标识（前端据此渲染菜单和按钮）
+	@handler myPermissions
+	get /admin/profile/permissions returns (MyPermissionResp)
 }
 

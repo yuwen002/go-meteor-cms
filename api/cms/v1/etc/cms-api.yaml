@@ -9,3 +9,11 @@ Database:
 Auth:
   AccessSecret: "8x!A%D*G-KaPdSgVkYp3s6v9y$B?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2"   # 用于签发 Token
   AccessExpire: 86400             # Token 有效期，单位秒
+
+Mail:
+  Enabled: false                  # false 时邮件只输出到日志，不发真实邮件
+  Host: "smtp.example.com"        # SMTP 服务器
+  Port: 587                       # 常用端口：587(STARTTLS) / 465(SSL) / 25
+  Username: "noreply@example.com" # 登录账号
+  Password: ""                    # 登录密码或授权码
+  From: "Go Meteor CMS <noreply@example.com>"
