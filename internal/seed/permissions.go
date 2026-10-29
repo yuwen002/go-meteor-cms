@@ -118,6 +118,10 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "查看角色权限(含名称)", Permission: "system:role:perm_list_names", Type: PermissionTypeAPI, ParentName: "角色管理", Method: "GET", APIPath: "/admin/roles/:id/permissions-with-names", Sort: 36},
 	{Name: "分配角色权限", Permission: "system:role:perm_assign", Type: PermissionTypeButton, ParentName: "角色管理", Sort: 37},
 	{Name: "分配角色权限", Permission: "system:role:perm_assign", Type: PermissionTypeAPI, ParentName: "角色管理", Method: "PUT", APIPath: "/admin/roles/:id/permissions", Sort: 37},
+	{Name: "查看角色部门", Permission: "system:role:dept_list", Type: PermissionTypeButton, ParentName: "角色管理", Sort: 38},
+	{Name: "查看角色部门", Permission: "system:role:dept_list", Type: PermissionTypeAPI, ParentName: "角色管理", Method: "GET", APIPath: "/admin/roles/:id/departments", Sort: 38},
+	{Name: "设置角色部门", Permission: "system:role:dept_assign", Type: PermissionTypeButton, ParentName: "角色管理", Sort: 39},
+	{Name: "设置角色部门", Permission: "system:role:dept_assign", Type: PermissionTypeAPI, ParentName: "角色管理", Method: "PUT", APIPath: "/admin/roles/:id/departments", Sort: 39},
 
 	// ---------- 权限管理 ----------
 	{Name: "查看权限", Permission: "system:permission:list", Type: PermissionTypeButton, ParentName: "权限管理", Sort: 41},

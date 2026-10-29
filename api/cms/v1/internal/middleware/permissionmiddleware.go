@@ -20,8 +20,11 @@ var permissionBypassRoutes = map[string]struct{}{
 	http.MethodPost + " /admin/logout":                        {},
 	http.MethodGet + " /admin/test-token":                     {},
 	http.MethodPut + " /admin/admin-users/me/change-password": {},
-	// 取回自己的菜单与权限必须放行：普通管理员在拿到任何权限之前需要先调用它
+	// 个人中心相关接口必须放行：普通管理员在拿到任何权限之前需要取回菜单，
+	// 并需要维护自己的资料（不涉及角色与启用状态）
 	http.MethodGet + " /admin/profile/permissions": {},
+	http.MethodGet + " /admin/profile":             {},
+	http.MethodPut + " /admin/profile":             {},
 }
 
 type PermissionMiddleware struct {

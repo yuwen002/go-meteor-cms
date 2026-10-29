@@ -399,6 +399,25 @@ type (
 		Menus       []MyMenuItem `json:"menus"`
 		Permissions []string     `json:"permissions"`
 	}
+	// 当前登录管理员的个人信息
+	AdminProfileResp {
+		ID          int64  `json:"id"`
+		Username    string `json:"username"`
+		Nickname    string `json:"nickname"`
+		Email       string `json:"email"`
+		Phone       string `json:"phone"`
+		Avatar      string `json:"avatar"`
+		IsSuper     bool   `json:"is_super"`
+		DeptID      int64  `json:"dept_id"`
+		LastLoginAt string `json:"last_login_at"`
+		CreatedAt   string `json:"created_at"`
+	}
+	// 更新个人资料请求，未传字段保持不变
+	UpdateProfileReq {
+		Nickname *string `json:"nickname,optional"`
+		Email    *string `json:"email,optional"`
+		Phone    *string `json:"phone,optional"`
+	}
 )
 
 @server (
@@ -547,5 +566,13 @@ service cms-api {
 	// 获取当前登录用户的菜单树与功能权限标识（前端据此渲染菜单和按钮）
 	@handler myPermissions
 	get /admin/profile/permissions returns (MyPermissionResp)
+
+	// 获取当前登录管理员的个人信息
+	@handler myProfile
+	get /admin/profile returns (AdminProfileResp)
+
+	// 更新当前登录管理员的个人资料（不允许修改角色与启用状态）
+	@handler updateMyProfile
+	put /admin/profile (UpdateProfileReq) returns (AdminProfileResp)
 }
 

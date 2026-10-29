@@ -48,6 +48,19 @@ type AdminListResp struct {
 	List     []AdminItem `json:"list"`
 }
 
+type AdminProfileResp struct {
+	ID          int64  `json:"id"`
+	Username    string `json:"username"`
+	Nickname    string `json:"nickname"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
+	Avatar      string `json:"avatar"`
+	IsSuper     bool   `json:"is_super"`
+	DeptID      int64  `json:"dept_id"`
+	LastLoginAt string `json:"last_login_at"`
+	CreatedAt   string `json:"created_at"`
+}
+
 type AdminRoleAssignReq struct {
 	ID      int64   `path:"id"`       // 管理员ID
 	RoleIDs []int64 `json:"role_ids"` // 角色ID列表
@@ -396,4 +409,10 @@ type UpdateAdminReq struct {
 	Email    *string `json:"email,optional"`
 	Phone    *string `json:"phone,optional"`
 	IsActive *bool   `json:"is_active,optional"`
+}
+
+type UpdateProfileReq struct {
+	Nickname *string `json:"nickname,optional"`
+	Email    *string `json:"email,optional"`
+	Phone    *string `json:"phone,optional"`
 }

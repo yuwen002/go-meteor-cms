@@ -1,1130 +1,263 @@
-# Go Meteor CMS API 文档
+# Go Meteor CMS 接口文档
 
-## 概述
+服务默认监听 `http://localhost:8888`，本文按「模块 + 方法 + 路径」列出全部接口。
 
-Go Meteor CMS 是一个基于 Go 和 Go-Zero 开发的内容管理系统后端 API 服务。
+## 通用约定
 
-## 基础URL
+### 响应格式
 
-```
-http://localhost:8888
-```
-
-## 状态码说明
-
-所有接口的 HTTP 状态码恒为 `200`，业务结果由响应体中的 `code` 字段表示。
-
-| 状态码 | 说明 |
-| ------ | ---- |
-| 0 | 请求成功 |
-| 1000 | 服务器内部错误 |
-| 2001～2009 | 认证与权限类错误（2001 未授权、2006 验证码错误等） |
-| 3001～3011 | 管理员相关错误（3002 管理员不存在、3003 密码错误等） |
-| 4001 | 参数错误 |
-| 5001～5011 | 部门相关错误（5001 部门不存在等） |
-| 5201～5212 | 角色相关错误（5201 角色不存在等） |
-| 5401～5412 | 权限相关错误（5401 权限不存在等） |
-
-完整错误码定义见 [`internal/common/error_code.go`](../internal/common/error_code.go)。
-
-## 公共接口
-
-### 获取验证码
-
-获取图形验证码，用于登录时验证。
-
-**URL**: `GET /api/captcha`
-
-**请求参数**: 无
-
-**响应示例**:
 ```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "captcha_id": "验证码ID",
-    "captcha_base64": "验证码图片base64编码"
-  }
-}
+{ "code": 0, "msg": "success", "data": {} }
 ```
 
-### 管理员登录
+- `code = 0` 成功
+- `code > 0` 业务错误，`msg` 为可直接展示给用户的提示
+- 完整错误码见 [`internal/common/error_code.go`](../internal/common/error_code.go)
 
-管理员登录接口，需要提供用户名、密码和验证码。
+### 认证
 
-**URL**: `POST /admin/login`
-
-**请求参数**:
-```json
-{
-  "username": "admin",
-  "password": "123456",
-  "captcha_id": "验证码ID",
-  "captcha": "验证码"
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-```
-
-### 忘记密码
-
-当管理员忘记密码时，可以通过此接口发送密码重置邮件。
-
-**URL**: `POST /admin/forgot-password`
-
-**请求参数**:
-```json
-{
-  "username": "admin"
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "message": "重置密码邮件已发送，请检查邮箱"
-  }
-}
-```
-
-### 管理员注册
-
-新管理员注册接口。
-
-**URL**: `POST /admin/register`
-
-**请求参数**:
-```json
-{
-  "username": "newadmin",
-  "password": "password123",
-  "email": "newadmin@example.com",
-  "nickname": "新管理员"
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "message": "管理员注册成功"
-  }
-}
-```
-
-## 需要认证的接口
-
-以下接口需要在请求头中添加 Authorization:
+受保护接口需携带：
 
 ```
 Authorization: Bearer <token>
 ```
 
-### Token 验证测试
+未携带返回 `2001 请先登录`；token 无效或已登出返回 `2009 无效的token`；会话上下文缺失返回 `2004 用户会话已过期，请重新登录`。
 
-测试 Token 是否有效。
+### 鉴权
 
-**URL**: `GET /admin/test-token`
+除以下接口外，其余受保护接口均由权限中间件按 `method + api_path` 匹配 `Type=3` 权限记录后校验：
 
-**请求参数**: 无
+- `POST /admin/logout`
+- `GET /admin/test-token`
+- `PUT /admin/admin-users/me/change-password`
+- `GET /admin/profile`
+- `PUT /admin/profile`
+- `GET /admin/profile/permissions`
 
-**响应示例**:
+超级管理员跳过全部鉴权与数据范围过滤。
+
+### 分页
+
+`page` 小于 1 按 1 处理；`page_size` 小于 1 取接口默认值，**大于 100 一律截断为 100**，响应中的 `page_size` 为实际生效值。
+
+---
+
+## 公共接口（无需认证）
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/captcha` | 获取图形验证码，返回 `captcha_id` 与 base64 图片 |
+| POST | `/admin/login` | 登录，需提交验证码 |
+| POST | `/admin/register` | 注册管理员 |
+| POST | `/admin/forgot-password` | 申请密码重置令牌（账号不存在也返回成功，防账号枚举） |
+| POST | `/admin/reset-password` | 用令牌设置新密码，令牌一次性、1 小时有效 |
+
+### 登录
+
+```json
+// 请求
+{ "username": "admin", "password": "123456", "captcha_id": "xxx", "captcha": "1234" }
+// 响应
+{ "code": 0, "msg": "success", "data": { "token": "xxx", "expire": 1750000000 } }
+```
+
+失败场景：`4001` 参数缺失、`2006` 验证码错误、`2010` 用户名或密码错误、`2007` 账号未激活。
+
+### 图形验证码
+
+```json
+{ "code": 0, "msg": "success", "data": { "captcha_id": "xxx", "image": "data:image/png;base64,..." } }
+```
+
+### 重置密码
+
+```json
+// 请求
+{ "token": "邮件中的令牌", "new_password": "newpassword123" }
+// 失败码：3012 令牌无效 / 3013 令牌已过期 / 4001 新密码少于 6 位
+```
+
+---
+
+## 个人中心
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/profile` | 免鉴权 | 当前登录管理员的个人信息 |
+| PUT | `/admin/profile` | 免鉴权 | 更新昵称/邮箱/手机，未传字段保持不变 |
+| GET | `/admin/profile/permissions` | 免鉴权 | 当前用户的菜单树与权限码 |
+| PUT | `/admin/admin-users/me/change-password` | 免鉴权 | 修改自己的密码 |
+| POST | `/admin/logout` | 免鉴权 | 登出，token 进入黑名单 |
+| GET | `/admin/test-token` | 免鉴权 | 校验 token 是否有效 |
+
+### GET `/admin/profile`
+
 ```json
 {
   "code": 0,
   "msg": "success",
   "data": {
-    "message": "Token OK",
-    "claims": {
-      "user_id": 1,
-      "username": "admin"
-    }
+    "id": 1, "username": "admin", "nickname": "超级管理员",
+    "email": "admin@example.com", "phone": "", "avatar": "",
+    "is_super": true, "dept_id": 0,
+    "last_login_at": "2026-10-30T10:00:00+08:00",
+    "created_at": "2026-10-01T10:00:00+08:00"
   }
 }
 ```
 
-### 获取管理员列表
+### PUT `/admin/profile`
 
-分页获取管理员列表，支持关键词搜索和状态过滤。
+```json
+{ "nickname": "新昵称", "email": "new@example.com", "phone": "13800138000" }
+```
 
-**URL**: `GET /admin/admin-users`
+邮箱已被他人使用时返回 `3008 邮箱已被注册`。
 
-**查询参数**:
-- `page`: 页码（必填）
-- `page_size`: 每页数量（必填）
-- `keyword`: 搜索关键词（用户名/昵称/邮箱，选填）
-- `active`: 启用状态过滤（1-启用，2-禁用，选填）
+### GET `/admin/profile/permissions`
 
-**响应示例**:
 ```json
 {
   "code": 0,
   "msg": "success",
   "data": {
-    "total": 10,
-    "page": 1,
-    "page_size": 10,
-    "list": [
-      {
-        "id": 1,
-        "username": "admin",
-        "nickname": "管理员",
-        "email": "admin@example.com",
-        "phone": "13800138000",
-        "avatar": "/uploads/avatars/meteor-default.jpg",
-        "isSuper": true,
-        "isActive": true,
-        "last_login_at": "2023-01-01T12:00:00Z",
-        "createdAt": "2023-01-01T12:00:00Z"
-      }
-    ]
+    "is_super": false,
+    "menus": [
+      { "id": 2, "name": "管理员管理", "path": "/admin/admin-users",
+        "component": "views/admin/user/list.vue", "icon": "user",
+        "permission": "system:admin_user:list", "children": [] }
+    ],
+    "permissions": ["system:admin_user:list", "system:admin_user:add"]
   }
 }
 ```
 
-### 修改自己的密码
+---
 
-管理员修改自己的密码。
+## 管理员管理
 
-**URL**: `PUT /admin/admin-users/me/change-password`
+列表接口按当前用户的数据权限收敛结果，详见 [数据权限说明](#数据权限)。
 
-**请求参数**:
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/admin-users` | `system:admin_user:list` | 管理员列表（分页、按用户名/手机/状态筛选） |
+| GET | `/admin/admin-users/:id` | `system:admin_user:detail` | 管理员详情 |
+| POST | `/admin/admin-users/create` | `system:admin_user:add` | 新增管理员 |
+| PUT | `/admin/admin-users/:id` | `system:admin_user:edit` | 更新资料（局部更新，未传字段不变） |
+| DELETE | `/admin/admin-users/:id` | `system:admin_user:delete` | 删除管理员（软删除），不可删自己与超管 |
+| PUT | `/admin/admin-users/:id/disable` | `system:admin_user:disable` | 禁用，不可禁用自己与超管 |
+| PUT | `/admin/admin-users/:id/enable` | `system:admin_user:enable` | 启用 |
+| PUT | `/admin/admin-users/:id/bind-department` | `system:admin_user:bind_dept` | 绑定部门 |
+| PUT | `/admin/admin-users/reset-password` | `system:admin_user:reset_pwd` | 重置他人密码，仅超管，目标不能是超管 |
+| GET | `/admin/admin-users/:id/roles` | `system:admin_user:role_list` | 查询已分配角色 |
+| PUT | `/admin/admin-users/:id/roles` | `system:admin_user:role_assign` | 分配角色（覆盖式，事务保证） |
+| DELETE | `/admin/admin-users/:id/roles/:role_id` | `system:admin_user:role_remove` | 移除单个角色 |
+
+### 新增管理员
+
 ```json
 {
-  "old_password": "oldpassword",
-  "new_password": "newpassword"
+  "username": "editor", "password": "123456", "nickname": "编辑",
+  "email": "editor@example.com", "phone": "13800138000",
+  "is_active": true, "is_super": false, "dept_id": 1
 }
 ```
 
-**响应示例**:
+用户名重复返回 `3001 管理员已存在`，邮箱重复返回 `3008 邮箱已被注册`。
+
+### 分配角色
+
 ```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "message": "密码修改成功"
-  }
-}
+{ "role_ids": [1, 2] }
 ```
 
-### 禁用管理员账号
+角色 ID 去重后覆盖写入，角色不存在返回 `5201 角色不存在`。
 
-超级管理员禁用其他管理员的账号。
+---
 
-**URL**: `PUT /admin/admin-users/:id/disable`
+## 部门管理
 
-**路径参数**:
-- `id`: 管理员ID
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/departments/tree` | `system:dept:list` | 部门树（仅返回启用部门） |
+| GET | `/admin/departments/:id` | `system:dept:detail` | 部门详情 |
+| POST | `/admin/departments` | `system:dept:add` | 新增部门 |
+| PUT | `/admin/departments/:id` | `system:dept:edit` | 更新部门 |
+| DELETE | `/admin/departments/:id` | `system:dept:delete` | 删除部门，存在子部门或仍有关联管理员时拒绝 |
 
-**请求体**: 无
+部门树节点含 `children`，父部门未启用时其下的启用子部门不会出现在树中。
 
-**响应示例**:
+---
+
+## 角色管理
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/roles` | `system:role:list` | 角色列表（分页、按名称/编码/状态筛选） |
+| GET | `/admin/roles/:id` | `system:role:detail` | 角色详情 |
+| POST | `/admin/roles` | `system:role:add` | 新增角色，含 `data_scope` 数据范围 |
+| PUT | `/admin/roles/:id` | `system:role:edit` | 更新角色，系统内置角色不可改 |
+| DELETE | `/admin/roles/:id` | `system:role:delete` | 删除角色，仍有关联用户时拒绝 |
+| GET | `/admin/roles/:id/permissions` | `system:role:perm_list` | 角色已分配的权限 ID 列表 |
+| GET | `/admin/roles/:id/permissions-with-names` | `system:role:perm_list_names` | 同上，附带权限名称 |
+| PUT | `/admin/roles/:id/permissions` | `system:role:perm_assign` | 分配权限（覆盖式，事务保证） |
+| GET | `/admin/roles/:id/departments` | `system:role:dept_list` | 自定义数据范围的部门列表 |
+| PUT | `/admin/roles/:id/departments` | `system:role:dept_assign` | 设置部门范围，仅 `data_scope=5` 可用 |
+
+### 分配权限
+
 ```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "禁用管理员成功"
-  }
-}
+{ "permission_ids": [1, 2, 3] }
 ```
 
-**错误码**:
-- `3002`: 管理员不存在
-- `1000`: 服务器内部错误
+系统内置角色返回 `5208 系统内置角色，禁止修改`；权限不存在返回 `5401 权限不存在`。
 
-### 启用管理员账号
+### 设置部门范围
 
-超级管理员启用已被禁用的管理员账号。
-
-**URL**: `PUT /admin/admin-users/:id/enable`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**请求体**: 无
-
-**响应示例**:
 ```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "启用管理员成功"
-  }
-}
+{ "dept_ids": [1, 2] }
 ```
 
-**错误码**:
-- `3002`: 管理员不存在
-- `1000`: 服务器内部错误
+非 `data_scope=5` 的角色返回 `4001 参数错误`；部门不存在或未启用返回 `5001 部门不存在`。
 
-### 重置其他管理员的密码
+---
 
-超级管理员重置其他管理员的密码。
+## 权限管理
 
-**URL**: `PUT /admin/admin-users/reset-password`
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/permissions` | `system:permission:list` | 权限列表（分页，可按类型/名称筛选） |
+| GET | `/admin/permissions/tree` | `system:permission:tree` | 权限树 |
+| GET | `/admin/permissions/:id` | `system:permission:detail` | 权限详情 |
+| POST | `/admin/permissions` | `system:permission:add` | 新增权限 |
+| PUT | `/admin/permissions/:id` | `system:permission:edit` | 更新权限 |
+| DELETE | `/admin/permissions/:id` | `system:permission:delete` | 删除权限，存在子权限时拒绝 |
 
-**请求参数**:
-```json
-{
-  "id": 2,
-  "new_password": "newpassword"
-}
-```
+### 权限类型
 
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "message": "密码已重置"
-  }
-}
-```
+| type | 含义 | 用途 |
+| --- | --- | --- |
+| 1 | 菜单 | 前端路由，`/admin/profile/permissions` 据此下发菜单树 |
+| 2 | 按钮 | 前端功能点，控制按钮显隐 |
+| 3 | API | 后端接口鉴权，按 `method + api_path` 匹配 |
 
-### 获取角色权限名称列表
-获取指定角色拥有的权限名称列表（需要超级管理员权限）。
+新增受保护接口后，请同步在 `internal/seed/permissions.go` 追加一条 `Type=3` 权限，并执行 `go run ./cmd/migrate` 写入，否则非超管访问会返回 `2002 权限不足`。
 
-**URL**: `GET /admin/roles/:id/permissions-with-names`
+---
 
-**路径参数**:
-- `id`: 角色ID
+## 数据权限
 
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "permissions": [
-      {
-        "id": 1,
-        "name": "用户管理"
-      },
-      {
-        "id": 2,
-        "name": "角色管理"
-      }
-    ]
-  }
-}
-```
+角色通过 `data_scope` 声明可见数据范围：
 
-### 权限管理
+| data_scope | 含义 |
+| --- | --- |
+| 1 | 全部数据 |
+| 2 | 本部门 |
+| 3 | 本部门及子部门 |
+| 4 | 仅自己 |
+| 5 | 自定义部门（读取 `admin_role_depts`） |
 
-#### 权限列表
-获取权限列表（需要超级管理员权限）。
-
-**URL**: `GET /admin/permissions`
-
-**查询参数**:
-- `page`: 页码（默认1）
-- `page_size`: 每页数量（默认20）
-- `keyword`: 搜索关键词（权限名称/权限标识，选填）
-- `type`: 权限类型过滤（1-菜单，2-按钮，3-API，选填）
-- `is_active`: 是否启用（选填）
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "total": 10,
-    "page": 1,
-    "page_size": 20,
-    "list": [
-      {
-        "id": 1,
-        "name": "用户管理",
-        "parent_id": 0,
-        "type": 1,
-        "path": "/users",
-        "component": "UsersView",
-        "icon": "user-icon",
-        "method": "GET",
-        "api_path": "/api/users",
-        "permission": "user:view",
-        "is_active": true,
-        "sort": 0,
-        "created_at": "2023-01-01T12:00:00Z",
-        "updated_at": "2023-01-01T12:00:00Z"
-      }
-    ]
-  }
-}
-```
-
-#### 创建权限
-创建新的权限（需要超级管理员权限）。
-
-**URL**: `POST /admin/permissions`
-
-**请求参数**:
-```json
-{
-  "name": "新增用户",
-  "parent_id": 1,
-  "type": 2,
-  "path": "",
-  "component": "",
-  "icon": "",
-  "method": "POST",
-  "api_path": "/api/users",
-  "permission": "user:add",
-  "is_active": true,
-  "sort": 0
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "创建权限成功"
-  }
-}
-```
-
-#### 权限详情
-获取指定权限的详细信息（需要超级管理员权限）。
-
-**URL**: `GET /admin/permissions/:id`
-
-**路径参数**:
-- `id`: 权限ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "name": "用户管理",
-    "parent_id": 0,
-    "type": 1,
-    "path": "/users",
-    "component": "UsersView",
-    "icon": "user-icon",
-    "method": "GET",
-    "api_path": "/api/users",
-    "permission": "user:view",
-    "is_active": true,
-    "sort": 0,
-    "created_at": "2023-01-01T12:00:00Z",
-    "updated_at": "2023-01-01T12:00:00Z"
-  }
-}
-```
-
-#### 更新权限
-更新指定权限的信息（需要超级管理员权限）。
-
-**URL**: `PUT /admin/permissions/:id`
-
-**路径参数**:
-- `id`: 权限ID
-
-**请求参数**:
-```json
-{
-  "name": "更新的权限名称",
-  "parent_id": 0,
-  "type": 1,
-  "path": "/updated-path",
-  "component": "UpdatedComponent",
-  "icon": "updated-icon",
-  "method": "GET",
-  "api_path": "/api/updated",
-  "permission": "updated:permission",
-  "is_active": true,
-  "sort": 1
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "更新权限成功"
-  }
-}
-```
-
-#### 删除权限
-删除指定权限（需要超级管理员权限）。
-
-**URL**: `DELETE /admin/permissions/:id`
-
-**路径参数**:
-- `id`: 权限ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "删除权限成功"
-  }
-}
-```
-
-#### 权限树
-获取权限树结构。
-
-**URL**: `GET /admin/permissions/tree`
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": [
-    {
-      "id": 1,
-      "name": "用户管理",
-      "parent_id": 0,
-      "type": 1,
-      "path": "/users",
-      "component": "UsersView",
-      "icon": "user-icon",
-      "method": "GET",
-      "api_path": "/api/users",
-      "permission": "user:view",
-      "is_active": true,
-      "sort": 0,
-      "children": [
-        {
-          "id": 2,
-          "name": "新增用户",
-          "parent_id": 1,
-          "type": 2,
-          "path": "",
-          "component": "",
-          "icon": "",
-          "method": "POST",
-          "api_path": "/api/users",
-          "permission": "user:add",
-          "is_active": true,
-          "sort": 0,
-          "children": []
-        }
-      ]
-    }
-  ]
-}
-```
-
-### 管理员登出
-
-管理员登出接口。
-
-**URL**: `POST /admin/logout`
-
-**请求参数**: 无
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "message": "登出成功"
-  }
-}
-```
-
-### 管理员详情
-
-获取指定管理员的详细信息。
-
-**URL**: `GET /admin/admin-users/:id`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "username": "admin",
-    "nickname": "管理员",
-    "email": "admin@example.com",
-    "phone": "13800138000",
-    "is_active": true
-  }
-}
-```
-
-### 创建管理员
-
-创建新的管理员账号（需要超级管理员权限）。
-
-**URL**: `POST /admin/admin-users/create`
-
-**请求参数**:
-```json
-{
-  "username": "newadmin",
-  "password": "password123",
-  "nickname": "新管理员",
-  "email": "newadmin@example.com",
-  "phone": "13800000000",
-  "is_active": true,
-  "is_super": false
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "创建管理员成功"
-  }
-}
-```
-
-### 更新管理员
-
-更新指定管理员的信息（需要超级管理员权限）。
-
-**URL**: `PUT /admin/admin-users/:id`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**请求参数**:
-```json
-{
-  "nickname": "更新的昵称",
-  "email": "updated@example.com",
-  "phone": "13800000000",
-  "is_active": true
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "更新管理员成功"
-  }
-}
-```
-
-### 删除管理员
-
-删除指定管理员账号（需要超级管理员权限）。
-
-**URL**: `DELETE /admin/admin-users/:id`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "删除管理员成功"
-  }
-}
-```
-
-### 部门管理
-
-#### 创建部门
-
-创建新的部门（需要超级管理员权限）。
-
-**URL**: `POST /admin/departments`
-
-**请求参数**:
-```json
-{
-  "name": "技术部",
-  "parent_id": 0,
-  "sort": 1,
-  "is_active": true,
-  "leader_id": 1
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "创建部门成功"
-  }
-}
-```
-
-#### 更新部门
-
-更新指定部门信息（需要超级管理员权限）。
-
-**URL**: `PUT /admin/departments/:id`
-
-**路径参数**:
-- `id`: 部门ID
-
-**请求参数**:
-```json
-{
-  "name": "更新的部门名称",
-  "parent_id": 0,
-  "sort": 2,
-  "is_active": true,
-  "leader_id": 1
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "更新部门成功"
-  }
-}
-```
-
-#### 删除部门
-
-删除指定部门（需要超级管理员权限）。
-
-**URL**: `DELETE /admin/departments/:id`
-
-**路径参数**:
-- `id`: 部门ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "删除部门成功"
-  }
-}
-```
-
-#### 部门详情
-
-获取指定部门的详细信息。
-
-**URL**: `GET /admin/departments/:id`
-
-**路径参数**:
-- `id`: 部门ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "name": "技术部",
-    "parent_id": 0,
-    "sort": 1,
-    "is_active": true,
-    "leader_id": 1
-  }
-}
-```
-
-#### 部门树
-
-获取部门树结构。
-
-**URL**: `GET /admin/departments/tree`
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": [
-    {
-      "id": 1,
-      "name": "技术部",
-      "sort": 1,
-      "is_active": true,
-      "children": [
-        {
-          "id": 2,
-          "name": "前端组",
-          "sort": 1,
-          "is_active": true,
-          "children": []
-        }
-      ]
-    }
-  ]
-}
-```
-
-### 管理员绑定部门
-
-将管理员绑定到指定部门（需要超级管理员权限）。
-
-**URL**: `PUT /admin/admin-users/:id/bind-department`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**请求参数**:
-```json
-{
-  "dept_id": 1
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "绑定部门成功"
-  }
-}
-```
-
-### 角色管理
-
-#### 角色列表
-
-获取角色列表（需要超级管理员权限）。
-
-**URL**: `GET /admin/roles`
-
-**查询参数**:
-- `page`: 页码（默认1）
-- `page_size`: 每页数量（默认20）
-- `keyword`: 搜索关键词（角色名称/编码，选填）
-- `is_active`: 是否启用（选填）
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "total": 10,
-    "page": 1,
-    "page_size": 20,
-    "list": [
-      {
-        "id": 1,
-        "name": "管理员",
-        "code": "ADMIN",
-        "desc": "系统管理员",
-        "data_scope": 1,
-        "is_system": true,
-        "is_active": true,
-        "sort": 0,
-        "created_at": "2023-01-01T12:00:00Z",
-        "updated_at": "2023-01-01T12:00:00Z"
-      }
-    ]
-  }
-}
-```
-
-#### 角色详情
-
-获取指定角色的详细信息（需要超级管理员权限）。
-
-**URL**: `GET /admin/roles/:id`
-
-**路径参数**:
-- `id`: 角色ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "name": "管理员",
-    "code": "ADMIN",
-    "desc": "系统管理员",
-    "data_scope": 1,
-    "is_system": true,
-    "is_active": true,
-    "sort": 0,
-    "created_at": "2023-01-01T12:00:00Z",
-    "updated_at": "2023-01-01T12:00:00Z"
-  }
-}
-```
-
-#### 创建角色
-
-创建新的角色（需要超级管理员权限）。
-
-**URL**: `POST /admin/roles`
-
-**请求参数**:
-```json
-{
-  "name": "普通用户",
-  "code": "USER",
-  "desc": "普通用户角色",
-  "data_scope": 1,
-  "is_active": true,
-  "sort": 0
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "创建角色成功"
-  }
-}
-```
-
-#### 更新角色
-
-更新指定角色的信息（需要超级管理员权限）。
-
-**URL**: `PUT /admin/roles/:id`
-
-**路径参数**:
-- `id`: 角色ID
-
-**请求参数**:
-```json
-{
-  "name": "更新的角色名称",
-  "code": "UPDATED_CODE",
-  "desc": "更新的角色描述",
-  "data_scope": 2,
-  "is_active": true,
-  "sort": 1
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "更新角色成功"
-  }
-}
-```
-
-#### 删除角色
-
-删除指定角色（需要超级管理员权限）。
-
-**URL**: `DELETE /admin/roles/:id`
-
-**路径参数**:
-- `id`: 角色ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "删除角色成功"
-  }
-}
-```
-
-#### 获取角色权限ID列表
-
-获取指定角色拥有的权限ID列表（需要超级管理员权限）。
-
-**URL**: `GET /admin/roles/:id/permissions`
-
-**路径参数**:
-- `id`: 角色ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "permission_ids": [1, 2, 3]
-  }
-}
-```
-
-#### 分配角色权限
-
-为指定角色分配权限（需要超级管理员权限）。
-
-**URL**: `PUT /admin/roles/:id/permissions`
-
-**路径参数**:
-- `id`: 角色ID
-
-**请求参数**:
-```json
-{
-  "permission_ids": [1, 2, 3]
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 1,
-    "message": "分配权限成功"
-  }
-}
-```
-
-### 管理员角色管理
-
-> 说明：
-> - 角色列表按 `sort` 升序、`id` 降序返回；
-> - 分配为覆盖式：先清空该管理员原有角色再写入，`role_ids` 不能为空数组（否则返回 `4001`），重复ID会自动去重；
-> - 管理员不存在返回 `3002`；角色不存在或已被删除返回 `5201`；移除一个未绑定的角色同样返回 `5201`，提示"该管理员未绑定此角色"。
-
-#### 获取管理员角色列表
-
-获取指定管理员已绑定的角色列表。
-
-**URL**: `GET /admin/admin-users/:id/roles`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "roles": [
-      {
-        "id": 1,
-        "name": "超级管理员",
-        "code": "SUPER_ADMIN",
-        "desc": "系统内置角色",
-        "data_scope": 1,
-        "is_system": true,
-        "is_active": true,
-        "sort": 0,
-        "created_at": "2023-01-01T12:00:00Z"
-      }
-    ]
-  }
-}
-```
-
-#### 分配管理员角色
-
-为指定管理员分配角色（覆盖式分配）。
-
-**URL**: `PUT /admin/admin-users/:id/roles`
-
-**路径参数**:
-- `id`: 管理员ID
-
-**请求参数**:
-```json
-{
-  "role_ids": [1, 2]
-}
-```
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "分配管理员角色成功"
-  }
-}
-```
-
-#### 移除管理员角色
-
-移除指定管理员的某个角色。
-
-**URL**: `DELETE /admin/admin-users/:id/roles/:role_id`
-
-**路径参数**:
-- `id`: 管理员ID
-- `role_id`: 角色ID
-
-**响应示例**:
-```json
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "id": 2,
-    "message": "移除管理员角色成功"
-  }
-}
-```
+- 多角色取并集，任一角色为「全部数据」时不过滤
+- 范围解析失败、未分配启用角色、或要求按部门过滤但未分配部门时，按最严格处理（返回空集）
+- 当前仅在管理员列表接口落地

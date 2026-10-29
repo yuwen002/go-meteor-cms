@@ -59,11 +59,9 @@ func ParseToken(secret, tokenStr string) (map[string]interface{}, error) {
 	// 将 claims 转换为 MapClaims 类型
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		data := make(map[string]interface{})
-		// 复制除 exp 之外的所有声明到返回的 map 中
+		// 保留 exp：登出时需要按 token 真实过期时间写入黑名单，否则只能退化成一个固定的兜底时长
 		for k, v := range claims {
-			if k != "exp" { // 排除过期时间字段
-				data[k] = v
-			}
+			data[k] = v
 		}
 		return data, nil
 	}

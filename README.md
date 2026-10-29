@@ -121,10 +121,13 @@ go run api/cms/v1/cms.go
 │   └── schema/            # 数据库表结构定义
 ├── internal/              # 内部包
 │   ├── common/            # 通用组件（响应、错误码、权限类型）
-│   ├── pkg/               # 可复用子包（mail 邮件、datascope 数据权限）
+│   ├── pkg/               # 可复用子包（mail 邮件、datascope 数据权限、cleanup 维护任务）
 │   ├── seed/              # 初始化数据（含权限清单）
 │   └── utils/             # 工具函数（jwt、password、captcha、page）
-└── rpc/                   # RPC 服务定义
+├── rpc/                   # RPC 服务定义
+├── Makefile               # 常用开发命令
+├── Dockerfile             # 多阶段构建镜像
+└── docker-compose.yml     # MySQL + 迁移 + API 一键编排
 ```
 
 ## API 接口
@@ -468,15 +471,55 @@ go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 
 ## 部署
 
-项目暂未内置 Dockerfile 与 docker-compose.yml，容器化部署需自行补充，运行参数参考：
+### Docker（推荐）
+
+项目已内置 `Dockerfile`（多阶段构建，最终镜像基于 alpine，以非 root 用户运行）与 `docker-compose.yml`。
 
 ```bash
-# 构建镜像（需自行提供 Dockerfile）
-docker build -t go-meteor-cms .
+# 一键启动：MySQL（健康检查通过）→ 迁移（执行成功）→ API 服务
+docker compose up -d --wait
 
-# 运行容器
-docker run -d -p 8888:8888 go-meteor-cms
+# 停止
+docker compose down
 ```
+
+或单独构建运行：
+
+```bash
+docker build -t go-meteor-cms .
+docker run -d -p 8888:8888 \
+  -e MYSQL_DSN="root:123456@tcp(host.docker.internal:3306)/go_meteor_cms?parseTime=True&loc=Local" \
+  go-meteor-cms
+```
+
+容器内的迁移工具位于 `/app/migrate`，可在部署流程中单独执行：
+
+```bash
+docker run --rm -e MYSQL_DSN="..." --entrypoint /app/migrate go-meteor-cms
+```
+
+### 编译部署
+
+```bash
+go build -o bin/cms ./api/cms/v1
+go build -o bin/migrate ./cmd/migrate
+
+# 先迁移（幂等），再启动服务
+./bin/migrate
+./bin/cms -f api/cms/v1/etc/cms-api.yaml
+```
+
+### 环境变量
+
+| 变量 | 说明 |
+| --- | --- |
+| `MYSQL_DSN` | 数据库连接串，设置后覆盖配置文件中的 `Database.Source`（容器化部署推荐） |
+
+### 后台维护任务
+
+服务启动时会自动清理已过期的 token 黑名单记录，之后按 `Maintenance.TokenBlacklistCleanInterval`（默认 3600 秒）周期性执行，避免 `token_blacklists` 表随每次登出无限增长。
+
+## 贡献指南
 
 ## 贡献指南
 

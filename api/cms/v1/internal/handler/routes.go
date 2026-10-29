@@ -173,6 +173,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodGet,
+					Path:    "/admin/profile",
+					Handler: myProfileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/profile",
+					Handler: updateMyProfileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
 					Path:    "/admin/profile/permissions",
 					Handler: myPermissionsHandler(serverCtx),
 				},

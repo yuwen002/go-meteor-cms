@@ -9,6 +9,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
+	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
@@ -51,6 +52,22 @@ func (l *AdminLogoutLogic) AdminLogout() (resp *types.CommonResp, err error) {
 
 	// 生成 token 的哈希值
 	tokenHash := utils.GenerateTokenHash(token)
+
+	// 重复登出时 token 已在黑名单中，直接返回成功，避免撞唯一索引
+	exists, err := l.svcCtx.EntClient.TokenBlacklist.
+		Query().
+		Where(tokenblacklist.TokenHashEQ(tokenHash)).
+		Exist(l.ctx)
+	if err != nil {
+		logx.Errorf("Failed to check token blacklist: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if exists {
+		return &types.CommonResp{
+			ID:      0,
+			Message: "Logout successful",
+		}, nil
+	}
 
 	// 将token加入黑名单
 	_, err = l.svcCtx.EntClient.TokenBlacklist.Create().

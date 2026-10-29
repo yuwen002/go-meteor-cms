@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+.codebuddy
+bin
+out
+docs
+*.exe
+*.log
+coverage.out
+README.md

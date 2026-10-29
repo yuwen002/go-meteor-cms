@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: go-meteor-cms-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: go_meteor_cms
+      TZ: Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p123456"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: .
+    container_name: go-meteor-cms-migrate
+    restart: "no"
+    command: ["/app/migrate"]
+    environment:
+      MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  api:
+    build: .
+    container_name: go-meteor-cms-api
+    restart: unless-stopped
+    command: ["/app/cms", "-f", "etc/cms-api.yaml"]
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
+    ports:
+      - "8888:8888"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  mysql-data:

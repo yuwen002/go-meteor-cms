@@ -23,4 +23,8 @@ type Config struct {
 		Password string
 		From     string
 	}
+	Maintenance struct {
+		// TokenBlacklistCleanInterval 过期 token 黑名单的清理间隔（秒），<=0 时按 3600 秒处理
+		TokenBlacklistCleanInterval int
+	}
 }
