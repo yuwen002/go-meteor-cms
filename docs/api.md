@@ -1042,7 +1042,10 @@ Authorization: Bearer <token>
 
 ### 管理员角色管理
 
-> ⚠️ 以下 3 个接口的 logic 目前仍是 goctl 生成的空实现（`// todo: add your logic here`），调用会返回 `code: 0` 但不会产生实际效果，待实现后再接入前端。
+> 说明：
+> - 角色列表按 `sort` 升序、`id` 降序返回；
+> - 分配为覆盖式：先清空该管理员原有角色再写入，`role_ids` 不能为空数组（否则返回 `4001`），重复ID会自动去重；
+> - 管理员不存在返回 `3002`；角色不存在或已被删除返回 `5201`；移除一个未绑定的角色同样返回 `5201`，提示"该管理员未绑定此角色"。
 
 #### 获取管理员角色列表
 
@@ -1053,7 +1056,7 @@ Authorization: Bearer <token>
 **路径参数**:
 - `id`: 管理员ID
 
-**响应示例（预期）**:
+**响应示例**:
 ```json
 {
   "code": 0,
@@ -1063,7 +1066,7 @@ Authorization: Bearer <token>
       {
         "id": 1,
         "name": "超级管理员",
-        "code": "super_admin",
+        "code": "SUPER_ADMIN",
         "desc": "系统内置角色",
         "data_scope": 1,
         "is_system": true,
@@ -1092,14 +1095,14 @@ Authorization: Bearer <token>
 }
 ```
 
-**响应示例（预期）**:
+**响应示例**:
 ```json
 {
   "code": 0,
   "msg": "success",
   "data": {
     "id": 2,
-    "message": "分配角色成功"
+    "message": "分配管理员角色成功"
   }
 }
 ```
@@ -1114,14 +1117,14 @@ Authorization: Bearer <token>
 - `id`: 管理员ID
 - `role_id`: 角色ID
 
-**响应示例（预期）**:
+**响应示例**:
 ```json
 {
   "code": 0,
   "msg": "success",
   "data": {
     "id": 2,
-    "message": "移除角色成功"
+    "message": "移除管理员角色成功"
   }
 }
 ```
