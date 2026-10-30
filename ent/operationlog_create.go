@@ -48,20 +48,6 @@ func (_c *OperationLogCreate) SetNillableUpdatedAt(v *time.Time) *OperationLogCr
 	return _c
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_c *OperationLogCreate) SetDeletedAt(v time.Time) *OperationLogCreate {
-	_c.mutation.SetDeletedAt(v)
-	return _c
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_c *OperationLogCreate) SetNillableDeletedAt(v *time.Time) *OperationLogCreate {
-	if v != nil {
-		_c.SetDeletedAt(*v)
-	}
-	return _c
-}
-
 // SetUserID sets the "user_id" field.
 func (_c *OperationLogCreate) SetUserID(v int64) *OperationLogCreate {
 	_c.mutation.SetUserID(v)
@@ -227,9 +213,7 @@ func (_c *OperationLogCreate) Mutation() *OperationLogMutation {
 
 // Save creates the OperationLog in the database.
 func (_c *OperationLogCreate) Save(ctx context.Context) (*OperationLog, error) {
-	if err := _c.defaults(); err != nil {
-		return nil, err
-	}
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -256,18 +240,12 @@ func (_c *OperationLogCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *OperationLogCreate) defaults() error {
+func (_c *OperationLogCreate) defaults() {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if operationlog.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized operationlog.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
 		v := operationlog.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		if operationlog.DefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized operationlog.DefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := operationlog.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
@@ -279,7 +257,6 @@ func (_c *OperationLogCreate) defaults() error {
 		v := operationlog.DefaultDurationMs
 		_c.mutation.SetDurationMs(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -386,10 +363,6 @@ func (_c *OperationLogCreate) createSpec() (*OperationLog, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(operationlog.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := _c.mutation.DeletedAt(); ok {
-		_spec.SetField(operationlog.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.UserID(); ok {
 		_spec.SetField(operationlog.FieldUserID, field.TypeInt64, value)

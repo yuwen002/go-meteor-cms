@@ -40,7 +40,14 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 	query := l.svcCtx.EntClient.OperationLog.Query()
 
 	conds := make([]predicate.OperationLog, 0, 8)
-	if req.UserID > 0 {
+	// 数据权限：非超管只能查看自己的操作日志，忽略外部传入的 user_id 参数，防止越权检索他人日志
+	if !utils.IsSuperAdmin(l.ctx) {
+		uid, ok := utils.CurrentUserID(l.ctx)
+		if !ok || uid <= 0 {
+			return nil, common.NewBizError(common.ErrUnauthorized)
+		}
+		conds = append(conds, operationlog.UserIDEQ(uid))
+	} else if req.UserID > 0 {
 		conds = append(conds, operationlog.UserIDEQ(req.UserID))
 	}
 	if req.Username != "" {

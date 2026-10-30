@@ -48,26 +48,6 @@ func (_u *LoginLogUpdate) SetUpdatedAt(v time.Time) *LoginLogUpdate {
 	return _u
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *LoginLogUpdate) SetDeletedAt(v time.Time) *LoginLogUpdate {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *LoginLogUpdate) SetNillableDeletedAt(v *time.Time) *LoginLogUpdate {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *LoginLogUpdate) ClearDeletedAt() *LoginLogUpdate {
-	_u.mutation.ClearDeletedAt()
-	return _u
-}
-
 // SetUserID sets the "user_id" field.
 func (_u *LoginLogUpdate) SetUserID(v int64) *LoginLogUpdate {
 	_u.mutation.ResetUserID()
@@ -211,9 +191,7 @@ func (_u *LoginLogUpdate) Mutation() *LoginLogMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *LoginLogUpdate) Save(ctx context.Context) (int, error) {
-	if err := _u.defaults(); err != nil {
-		return 0, err
-	}
+	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -240,15 +218,11 @@ func (_u *LoginLogUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *LoginLogUpdate) defaults() error {
+func (_u *LoginLogUpdate) defaults() {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		if loginlog.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized loginlog.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := loginlog.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -293,12 +267,6 @@ func (_u *LoginLogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(loginlog.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(loginlog.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(loginlog.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(loginlog.FieldUserID, field.TypeInt64, value)
@@ -376,26 +344,6 @@ func (_u *LoginLogUpdateOne) SetNillableCreatedAt(v *time.Time) *LoginLogUpdateO
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *LoginLogUpdateOne) SetUpdatedAt(v time.Time) *LoginLogUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *LoginLogUpdateOne) SetDeletedAt(v time.Time) *LoginLogUpdateOne {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *LoginLogUpdateOne) SetNillableDeletedAt(v *time.Time) *LoginLogUpdateOne {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *LoginLogUpdateOne) ClearDeletedAt() *LoginLogUpdateOne {
-	_u.mutation.ClearDeletedAt()
 	return _u
 }
 
@@ -555,9 +503,7 @@ func (_u *LoginLogUpdateOne) Select(field string, fields ...string) *LoginLogUpd
 
 // Save executes the query and returns the updated LoginLog entity.
 func (_u *LoginLogUpdateOne) Save(ctx context.Context) (*LoginLog, error) {
-	if err := _u.defaults(); err != nil {
-		return nil, err
-	}
+	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -584,15 +530,11 @@ func (_u *LoginLogUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *LoginLogUpdateOne) defaults() error {
+func (_u *LoginLogUpdateOne) defaults() {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		if loginlog.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized loginlog.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := loginlog.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -654,12 +596,6 @@ func (_u *LoginLogUpdateOne) sqlSave(ctx context.Context) (_node *LoginLog, err 
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(loginlog.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(loginlog.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(loginlog.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(loginlog.FieldUserID, field.TypeInt64, value)

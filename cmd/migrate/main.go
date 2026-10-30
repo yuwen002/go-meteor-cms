@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/migrate"
 	_ "github.com/yuwen002/go-meteor-cms/ent/runtime"
 	"github.com/yuwen002/go-meteor-cms/internal/seed"
 	"github.com/zeromicro/go-zero/core/conf"
@@ -57,8 +58,9 @@ func main() {
 	log.Println("✅ 数据库连接成功，开始同步表结构...")
 
 	ctx := context.Background()
-	// 执行迁移
-	if err := client.Schema.Create(ctx); err != nil {
+	// 执行迁移。WithDropColumn 会在 schema 中已不存在的列（如审计日志去掉软删除后残留的
+	// deleted_at）从数据库删除，使表结构与代码定义保持一致。
+	if err := client.Schema.Create(ctx, migrate.WithDropColumn(true)); err != nil {
 		log.Fatalf("❌ 数据库迁移失败：%v", err)
 	}
 

@@ -300,10 +300,6 @@ func init() {
 	// department.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	department.IDValidator = departmentDescID.Validators[0].(func(int64) error)
 	loginlogMixin := schema.LoginLog{}.Mixin()
-	loginlogMixinHooks1 := loginlogMixin[1].Hooks()
-	loginlog.Hooks[0] = loginlogMixinHooks1[0]
-	loginlogMixinInters1 := loginlogMixin[1].Interceptors()
-	loginlog.Interceptors[0] = loginlogMixinInters1[0]
 	loginlogMixinFields0 := loginlogMixin[0].Fields()
 	_ = loginlogMixinFields0
 	loginlogFields := schema.LoginLog{}.Fields()
@@ -347,10 +343,6 @@ func init() {
 	// loginlog.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	loginlog.IDValidator = loginlogDescID.Validators[0].(func(int64) error)
 	operationlogMixin := schema.OperationLog{}.Mixin()
-	operationlogMixinHooks1 := operationlogMixin[1].Hooks()
-	operationlog.Hooks[0] = operationlogMixinHooks1[0]
-	operationlogMixinInters1 := operationlogMixin[1].Interceptors()
-	operationlog.Interceptors[0] = operationlogMixinInters1[0]
 	operationlogMixinFields0 := operationlogMixin[0].Fields()
 	_ = operationlogMixinFields0
 	operationlogFields := schema.OperationLog{}.Fields()

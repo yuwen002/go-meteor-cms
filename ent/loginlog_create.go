@@ -48,20 +48,6 @@ func (_c *LoginLogCreate) SetNillableUpdatedAt(v *time.Time) *LoginLogCreate {
 	return _c
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_c *LoginLogCreate) SetDeletedAt(v time.Time) *LoginLogCreate {
-	_c.mutation.SetDeletedAt(v)
-	return _c
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_c *LoginLogCreate) SetNillableDeletedAt(v *time.Time) *LoginLogCreate {
-	if v != nil {
-		_c.SetDeletedAt(*v)
-	}
-	return _c
-}
-
 // SetUserID sets the "user_id" field.
 func (_c *LoginLogCreate) SetUserID(v int64) *LoginLogCreate {
 	_c.mutation.SetUserID(v)
@@ -165,9 +151,7 @@ func (_c *LoginLogCreate) Mutation() *LoginLogMutation {
 
 // Save creates the LoginLog in the database.
 func (_c *LoginLogCreate) Save(ctx context.Context) (*LoginLog, error) {
-	if err := _c.defaults(); err != nil {
-		return nil, err
-	}
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -194,18 +178,12 @@ func (_c *LoginLogCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *LoginLogCreate) defaults() error {
+func (_c *LoginLogCreate) defaults() {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if loginlog.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized loginlog.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
 		v := loginlog.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		if loginlog.DefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized loginlog.DefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := loginlog.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
@@ -214,13 +192,9 @@ func (_c *LoginLogCreate) defaults() error {
 		_c.mutation.SetStatus(v)
 	}
 	if _, ok := _c.mutation.LoginAt(); !ok {
-		if loginlog.DefaultLoginAt == nil {
-			return fmt.Errorf("ent: uninitialized loginlog.DefaultLoginAt (forgotten import ent/runtime?)")
-		}
 		v := loginlog.DefaultLoginAt()
 		_c.mutation.SetLoginAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -304,10 +278,6 @@ func (_c *LoginLogCreate) createSpec() (*LoginLog, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(loginlog.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := _c.mutation.DeletedAt(); ok {
-		_spec.SetField(loginlog.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.UserID(); ok {
 		_spec.SetField(loginlog.FieldUserID, field.TypeInt64, value)

@@ -1588,14 +1588,12 @@ func (c *LoginLogClient) GetX(ctx context.Context, id int64) *LoginLog {
 
 // Hooks returns the client hooks.
 func (c *LoginLogClient) Hooks() []Hook {
-	hooks := c.hooks.LoginLog
-	return append(hooks[:len(hooks):len(hooks)], loginlog.Hooks[:]...)
+	return c.hooks.LoginLog
 }
 
 // Interceptors returns the client interceptors.
 func (c *LoginLogClient) Interceptors() []Interceptor {
-	inters := c.inters.LoginLog
-	return append(inters[:len(inters):len(inters)], loginlog.Interceptors[:]...)
+	return c.inters.LoginLog
 }
 
 func (c *LoginLogClient) mutate(ctx context.Context, m *LoginLogMutation) (Value, error) {
@@ -1723,14 +1721,12 @@ func (c *OperationLogClient) GetX(ctx context.Context, id int64) *OperationLog {
 
 // Hooks returns the client hooks.
 func (c *OperationLogClient) Hooks() []Hook {
-	hooks := c.hooks.OperationLog
-	return append(hooks[:len(hooks):len(hooks)], operationlog.Hooks[:]...)
+	return c.hooks.OperationLog
 }
 
 // Interceptors returns the client interceptors.
 func (c *OperationLogClient) Interceptors() []Interceptor {
-	inters := c.inters.OperationLog
-	return append(inters[:len(inters):len(inters)], operationlog.Interceptors[:]...)
+	return c.inters.OperationLog
 }
 
 func (c *OperationLogClient) mutate(ctx context.Context, m *OperationLogMutation) (Value, error) {

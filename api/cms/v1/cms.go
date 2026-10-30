@@ -55,6 +55,8 @@ func main() {
 		ctx.EntClient,
 		time.Duration(c.Maintenance.TokenBlacklistCleanInterval)*time.Second,
 	)
+	// 操作/登录日志定期清理（retentionDays<=0 时内部不启动，永久保留）
+	cleanup.StartAuditLogCleaner(taskCtx, ctx.EntClient, c.Maintenance.AuditLogRetentionDays)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

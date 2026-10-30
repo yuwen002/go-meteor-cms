@@ -30,6 +30,8 @@ type Config struct {
 	Maintenance struct {
 		// TokenBlacklistCleanInterval 过期 token 黑名单的清理间隔（秒），<=0 时按 3600 秒处理
 		TokenBlacklistCleanInterval int
+		// AuditLogRetentionDays 操作/登录日志保留天数，<=0 表示永久保留（不清理）
+		AuditLogRetentionDays int `json:",default=90"`
 	}
 	Upload baseconfig.Upload
 }

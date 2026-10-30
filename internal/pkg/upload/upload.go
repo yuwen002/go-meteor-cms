@@ -136,3 +136,41 @@ func detectMismatch(src multipart.File, ext string) error {
 
 	return nil
 }
+
+// defaultAvatarURL 默认头像，删除时跳过，避免误删系统资源
+const defaultAvatarURL = "/uploads/avatars/meteor-default.jpg"
+
+// Delete 删除通过 Save 落盘的文件。
+//
+// url 形如 /uploads/2006/01/name.ext。出于安全考虑：
+//   - 仅接受 /uploads/ 前缀的路径，且不允许包含 ".." 或绝对路径，防止路径穿越误删系统文件；
+//   - 默认头像不删除；
+//   - 文件不存在时视为已清理，返回 (false, nil)。
+func Delete(dir, url string) (bool, error) {
+	const prefix = "/uploads/"
+	if url == "" || !strings.HasPrefix(url, prefix) {
+		return false, nil
+	}
+	if url == defaultAvatarURL || strings.Contains(url, "meteor-default") {
+		return false, nil
+	}
+
+	rel := strings.TrimPrefix(url, prefix)
+	if strings.Contains(rel, "..") || filepath.IsAbs(rel) {
+		return false, fmt.Errorf("非法的文件访问路径: %s", url)
+	}
+
+	full := filepath.Clean(filepath.Join(dir, rel))
+	base := filepath.Clean(dir)
+	if full != base && !strings.HasPrefix(full, base+string(os.PathSeparator)) {
+		return false, fmt.Errorf("文件路径越界: %s", url)
+	}
+
+	if err := os.Remove(full); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}

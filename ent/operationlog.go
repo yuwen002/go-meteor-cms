@@ -22,8 +22,6 @@ type OperationLog struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 删除时间，用于软删除
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// 操作人ID，未登录时为空
 	UserID int64 `json:"user_id,omitempty"`
 	// 操作人账号
@@ -60,7 +58,7 @@ func (*OperationLog) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case operationlog.FieldUsername, operationlog.FieldModule, operationlog.FieldAction, operationlog.FieldMethod, operationlog.FieldPath, operationlog.FieldIP, operationlog.FieldUserAgent, operationlog.FieldErrorMsg, operationlog.FieldParams:
 			values[i] = new(sql.NullString)
-		case operationlog.FieldCreatedAt, operationlog.FieldUpdatedAt, operationlog.FieldDeletedAt:
+		case operationlog.FieldCreatedAt, operationlog.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -94,13 +92,6 @@ func (_m *OperationLog) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
-			}
-		case operationlog.FieldDeletedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
-			} else if value.Valid {
-				_m.DeletedAt = new(time.Time)
-				*_m.DeletedAt = value.Time
 			}
 		case operationlog.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -215,11 +206,6 @@ func (_m *OperationLog) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	if v := _m.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.UserID))

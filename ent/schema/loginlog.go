@@ -58,11 +58,11 @@ func (LoginLog) Fields() []ent.Field {
 	}
 }
 
-// Mixin 复用创建时间、更新时间等通用字段
+// Mixin 复用创建时间、更新时间等通用字段。
+// 注意：登录日志刻意不继承 SoftDeleteMixin，保证记录不可被软删除/篡改，满足审计完整性。
 func (LoginLog) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		BaseMixin{},
-		SoftDeleteMixin{},
 	}
 }
 

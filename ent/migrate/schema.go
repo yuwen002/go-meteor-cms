@@ -293,7 +293,6 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
 		{Name: "user_id", Type: field.TypeInt64, Nullable: true, Comment: "管理员ID，登录失败且账号不存在时为空"},
 		{Name: "username", Type: field.TypeString, Size: 50, Comment: "尝试登录的账号"},
 		{Name: "ip", Type: field.TypeString, Nullable: true, Size: 45, Comment: "来源IP，兼容 IPv6"},
@@ -315,24 +314,19 @@ var (
 				Columns: []*schema.Column{LoginLogsColumns[1]},
 			},
 			{
-				Name:    "loginlog_deleted_at",
+				Name:    "loginlog_user_id",
 				Unique:  false,
 				Columns: []*schema.Column{LoginLogsColumns[3]},
 			},
 			{
-				Name:    "loginlog_user_id",
+				Name:    "loginlog_username",
 				Unique:  false,
 				Columns: []*schema.Column{LoginLogsColumns[4]},
 			},
 			{
-				Name:    "loginlog_username",
-				Unique:  false,
-				Columns: []*schema.Column{LoginLogsColumns[5]},
-			},
-			{
 				Name:    "loginlog_login_at",
 				Unique:  false,
-				Columns: []*schema.Column{LoginLogsColumns[10]},
+				Columns: []*schema.Column{LoginLogsColumns[9]},
 			},
 		},
 	}
@@ -341,7 +335,6 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
 		{Name: "user_id", Type: field.TypeInt64, Nullable: true, Comment: "操作人ID，未登录时为空"},
 		{Name: "username", Type: field.TypeString, Nullable: true, Size: 50, Comment: "操作人账号"},
 		{Name: "module", Type: field.TypeString, Nullable: true, Size: 50, Comment: "业务模块，如 管理员管理"},
@@ -368,19 +361,14 @@ var (
 				Columns: []*schema.Column{OperationLogsColumns[1]},
 			},
 			{
-				Name:    "operationlog_deleted_at",
+				Name:    "operationlog_user_id",
 				Unique:  false,
 				Columns: []*schema.Column{OperationLogsColumns[3]},
 			},
 			{
-				Name:    "operationlog_user_id",
-				Unique:  false,
-				Columns: []*schema.Column{OperationLogsColumns[4]},
-			},
-			{
 				Name:    "operationlog_status",
 				Unique:  false,
-				Columns: []*schema.Column{OperationLogsColumns[12]},
+				Columns: []*schema.Column{OperationLogsColumns[11]},
 			},
 		},
 	}

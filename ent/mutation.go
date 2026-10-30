@@ -7069,7 +7069,6 @@ type LoginLogMutation struct {
 	id            *int64
 	created_at    *time.Time
 	updated_at    *time.Time
-	deleted_at    *time.Time
 	user_id       *int64
 	adduser_id    *int64
 	username      *string
@@ -7259,55 +7258,6 @@ func (m *LoginLogMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err e
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *LoginLogMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *LoginLogMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *LoginLogMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the LoginLog entity.
-// If the LoginLog object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LoginLogMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *LoginLogMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[loginlog.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *LoginLogMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[loginlog.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *LoginLogMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, loginlog.FieldDeletedAt)
 }
 
 // SetUserID sets the "user_id" field.
@@ -7689,15 +7639,12 @@ func (m *LoginLogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LoginLogMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, loginlog.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, loginlog.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, loginlog.FieldDeletedAt)
 	}
 	if m.user_id != nil {
 		fields = append(fields, loginlog.FieldUserID)
@@ -7732,8 +7679,6 @@ func (m *LoginLogMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case loginlog.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case loginlog.FieldDeletedAt:
-		return m.DeletedAt()
 	case loginlog.FieldUserID:
 		return m.UserID()
 	case loginlog.FieldUsername:
@@ -7761,8 +7706,6 @@ func (m *LoginLogMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldCreatedAt(ctx)
 	case loginlog.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case loginlog.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case loginlog.FieldUserID:
 		return m.OldUserID(ctx)
 	case loginlog.FieldUsername:
@@ -7799,13 +7742,6 @@ func (m *LoginLogMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case loginlog.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case loginlog.FieldUserID:
 		v, ok := value.(int64)
@@ -7913,9 +7849,6 @@ func (m *LoginLogMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *LoginLogMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(loginlog.FieldDeletedAt) {
-		fields = append(fields, loginlog.FieldDeletedAt)
-	}
 	if m.FieldCleared(loginlog.FieldUserID) {
 		fields = append(fields, loginlog.FieldUserID)
 	}
@@ -7942,9 +7875,6 @@ func (m *LoginLogMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *LoginLogMutation) ClearField(name string) error {
 	switch name {
-	case loginlog.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
 	case loginlog.FieldUserID:
 		m.ClearUserID()
 		return nil
@@ -7970,9 +7900,6 @@ func (m *LoginLogMutation) ResetField(name string) error {
 		return nil
 	case loginlog.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case loginlog.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case loginlog.FieldUserID:
 		m.ResetUserID()
@@ -8055,7 +7982,6 @@ type OperationLogMutation struct {
 	id             *int64
 	created_at     *time.Time
 	updated_at     *time.Time
-	deleted_at     *time.Time
 	user_id        *int64
 	adduser_id     *int64
 	username       *string
@@ -8251,55 +8177,6 @@ func (m *OperationLogMutation) OldUpdatedAt(ctx context.Context) (v time.Time, e
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *OperationLogMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *OperationLogMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *OperationLogMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the OperationLog entity.
-// If the OperationLog object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OperationLogMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *OperationLogMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[operationlog.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *OperationLogMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[operationlog.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *OperationLogMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, operationlog.FieldDeletedAt)
 }
 
 // SetUserID sets the "user_id" field.
@@ -8933,15 +8810,12 @@ func (m *OperationLogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OperationLogMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, operationlog.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, operationlog.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, operationlog.FieldDeletedAt)
 	}
 	if m.user_id != nil {
 		fields = append(fields, operationlog.FieldUserID)
@@ -8991,8 +8865,6 @@ func (m *OperationLogMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case operationlog.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case operationlog.FieldDeletedAt:
-		return m.DeletedAt()
 	case operationlog.FieldUserID:
 		return m.UserID()
 	case operationlog.FieldUsername:
@@ -9030,8 +8902,6 @@ func (m *OperationLogMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldCreatedAt(ctx)
 	case operationlog.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case operationlog.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
 	case operationlog.FieldUserID:
 		return m.OldUserID(ctx)
 	case operationlog.FieldUsername:
@@ -9078,13 +8948,6 @@ func (m *OperationLogMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case operationlog.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
 		return nil
 	case operationlog.FieldUserID:
 		v, ok := value.(int64)
@@ -9239,9 +9102,6 @@ func (m *OperationLogMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *OperationLogMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(operationlog.FieldDeletedAt) {
-		fields = append(fields, operationlog.FieldDeletedAt)
-	}
 	if m.FieldCleared(operationlog.FieldUserID) {
 		fields = append(fields, operationlog.FieldUserID)
 	}
@@ -9280,9 +9140,6 @@ func (m *OperationLogMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *OperationLogMutation) ClearField(name string) error {
 	switch name {
-	case operationlog.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
 	case operationlog.FieldUserID:
 		m.ClearUserID()
 		return nil
@@ -9320,9 +9177,6 @@ func (m *OperationLogMutation) ResetField(name string) error {
 		return nil
 	case operationlog.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case operationlog.FieldDeletedAt:
-		m.ResetDeletedAt()
 		return nil
 	case operationlog.FieldUserID:
 		m.ResetUserID()

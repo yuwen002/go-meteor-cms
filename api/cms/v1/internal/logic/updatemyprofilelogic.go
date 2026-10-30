@@ -10,6 +10,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/upload"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -56,6 +57,7 @@ func (l *UpdateMyProfileLogic) UpdateMyProfile(req *types.UpdateProfileReq) (res
 
 	// 按传入字段做局部更新
 	update := l.svcCtx.EntClient.AdminUser.UpdateOneID(userID)
+	var oldAvatar string
 	changed := false
 	if req.Nickname != nil {
 		update = update.SetNickname(*req.Nickname)
@@ -70,6 +72,14 @@ func (l *UpdateMyProfileLogic) UpdateMyProfile(req *types.UpdateProfileReq) (res
 		changed = true
 	}
 	if req.Avatar != nil {
+		// 记录旧头像，更新成功后清理，避免产生孤儿文件（默认头像除外）
+		if old, err := l.svcCtx.EntClient.AdminUser.
+			Query().
+			Where(adminuser.IDEQ(userID)).
+			Select(adminuser.FieldAvatar).
+			Only(l.ctx); err == nil {
+			oldAvatar = old.Avatar
+		}
 		update = update.SetAvatar(utils.Truncate(*req.Avatar, 512))
 		changed = true
 	}
@@ -87,6 +97,15 @@ func (l *UpdateMyProfileLogic) UpdateMyProfile(req *types.UpdateProfileReq) (res
 	if err != nil {
 		l.Logger.Errorf("更新个人资料失败: %v", err)
 		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	// 头像被替换为新值后，删除旧头像文件（若非默认头像且文件仍存在）
+	if req.Avatar != nil && oldAvatar != "" && oldAvatar != utils.Truncate(*req.Avatar, 512) {
+		if removed, derr := upload.Delete(l.svcCtx.Config.Upload.Defaults().Dir, oldAvatar); derr != nil {
+			l.Logger.Errorf("删除旧头像文件失败: %v", derr)
+		} else if removed {
+			l.Logger.Infof("已删除旧头像文件 %s", oldAvatar)
+		}
 	}
 
 	return toProfileResp(user), nil

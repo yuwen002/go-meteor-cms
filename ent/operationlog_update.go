@@ -48,26 +48,6 @@ func (_u *OperationLogUpdate) SetUpdatedAt(v time.Time) *OperationLogUpdate {
 	return _u
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *OperationLogUpdate) SetDeletedAt(v time.Time) *OperationLogUpdate {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *OperationLogUpdate) SetNillableDeletedAt(v *time.Time) *OperationLogUpdate {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *OperationLogUpdate) ClearDeletedAt() *OperationLogUpdate {
-	_u.mutation.ClearDeletedAt()
-	return _u
-}
-
 // SetUserID sets the "user_id" field.
 func (_u *OperationLogUpdate) SetUserID(v int64) *OperationLogUpdate {
 	_u.mutation.ResetUserID()
@@ -312,9 +292,7 @@ func (_u *OperationLogUpdate) Mutation() *OperationLogMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *OperationLogUpdate) Save(ctx context.Context) (int, error) {
-	if err := _u.defaults(); err != nil {
-		return 0, err
-	}
+	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -341,15 +319,11 @@ func (_u *OperationLogUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *OperationLogUpdate) defaults() error {
+func (_u *OperationLogUpdate) defaults() {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		if operationlog.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized operationlog.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := operationlog.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -414,12 +388,6 @@ func (_u *OperationLogUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(operationlog.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(operationlog.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(operationlog.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(operationlog.FieldUserID, field.TypeInt64, value)
@@ -527,26 +495,6 @@ func (_u *OperationLogUpdateOne) SetNillableCreatedAt(v *time.Time) *OperationLo
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *OperationLogUpdateOne) SetUpdatedAt(v time.Time) *OperationLogUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (_u *OperationLogUpdateOne) SetDeletedAt(v time.Time) *OperationLogUpdateOne {
-	_u.mutation.SetDeletedAt(v)
-	return _u
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (_u *OperationLogUpdateOne) SetNillableDeletedAt(v *time.Time) *OperationLogUpdateOne {
-	if v != nil {
-		_u.SetDeletedAt(*v)
-	}
-	return _u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (_u *OperationLogUpdateOne) ClearDeletedAt() *OperationLogUpdateOne {
-	_u.mutation.ClearDeletedAt()
 	return _u
 }
 
@@ -807,9 +755,7 @@ func (_u *OperationLogUpdateOne) Select(field string, fields ...string) *Operati
 
 // Save executes the query and returns the updated OperationLog entity.
 func (_u *OperationLogUpdateOne) Save(ctx context.Context) (*OperationLog, error) {
-	if err := _u.defaults(); err != nil {
-		return nil, err
-	}
+	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -836,15 +782,11 @@ func (_u *OperationLogUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *OperationLogUpdateOne) defaults() error {
+func (_u *OperationLogUpdateOne) defaults() {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		if operationlog.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized operationlog.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := operationlog.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -926,12 +868,6 @@ func (_u *OperationLogUpdateOne) sqlSave(ctx context.Context) (_node *OperationL
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(operationlog.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.DeletedAt(); ok {
-		_spec.SetField(operationlog.FieldDeletedAt, field.TypeTime, value)
-	}
-	if _u.mutation.DeletedAtCleared() {
-		_spec.ClearField(operationlog.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(operationlog.FieldUserID, field.TypeInt64, value)

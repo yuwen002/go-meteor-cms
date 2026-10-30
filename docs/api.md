@@ -261,3 +261,82 @@ Authorization: Bearer <token>
 - 多角色取并集，任一角色为「全部数据」时不过滤
 - 范围解析失败、未分配启用角色、或要求按部门过滤但未分配部门时，按最严格处理（返回空集）
 - 当前仅在管理员列表接口落地
+
+---
+
+## 审计日志
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/logs/operations` | `system:log:operation_list` | 操作日志列表 |
+| GET | `/admin/logs/logins` | `system:log:login_list` | 登录日志列表 |
+
+### GET `/admin/logs/operations`
+
+查询后台接口调用记录，用于安全审计与问题排查。支持按操作人、模块、路径、结果、时间范围筛选。
+
+**请求参数（query）**：
+
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| page | int | 页码，默认 1 |
+| page_size | int | 每页条数，默认 20，上限 100 |
+| user_id | int64 | 操作人 ID（仅超管可指定；非超管强制只看自己） |
+| username | string | 操作人账号（模糊匹配） |
+| module | string | 业务模块，如「管理员管理」 |
+| path | string | 请求路径（模糊匹配） |
+| status | int | 0 成功 / 1 失败 |
+| start_time | string | 起始时间，支持 `2006-01-02 15:04:05` / `2006-01-02` / RFC3339 |
+| end_time | string | 结束时间 |
+
+**响应 data**：
+
+| 字段 | 说明 |
+| --- | --- |
+| total | 总条数 |
+| list[].module | 业务模块 |
+| list[].action | 操作描述（取自权限树，如「新增管理员」） |
+| list[].status | 0 成功 / 1 失败 |
+| list[].params | 请求参数快照（密码等敏感字段已脱敏、超长截断） |
+| list[].duration_ms | 耗时（毫秒） |
+
+> 数据权限：非超管只能查询自己的操作日志，外部传入的 `user_id` 会被忽略。按 `created_at` 倒序返回。
+> 日志保留策略由 `Maintenance.AuditLogRetentionDays` 配置（默认 90 天，<=0 表示永久保留），由后台任务定期清理。
+
+### GET `/admin/logs/logins`
+
+查询登录成功与失败记录，用于账号安全审计。参数与操作日志类似（`user_id`/`username`/`status`/`start_time`/`end_time`），按 `login_at` 倒序。
+
+**响应 data.list[]** 字段：`id, user_id, username, ip, user_agent, status, fail_reason, login_at`。
+
+---
+
+## 文件上传
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| POST | `/admin/upload` | `system:upload:file` | 上传文件（multipart/form-data，字段名 `file`） |
+
+### POST `/admin/upload`
+
+接收单个文件，落盘到 `public/uploads/YYYY/MM/<uuid>.<ext>`，返回可直接访问的 URL（前缀 `/uploads/`）。静态资源通过 `rest.WithFileServer` 对外暴露，无需鉴权即可 GET。
+
+**校验规则**：
+- 扩展名白名单：`.jpg .jpeg .png .gif .webp`（配置于 `etc/cms-api.yaml` 的 `Upload.AllowedExts`）
+- 文件头魔数校验：真实类型必须与扩展名一致，伪造后缀会被拒绝（返回 `4001`）
+- 大小上限：默认 5MB（`Upload.MaxSizeMB`），超限返回 `4001`
+- 文件名统一用 UUID 重命名，杜绝路径穿越与同名覆盖
+
+**请求**：`multipart/form-data`，字段名 `file`
+
+**响应 data**：
+
+| 字段 | 说明 |
+| --- | --- |
+| url | 可访问的相对路径，如 `/uploads/2026/10/xxxx.png` |
+| filename | 原始文件名 |
+| size | 文件大小（字节） |
+
+> 回填头像：把返回的 `url` 通过 `PUT /admin/profile` 的 `avatar` 字段更新即可；更新头像时会自动清理旧头像文件（默认头像除外）。
+> 上传目录（`public/uploads/*`，默认头像除外）已在 `.gitignore` 忽略，避免运行时文件污染仓库。
+

@@ -39,7 +39,14 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 	query := l.svcCtx.EntClient.LoginLog.Query()
 
 	conds := make([]predicate.LoginLog, 0, 6)
-	if req.UserID > 0 {
+	// 数据权限：非超管只能查看自己的登录日志，忽略外部传入的 user_id 参数，防止越权检索他人日志
+	if !utils.IsSuperAdmin(l.ctx) {
+		uid, ok := utils.CurrentUserID(l.ctx)
+		if !ok || uid <= 0 {
+			return nil, common.NewBizError(common.ErrUnauthorized)
+		}
+		conds = append(conds, loginlog.UserIDEQ(uid))
+	} else if req.UserID > 0 {
 		conds = append(conds, loginlog.UserIDEQ(req.UserID))
 	}
 	if req.Username != "" {
