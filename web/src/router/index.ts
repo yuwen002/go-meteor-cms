@@ -4,6 +4,7 @@ import Layout from '@/layout/index.vue'
 import { useUserStore } from '@/stores/user'
 import { getProfile, getMyPermissions } from '@/api/user'
 import type { PermissionItem } from '@/stores/user'
+import { allMenus } from '@/config/menus'
 
 const routes = [
   {
@@ -51,7 +52,7 @@ const routes = [
         path: 'system/files',
         name: 'FileManage',
         component: () => import('@/views/system/file/index.vue'),
-        meta: { title: '文件管理' },
+        meta: { title: '文件管理', permission: 'system:file:list' },
       },
       {
         path: 'system/operation-log',
@@ -122,9 +123,31 @@ router.beforeEach(async (to, from, next) => {
       userStore.logoutAction()
       next('/login')
     }
-  } else {
-    next()
+    return
   }
+
+  // 路由级权限守卫：防止直接在地址栏输入未授权路径。
+  // 无权限时回退到「第一个有权访问的菜单」而非固定首页，避免用户对首页也无权限时形成重定向死循环。
+  const required = to.meta.permission as string | undefined
+  if (required && !hasAccess(userStore, required)) {
+    const fallback = firstAccessiblePath(userStore)
+    if (fallback && fallback !== to.path) {
+      next(fallback)
+      return
+    }
+  }
+  next()
 })
+
+// 是否有访问权限：超级管理员天然放行（同时校验后端下发的 is_super，避免权限数组异常时被误拦）
+function hasAccess(userStore: ReturnType<typeof useUserStore>, code: string): boolean {
+  return userStore.userInfo?.isSuper === true || userStore.hasPermission(code)
+}
+
+// 第一个有权访问的菜单路径；个人中心不设限，因此必定存在兜底目标
+function firstAccessiblePath(userStore: ReturnType<typeof useUserStore>): string {
+  const menu = allMenus.find((m) => !m.permission || hasAccess(userStore, m.permission))
+  return menu ? menu.path : '/profile'
+}
 
 export default router
