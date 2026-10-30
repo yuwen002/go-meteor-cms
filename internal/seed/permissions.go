@@ -62,8 +62,10 @@ var DefaultPermissions = []PermissionSpec{
 		Path: "/system/roles", Component: "views/admin/role/index.vue", Icon: "role", Sort: 30},
 	{Name: "权限管理", Permission: "system:permission:list", Type: PermissionTypeMenu,
 		Path: "/system/permissions", Component: "views/admin/permission/index.vue", Icon: "permission", Sort: 40},
-	{Name: "日志管理", Permission: "system:log:operation_list", Type: PermissionTypeMenu,
-		Path: "/system/operation-log", Component: "views/system/log/operation.vue", Icon: "log", Sort: 50},
+	{Name: "操作日志", Permission: "system:log:operation_list", Type: PermissionTypeMenu,
+		Path: "/system/operation-log", Component: "views/system/log/operation.vue", Icon: "document", Sort: 50},
+	{Name: "登录日志", Permission: "system:log:login_list", Type: PermissionTypeMenu,
+		Path: "/system/login-log", Component: "views/system/log/login.vue", Icon: "clock", Sort: 55},
 
 	// ---------- 控制台（菜单与统计接口同用一个标识） ----------
 	{Name: "查看控制台", Permission: "system:dashboard:view", Type: PermissionTypeButton, ParentName: "控制台", Sort: 2},
@@ -144,10 +146,10 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "删除权限", Permission: "system:permission:delete", Type: PermissionTypeAPI, ParentName: "权限管理", Method: "DELETE", APIPath: "/admin/permissions/:id", Sort: 46},
 
 	// ---------- 日志管理 ----------
-	{Name: "查看操作日志", Permission: "system:log:operation_list", Type: PermissionTypeButton, ParentName: "日志管理", Sort: 51},
-	{Name: "查看操作日志", Permission: "system:log:operation_list", Type: PermissionTypeAPI, ParentName: "日志管理", Method: "GET", APIPath: "/admin/logs/operations", Sort: 51},
-	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeButton, ParentName: "日志管理", Sort: 52},
-	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeAPI, ParentName: "日志管理", Method: "GET", APIPath: "/admin/logs/logins", Sort: 52},
+	{Name: "查看操作日志", Permission: "system:log:operation_list", Type: PermissionTypeButton, ParentName: "操作日志", Sort: 51},
+	{Name: "查看操作日志", Permission: "system:log:operation_list", Type: PermissionTypeAPI, ParentName: "操作日志", Method: "GET", APIPath: "/admin/logs/operations", Sort: 51},
+	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeButton, ParentName: "登录日志", Sort: 52},
+	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeAPI, ParentName: "登录日志", Method: "GET", APIPath: "/admin/logs/logins", Sort: 52},
 	{Name: "上传文件", Permission: "system:upload:file", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 25},
 	{Name: "上传文件", Permission: "system:upload:file", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "POST", APIPath: "/admin/upload", Sort: 25},
 

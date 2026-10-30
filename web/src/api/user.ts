@@ -1,5 +1,23 @@
 import request from '@/utils/request'
 
+export interface MyMenuItem {
+  id: number
+  name: string
+  parent_id: number
+  path: string
+  component: string
+  icon: string
+  permission: string
+  sort: number
+  children: MyMenuItem[]
+}
+
+export interface MyPermissionResp {
+  is_super: boolean
+  menus: MyMenuItem[]
+  permissions: string[]
+}
+
 export function getProfile() {
   return request({ url: '/admin/profile', method: 'get' })
 }
@@ -66,7 +84,7 @@ export function assignAdminRoles(id: number, roleIds: number[]) {
   })
 }
 
-// 登录后拉取「当前用户拥有的权限树」，用于菜单/按钮级权限控制
+// 登录后拉取「当前用户可见的菜单树 + 可用权限标识」，用于动态菜单与按钮级权限控制
 export function getMyPermissions() {
-  return request({ url: '/admin/profile/permissions', method: 'get' })
+  return request({ url: '/admin/profile/permissions', method: 'get' }) as Promise<MyPermissionResp>
 }

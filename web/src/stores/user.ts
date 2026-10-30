@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { getToken, setToken, removeToken, getRefreshToken, setRefreshToken, removeRefreshToken } from '@/utils/auth'
+import type { MyMenuItem } from '@/api/user'
 
 export interface UserInfo {
   id: number
@@ -12,17 +13,7 @@ export interface UserInfo {
   isActive: boolean
 }
 
-export interface PermissionItem {
-  id: number
-  name: string
-  permission: string
-  type: number
-  parentName: string
-  apiPath: string
-  method: string
-  sort: number
-  children?: PermissionItem[]
-}
+
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -30,7 +21,10 @@ export const useUserStore = defineStore('user', {
     refreshToken: getRefreshToken(),
     userInfo: null as UserInfo | null,
     permissions: [] as string[],
-    permissionTree: [] as PermissionItem[],
+    // 动态菜单：由 /admin/profile/permissions 下发，已按当前用户权限过滤
+    menus: [] as MyMenuItem[],
+    // 是否已拉取过菜单与权限；零权限用户据此避免每次导航重复拉取
+    accessLoaded: false,
   }),
   getters: {
     hasPermission: (state) => (code: string) => state.permissions.includes(code),
@@ -47,16 +41,18 @@ export const useUserStore = defineStore('user', {
     setUserInfo(info: UserInfo) {
       this.userInfo = info
     },
-    setPermissions(codes: string[], tree: PermissionItem[]) {
+    setAccess(codes: string[], menus: MyMenuItem[]) {
       this.permissions = codes
-      this.permissionTree = tree
+      this.menus = menus
+      this.accessLoaded = true
     },
     logoutAction() {
       this.token = ''
       this.refreshToken = ''
       this.userInfo = null
       this.permissions = []
-      this.permissionTree = []
+      this.menus = []
+      this.accessLoaded = false
       removeToken()
       removeRefreshToken()
     },

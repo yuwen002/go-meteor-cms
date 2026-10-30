@@ -3,8 +3,6 @@ import { getToken } from '@/utils/auth'
 import Layout from '@/layout/index.vue'
 import { useUserStore } from '@/stores/user'
 import { getProfile, getMyPermissions } from '@/api/user'
-import type { PermissionItem } from '@/stores/user'
-import { allMenus } from '@/config/menus'
 
 const routes = [
   {
@@ -83,19 +81,6 @@ const router = createRouter({
 
 const whiteList = ['/login']
 
-// 从权限树递归提取当前用户拥有的权限码
-function extractCodes(nodes: PermissionItem[]): string[] {
-  const codes: string[] = []
-  const walk = (list: PermissionItem[]) => {
-    list.forEach((n) => {
-      if (n.permission) codes.push(n.permission)
-      if (n.children) walk(n.children)
-    })
-  }
-  walk(nodes)
-  return codes
-}
-
 router.beforeEach(async (to, from, next) => {
   const token = getToken()
   if (!token) {
@@ -112,12 +97,13 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const userStore = useUserStore()
-  if (userStore.permissions.length === 0) {
+  if (!userStore.accessLoaded) {
     try {
       const profile = await getProfile()
-      const tree = (await getMyPermissions()) as unknown as PermissionItem[]
+      // 注意：该接口返回的是对象 {is_super, menus, permissions}，此前被误当作数组使用
+      const access = await getMyPermissions()
       userStore.setUserInfo(profile)
-      userStore.setPermissions(extractCodes(tree), tree)
+      userStore.setAccess(access.permissions ?? [], access.menus ?? [])
       next({ ...to, replace: true })
     } catch {
       userStore.logoutAction()
@@ -144,10 +130,10 @@ function hasAccess(userStore: ReturnType<typeof useUserStore>, code: string): bo
   return userStore.userInfo?.isSuper === true || userStore.hasPermission(code)
 }
 
-// 第一个有权访问的菜单路径；个人中心不设限，因此必定存在兜底目标
+// 第一个可访问的菜单路径；后端下发的菜单已按权限过滤，取第一个即可。
+// 一个菜单都没有时兜底到个人中心（无需权限），避免重定向死循环。
 function firstAccessiblePath(userStore: ReturnType<typeof useUserStore>): string {
-  const menu = allMenus.find((m) => !m.permission || hasAccess(userStore, m.permission))
-  return menu ? menu.path : '/profile'
+  return userStore.menus[0]?.path || '/profile'
 }
 
 export default router

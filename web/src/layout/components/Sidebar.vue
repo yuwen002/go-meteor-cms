@@ -7,12 +7,14 @@
     router
     class="sidebar-menu"
   >
-    <template v-for="item in menus" :key="item.path">
-      <el-menu-item :index="item.path">
-        <el-icon v-if="item.icon"><component :is="item.icon" /></el-icon>
-        <span>{{ item.title }}</span>
-      </el-menu-item>
-    </template>
+    <!-- 动态菜单：由后端按当前用户权限下发，支持多级 -->
+    <menu-item v-for="m in menus" :key="m.id" :item="m" />
+
+    <!-- 个人中心不属于后台权限体系，固定展示 -->
+    <el-menu-item index="/profile">
+      <el-icon><Setting /></el-icon>
+      <template #title>个人中心</template>
+    </el-menu-item>
   </el-menu>
 </template>
 
@@ -20,15 +22,12 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { allMenus } from '@/config/menus'
+import MenuItem from './MenuItem.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
 
-const menus = computed(() =>
-  allMenus.filter((m) => !m.permission || userStore.hasPermission(m.permission)),
-)
-
+const menus = computed(() => userStore.menus)
 const activeMenu = computed(() => route.path)
 </script>
 
