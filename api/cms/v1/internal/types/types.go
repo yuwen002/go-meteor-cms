@@ -219,7 +219,40 @@ type RefreshTokenReq struct {
 }
 
 type RefreshTokenResp struct {
-	AccessToken string `json:"access_token"` // 新的访问令牌
+	AccessToken  string `json:"access_token"`  // 新的访问令牌
+	RefreshToken string `json:"refresh_token"` // 新的刷新令牌（轮换后旧令牌立即失效）
+}
+
+// 文件管理
+type FileItem struct {
+	Name     string `json:"name"`
+	Path     string `json:"path"`     // 相对上传根目录的路径（使用 / 分隔）
+	Url      string `json:"url"`      // 可访问的 URL
+	Size     int64  `json:"size"`     // 字节；目录为 0
+	Modified int64  `json:"modified"` // 修改时间（Unix 秒）
+	IsDir    bool   `json:"is_dir"`
+}
+
+type FileListReq struct {
+	Dir      string `json:"dir,optional"`     // 子目录，相对上传根；为空表示根目录
+	Keyword  string `json:"keyword,optional"` // 按文件名模糊匹配
+	Page     int64  `json:"page,optional"`
+	PageSize int64  `json:"page_size,optional"`
+}
+
+type FileListResp struct {
+	List       []FileItem `json:"list"`
+	Total      int64      `json:"total"`
+	CurrentDir string     `json:"current_dir"`
+}
+
+type FileDeleteReq struct {
+	Path string `json:"path"` // 相对上传根目录的路径
+}
+
+type FileRenameReq struct {
+	Path    string `json:"path"`
+	NewName string `json:"new_name"` // 新名称（不含路径分隔符）
 }
 
 type MyMenuItem struct {

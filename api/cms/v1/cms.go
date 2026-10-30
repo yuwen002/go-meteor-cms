@@ -53,6 +53,13 @@ func main() {
 	server.Use(middleware.NewSPAMiddleware(c.StaticDir))
 	// 将登出请求携带的 X-Refresh-Token 透传进 context，供登出接口一并吊销
 	server.Use(middleware.NewRefreshTokenHeaderMiddleware())
+	// 登录接口按 IP 限流（防爆破），配置见 Login.RateLimit
+	server.Use(middleware.NewLoginRateLimitMiddleware(
+		c.Login.RateLimit.Enabled,
+		c.Login.RateLimit.Max,
+		c.Login.RateLimit.Window,
+		c.Login.RateLimit.BlockSeconds,
+	))
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

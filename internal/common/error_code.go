@@ -38,6 +38,7 @@ const (
 
 	// Request validation errors (4000-4999)
 	ErrInvalidParams = 4001 // 参数错误
+	ErrFileNotFound  = 4002 // 文件不存在
 
 	// Department errors (5000-5199)
 	ErrDepartmentNotFound        = 5001 // 部门不存在
@@ -110,6 +111,7 @@ var errorMessages = map[int]string{
 	ErrResetTokenExpired:       "重置链接已过期，请重新申请",
 	ErrMailSendFailed:          "邮件发送失败，请稍后重试",
 	ErrInvalidParams:           "参数错误",
+	ErrFileNotFound:            "文件不存在",
 	// Department error messages
 	ErrDepartmentNotFound:        "部门不存在",
 	ErrDepartmentCreateFail:      "创建部门失败",

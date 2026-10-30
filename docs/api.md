@@ -370,6 +370,39 @@ Authorization: Bearer <token>
 
 ---
 
+## 文件管理
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/admin/files` | 列出上传目录下的文件（支持目录、关键字、分页） |
+| POST | `/admin/files/delete` | 删除指定文件（空目录也可删） |
+| PUT | `/admin/files/rename` | 同级目录内重命名 |
+
+> 以上接口均需登录（JWT 鉴权），但不强制特定权限码，用于对已上传资源的可视化运维。路径均相对上传根目录，服务端做防穿越校验（`../` 会被拒绝）。
+
+### GET `/admin/files`
+
+**请求参数（query）**：
+
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| dir | string | 子目录，相对上传根；为空表示根目录 |
+| keyword | string | 按文件名模糊匹配 |
+| page | int | 页码，默认 1 |
+| page_size | int | 每页条数，默认 20，上限 100 |
+
+**响应 data**：`list[]`（字段 `name / path / url / size / modified / is_dir`）、`total`、`current_dir`。
+
+### POST `/admin/files/delete`
+
+请求体：`{ "path": "相对上传根目录的路径" }`。目录仅允许在为空时删除。
+
+### PUT `/admin/files/rename`
+
+请求体：`{ "path": "...", "new_name": "新名称" }`。`new_name` 不含路径分隔符，且目标名称不得已存在。
+
+---
+
 ## 仪表盘统计
 
 | 方法 | 路径 | 说明 |

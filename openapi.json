@@ -494,6 +494,87 @@
         "summary": "departmentUpdate"
       }
     },
+    "/admin/files": {
+      "get": {
+        "operationId": "fileList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileListReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "fileList"
+      }
+    },
+    "/admin/files/delete": {
+      "post": {
+        "operationId": "fileDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileDeleteReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "fileDelete"
+      }
+    },
+    "/admin/files/rename": {
+      "put": {
+        "operationId": "fileRename",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileRenameReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "fileRename"
+      }
+    },
     "/admin/forgot-password": {
       "post": {
         "operationId": "forgotPassword",

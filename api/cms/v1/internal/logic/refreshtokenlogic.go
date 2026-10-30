@@ -99,5 +99,26 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
-	return &types.RefreshTokenResp{AccessToken: accessToken}, nil
+	// 刷新令牌轮换：签发新的刷新令牌，并将本次使用的旧刷新令牌立即吊销，
+	// 降低 refresh token 泄露后的重放风险。黑名单 TTL 取 RefreshExpire，可被清理任务回收。
+	newRefreshToken, err := utils.GenerateToken(l.svcCtx.Config.Auth.RefreshSecret, l.svcCtx.Config.Auth.RefreshExpire, map[string]interface{}{
+		"user_id":    user.ID,
+		"username":   user.Username,
+		"token_type": "refresh",
+	})
+	if err != nil {
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	oldHash := utils.GenerateTokenHash(req.RefreshToken)
+	if _, e := l.svcCtx.EntClient.TokenBlacklist.Create().
+		SetTokenHash(oldHash).
+		SetToken(req.RefreshToken).
+		SetExpiredAt(time.Now().Add(time.Duration(l.svcCtx.Config.Auth.RefreshExpire) * time.Second)).
+		Save(l.ctx); e != nil {
+		logx.Errorf("Failed to revoke old refresh token: %v", e)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	return &types.RefreshTokenResp{AccessToken: accessToken, RefreshToken: newRefreshToken}, nil
 }

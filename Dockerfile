@@ -33,6 +33,8 @@ WORKDIR /app
 COPY --from=builder /out/cms /app/cms
 COPY --from=builder /out/migrate /app/migrate
 COPY --from=web /web/dist /app/web/dist
+# 将 OpenAPI 文档一并发布到静态目录，供 /docs.html（Swagger UI）读取
+COPY openapi.json /app/web/dist/openapi.json
 COPY api/cms/v1/etc/cms-api.yaml /app/etc/cms-api.yaml
 
 RUN chown -R app:app /app

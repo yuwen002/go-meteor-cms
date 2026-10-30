@@ -272,4 +272,28 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			}...,
 		),
 	)
+
+	// 文件管理：需登录，但不强制权限码（任何已登录管理员均可管理上传文件）
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ClientInfoMiddleware, serverCtx.JwtMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/files",
+					Handler: fileListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/files/delete",
+					Handler: fileDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/admin/files/rename",
+					Handler: fileRenameHandler(serverCtx),
+				},
+			}...,
+		),
+	)
 }

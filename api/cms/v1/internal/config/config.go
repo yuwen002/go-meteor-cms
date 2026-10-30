@@ -40,6 +40,13 @@ type Config struct {
 		MaxFailCount int `json:",default=5"`
 		// LockMinutes 锁定持续时间（分钟），<=0 时按 15 处理
 		LockMinutes int `json:",default=15"`
+		// RateLimit 登录接口按客户端 IP 的限流配置（防爆破）；默认关闭，需显式开启
+		RateLimit struct {
+			Enabled      bool `json:",default=false"`
+			Max          int  `json:",default=10"`  // 窗口内允许的最大尝试次数
+			Window       int  `json:",default=60"`  // 统计窗口（秒）
+			BlockSeconds int  `json:",default=300"` // 触发限流后拒绝时长（秒）
+		}
 	}
 	// WebBaseURL 前端站点地址，用于拼接找回密码等邮件中的跳转链接；为空时仅下发裸令牌
 	WebBaseURL string

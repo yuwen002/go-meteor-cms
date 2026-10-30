@@ -48,6 +48,12 @@ const routes = [
         meta: { title: '权限管理', permission: 'system:permission:list' },
       },
       {
+        path: 'system/files',
+        name: 'FileManage',
+        component: () => import('@/views/system/file/index.vue'),
+        meta: { title: '文件管理' },
+      },
+      {
         path: 'system/operation-log',
         name: 'OperationLog',
         component: () => import('@/views/system/log/operation.vue'),

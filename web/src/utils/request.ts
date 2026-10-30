@@ -42,7 +42,9 @@ async function doRefresh(refreshToken: string): Promise<string> {
     url: '/admin/refresh',
     method: 'post',
     data: { refresh_token: refreshToken },
-  })) as { access_token: string }
+  })) as { access_token: string; refresh_token: string }
+  // 刷新令牌轮换：用服务端返回的新 refresh token 覆盖本地旧值
+  useUserStore().setRefreshTokenAction(data.refresh_token)
   return data.access_token
 }
 
