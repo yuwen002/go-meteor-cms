@@ -1,0 +1,129 @@
+ent/schema/sysdict.go
+  s_bbf609960902b0::t_48f8782b6130f8 1-70
+ent/mutation.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 24-26,48-50,9435-11603
+ent/sysdict.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-173
+ent/sysconfig/where.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-475
+ent/sysdict_query.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-527
+api/cms/v1/internal/logic/dictlogic.go
+  s_bbf609960902b0::t_a3786c5a8e24aa 1-178
+internal/seed/permissions.go
+  s_bbf609960902b0::t_2e85d856b76f65 165-196
+ent/schema/sysdictitem.go
+  h_a3f313f3d96276 1-69
+ent/sysconfig_update.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-508
+api/cms/v1/internal/config/config.go
+  s_bbf609960902b0::t_8fbc9c2b1c944c 59-60
+ent/sysdict_update.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-520
+ent/sysconfig.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-175
+ent/sysdict_delete.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-88
+ent/schema/sysconfig.go
+  h_a3f313f3d96276 1-70
+ent/sysconfig_delete.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-88
+web/src/layout/components/MenuItem.vue
+  s_bbf609960902b0::t_274994a8a2ac0a 33
+ent/sysdictitem_delete.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-88
+ent/migrate/schema.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 377-476,521-523
+web/src/api/config.ts
+  s_bbf609960902b0::t_30a6a5c43c7c85 1-37
+web/src/views/system/config/index.vue
+  s_bbf609960902b0::t_38477bfc9231ee 1-184
+ent/sysdictitem/where.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-455
+api/cms/v1/internal/logic/dictitemlogic.go
+  s_bbf609960902b0::t_9b87926f69bb40 1-165
+web/src/api/dict.ts
+  s_bbf609960902b0::t_e150ad1e8a7d8b 1-84
+ent/sysdictitem/sysdictitem.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-118
+api/cms/v1/internal/types/types.go
+  s_bbf609960902b0::t_f9993ee28432dc 260-271,273,278-313,315,319-356,358,360-383
+  s_bbf609960902b0::t_065d95ae78eb88 272,274-277
+  s_bbf609960902b0::t_ecd0d33845983d 314,316-318,357,359
+ent/ent.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 24-26,97-99
+ent/hook/hook.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 120-155
+api/cms/v1/internal/handler/routes.go
+  h_a3f313f3d96276 299-367
+ent/runtime/runtime.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 18-20,413-627
+internal/common/error_code.go
+  s_bbf609960902b0::t_c6ca4219821c8a 85-91,170-176
+  h_a3f313f3d96276 169,177-182
+ent/sysdict_create.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-353
+ent/sysconfig/sysconfig.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-118
+ent/sysconfig_query.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-527
+ent/intercept/intercept.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 21-23,326-406,455-460
+ent/internal/schema.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 9
+ent/sysdictitem_create.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-348
+web/src/router/index.ts
+  s_bbf609960902b0::t_c143fd0cea0258 55-66
+api/cms/v1/internal/handler/confighandler.go
+  h_a3f313f3d96276 1-63
+ent/sysdict/sysdict.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-118
+ent/sysdictitem_query.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-527
+ent/sysdict/where.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-470
+ent/predicate/predicate.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 36-44
+api/cms/v1/internal/handler/dicthandler.go
+  s_bbf609960902b0::t_4d73b9e31a5507 1-129
+ent/sysdictitem_update.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-502
+api/cms/v1/internal/logic/configlogic.go
+  s_bbf609960902b0::t_5e6b960b6260ce 1-146
+docs/api.md
+  s_bbf609960902b0::t_1498efa0adf9e0 414-455
+  s_bbf609960902b0::t_28cccf83c34438 158-160,167-171
+ent/sysdictitem.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-173
+ent/sysconfig_create.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 1-351
+web/src/views/system/dict/index.vue
+  s_bbf609960902b0::t_1d12cd540c4e54 1-405
+ent/client.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 27-29,56-61,84-86,189-191,221-223,256,268,295-300,1771-2169,2307-2308,2312-2313
+ent/tx.go
+  s_bbf609960902b0::t_ba48451b9e8bc0 33-38,181-183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "81c506be8ef4a4378b46b409de9930509d6fa206",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4-preview"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 11613
+    }
+  }
+}
