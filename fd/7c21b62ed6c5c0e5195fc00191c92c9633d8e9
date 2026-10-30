@@ -1,0 +1,77 @@
+docs/api.md
+  s_bbf609960902b0::t_2a4e5300c9e64e 373-405
+api/cms/v1/internal/handler/filedeletehandler.go
+  h_a3f313f3d96276 1-37
+web/public/docs.html
+  s_bbf609960902b0::t_8cf4cad3f898ce 1-20
+api/cms/v1/internal/handler/filelisthandler.go
+  s_bbf609960902b0::t_701706fce6ed8a 1-37
+api/cms/v1/cms.api
+  s_bbf609960902b0::t_410cb9e4ce49ad 55-56
+internal/utils/path.go
+  h_a3f313f3d96276 1-21
+web/src/layout/components/Sidebar.vue
+  s_bbf609960902b0::t_6169f6a50dd787 40
+.github/workflows/ci.yml
+  s_bbf609960902b0::t_424fe76b73a5aa 10-11,14-15,17,19-23,25-27,29-44
+internal/common/error_code.go
+  s_bbf609960902b0::t_4ecea2655803b6 41,114
+api/cms/v1/internal/handler/filerenamehandler.go
+  h_a3f313f3d96276 1-37
+api/cms/v1/internal/logic/filelistlogic.go
+  s_bbf609960902b0::t_ed1e4f5b2582ea 1-110
+api/cms/v1/internal/logic/filedeletelogic.go
+  s_bbf609960902b0::t_23ebd70d9a4d4b 1-60
+api/cms/v1/internal/logic/filerenamelogic.go
+  h_a3f313f3d96276 1-62
+api/cms/v1/internal/logic/refreshtokenlogic.go
+  s_bbf609960902b0::t_16e2ec2d62dc90 102-123
+api/cms/v1/internal/middleware/loginratelimit.go
+  s_bbf609960902b0::t_ccff9fea5ee51b 25-27,32-36
+  s_bbf609960902b0::t_fc47786de24de0 1-24,28-31,37-95
+api/cms/v1/internal/handler/routes.go
+  s_bbf609960902b0::t_2fda6f51339683 275-298
+Dockerfile
+  s_bbf609960902b0::t_09854169af6f7e 36-37
+api/cms/v1/internal/types/types.go
+  s_bbf609960902b0::t_21695da65e8864 226-236,239-255
+  s_bbf609960902b0::t_635a479f954296 222-223
+  s_bbf609960902b0::t_ba0d0ec2f0c966 237-238
+web/src/utils/request.ts
+  s_bbf609960902b0::t_d77f892c4651c3 45-47
+api/cms/v1/internal/config/config.go
+  s_bbf609960902b0::t_fc47786de24de0 46-47
+  s_bbf609960902b0::t_b6b5aa27e69767 43-45,48-49
+openapi.json
+  s_bbf609960902b0::t_ba0d0ec2f0c966 497-577
+web/src/api/file.ts
+  s_bbf609960902b0::t_cd33ac9d35d8b9 1-33
+api/cms/v1/etc/cms-api.yaml
+  s_bbf609960902b0::t_881df7b619988b 21-25
+web/src/views/system/file/index.vue
+  s_bbf609960902b0::t_49ad0f1fdd34ac 1-260
+web/src/router/index.ts
+  s_bbf609960902b0::t_9ea7b6c52849ad 50-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "fd7c21b62ed6c5c0e5195fc00191c92c9633d8e9",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 885
+    }
+  }
+}
