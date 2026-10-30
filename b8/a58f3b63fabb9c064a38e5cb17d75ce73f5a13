@@ -1,0 +1,72 @@
+ent/loginlog_update.go
+  s_bbf609960902b0::t_118faa4e44cd08 194,221,506,533
+api/cms/v1/internal/config/config.go
+  s_bbf609960902b0::t_ff75e7049110e9 33-34
+ent/loginlog_create.go
+  s_bbf609960902b0::t_118faa4e44cd08 154,181
+ent/schema/loginlog.go
+  s_bbf609960902b0::t_6f44dd2b29f936 61-62
+.github/workflows/ci.yml
+  s_bbf609960902b0::t_d067c5ac7fe31f 1-29
+docs/api.md
+  s_bbf609960902b0::t_4bfcbd8a94293a 264-342
+cmd/migrate/main.go
+  s_bbf609960902b0::t_e58938a26c4d47 61-62
+  s_bbf609960902b0::t_63372c3045c806 63
+  s_bbf609960902b0::t_92e3cfcd04e728 10
+ent/client.go
+  s_bbf609960902b0::t_118faa4e44cd08 1591,1596,1724,1729
+ent/mutation.go
+  s_bbf609960902b0::t_118faa4e44cd08 7642,8813
+ent/operationlog_create.go
+  s_bbf609960902b0::t_118faa4e44cd08 216,243
+ent/schema/operationlog.go
+  s_bbf609960902b0::t_028f1e5600f160 77-78
+internal/pkg/upload/upload_test.go
+  s_bbf609960902b0::t_ed7af04fb42b9d 1-142
+ent/operationlog_update.go
+  s_bbf609960902b0::t_118faa4e44cd08 295,322,758,785
+api/cms/v1/internal/middleware/operationlogmiddleware_test.go
+  s_bbf609960902b0::t_2f78dd96a18567 1-103
+internal/pkg/cleanup/auditlog.go
+  s_bbf609960902b0::t_a6dcf8cef20871 1-85
+internal/pkg/upload/upload.go
+  s_bbf609960902b0::t_e22b1204fbb4b3 139-176
+api/cms/v1/internal/logic/updatemyprofilelogic.go
+  s_bbf609960902b0::t_e1ffb59f14c1f1 60
+  s_bbf609960902b0::t_d2c1ae23592eda 75-82,102-110
+  s_bbf609960902b0::t_fe10d334d262ff 13
+.gitignore
+  s_bbf609960902b0::t_202a816d2f5234 50-54
+ent/migrate/schema.go
+  s_bbf609960902b0::t_118faa4e44cd08 319,324,329,366,371
+api/cms/v1/cms.go
+  s_bbf609960902b0::t_4e0f1a53398359 58-59
+ent/internal/schema.go
+  s_bbf609960902b0::t_118faa4e44cd08 9
+ent/operationlog.go
+  s_bbf609960902b0::t_118faa4e44cd08 61
+api/cms/v1/internal/logic/operationloglistlogic.go
+  s_bbf609960902b0::t_4a09ddde7e74d4 43-50
+api/cms/v1/internal/logic/loginloglistlogic.go
+  s_bbf609960902b0::t_a6d8def92996cf 42-49
+ent/loginlog.go
+  s_bbf609960902b0::t_118faa4e44cd08 51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "b8a58f3b63fabb9c064a38e5cb17d75ce73f5a13",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 564
+    }
+  }
+}
