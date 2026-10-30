@@ -1,0 +1,180 @@
+web/index.html
+  s_bbf609960902b0::t_8608f631bed741 1-12
+ent/adminuser_create.go
+  s_bbf609960902b0::t_f8d2d9153592c0 220-247,366-369,406-413,507-514
+ent/mutation.go
+  s_bbf609960902b0::t_f8d2d9153592c0 3840-3871,4622-4726,4909,4955-4960,4999-5002,5042-5045,5160-5173,5182-5184,5193-5194,5204-5210,5243-5245,5284-5286,5340-5345
+web/src/api/upload.ts
+  s_bbf609960902b0::t_c9f06a0839a042 1-13
+api/cms/v1/internal/logic/loginlogic.go
+  s_bbf609960902b0::t_5125646d6e0c66 141
+  s_bbf609960902b0::t_1818455f7e16da 59-71,75,79-88,98-117
+  s_bbf609960902b0::t_f6587ca325e708 179-200
+  s_bbf609960902b0::t_ec043756d22441 5
+api/cms/v1/internal/config/config.go
+  s_bbf609960902b0::t_4671fe5fbdf725 19-22
+  s_bbf609960902b0::t_8bfd0995323e55 38-45
+  s_bbf609960902b0::t_009a0569bab775 46-49
+web/src/layout/index.vue
+  s_bbf609960902b0::t_b23f5c8b8fa77a 1-51
+web/src/utils/auth.ts
+  s_bbf609960902b0::t_ac4756bbfd3bb4 1-13
+  s_bbf609960902b0::t_645eb8d18685a7 14-27
+web/src/views/dashboard/index.vue
+  s_bbf609960902b0::t_e9b6019a3b5e3a 1-3,8-10,20-24,26,29-31,53-55,61
+  s_bbf609960902b0::t_51b4dbcd081253 4-7,11-19,25,27-28,32-52,56-60
+api/cms/v1/etc/cms-api.yaml
+  s_bbf609960902b0::t_ff9acd40fd7285 15-16
+  s_bbf609960902b0::t_2c001b02baf598 18-23
+web/.gitignore
+  s_bbf609960902b0::t_62213f107b8c45 1-7
+ent/adminuser/where.go
+  s_bbf609960902b0::t_f8d2d9153592c0 133-142,918-1007
+web/src/views/admin/permission/index.vue
+  s_bbf609960902b0::t_1c6a4c9344a4c7 1,52
+  s_bbf609960902b0::t_64a3cf357fd75f 2-51,53-148
+web/package.json
+  s_bbf609960902b0::t_9cd5f583f0d0a4 1-25
+ent/migrate/schema.go
+  s_bbf609960902b0::t_f8d2d9153592c0 181-182,194
+web/src/api/role.ts
+  s_bbf609960902b0::t_0cf961041adabc 3-20,23-34,37-58
+  s_bbf609960902b0::t_7cd615940c2254 1-2,21-22,35-36
+api/cms/v1/cms.go
+  h_a3f313f3d96276 52,54
+  s_bbf609960902b0::t_6edac11ca8331e 53
+  s_bbf609960902b0::t_afe01374f8d7ae 16
+web/src/views/login/index.vue
+  s_bbf609960902b0::t_5966898597d6de 1-29,31-64,67-110
+  s_bbf609960902b0::t_c0fdae6395a4bb 30
+  s_bbf609960902b0::t_b1d8da455ebc9d 65-66
+web/src/router/index.ts
+  s_bbf609960902b0::t_7d8f2970b73ac8 1-109,111,113-124
+  s_bbf609960902b0::t_1ec483f48d2c7a 110,112
+api/cms/v1/cms.api
+  s_bbf609960902b0::t_12e4a5422a1200 24-25
+  s_bbf609960902b0::t_c18f0fd6e4ac6e 49-56,80-83
+  s_bbf609960902b0::t_37c33b3722f0de 676-690
+ent/adminuser_update.go
+  s_bbf609960902b0::t_f8d2d9153592c0 284-324,481-485,564-575,977-1017,1187-1191,1287-1298
+api/cms/v1/internal/logic/cmslogic.go
+  s_bbf609960902b0::t_4454df1dd49f70 35-36
+web/src/views/system/log/operation.vue
+  s_bbf609960902b0::t_7e2fbd0931ded2 1-112
+web/src/utils/request.ts
+  s_bbf609960902b0::t_211d33aa39c158 1-41
+web/src/api/permission.ts
+  s_bbf609960902b0::t_6262a8d7a2a50b 3-56,59-61,63-75
+  s_bbf609960902b0::t_2729e9a579644d 1-2,57-58,62,76
+web/src/api/user.ts
+  s_bbf609960902b0::t_42898fa992c690 1-72
+web/src/api/dashboard.ts
+  s_bbf609960902b0::t_7efa4b352ad6be 1-15
+web/src/stores/user.ts
+  h_a3f313f3d96276 30,43-46,56,61
+  s_bbf609960902b0::t_315e4a592ca1b7 1-29,31-42,47-55,57-60,62-64
+docs/api.md
+  s_bbf609960902b0::t_2996ad0f305949 63-69,71-88,91
+  s_bbf609960902b0::t_657ccf70b7ccf0 369-404
+  s_bbf609960902b0::t_cc99097902c52e 55
+ent/schema/adminuser.go
+  s_bbf609960902b0::t_8c24a0d08b724b 95-104
+api/cms/v1/internal/handler/refreshtokenhandler.go
+  s_bbf609960902b0::t_227c7c43179049 1-28
+web/src/views/admin/dept/index.vue
+  s_bbf609960902b0::t_fea694c56b8c29 1,32
+  s_bbf609960902b0::t_20f2d2e9f825c6 2-31,33-115
+ent/runtime/runtime.go
+  s_bbf609960902b0::t_f8d2d9153592c0 232-237
+api/cms/v1/internal/logic/refreshtokenlogic.go
+  s_bbf609960902b0::t_125634061f7eba 1-89
+api/cms/v1/internal/logic/forgotpasswordlogic.go
+  s_bbf609960902b0::t_4c11d14bffbc73 78-91,95
+  s_bbf609960902b0::t_0cb165dc01b2c5 9
+api/cms/v1/internal/handler/dashboardstatshandler.go
+  s_bbf609960902b0::t_6cbd72c33d190c 1-9,11-21
+  s_bbf609960902b0::t_fe23fcd5a52c60 10
+api/cms/v1/internal/logic/dashboardstatslogic.go
+  s_bbf609960902b0::t_d3494fa97c9af6 35,37,42,46-47,51-52,63,70,80
+  s_bbf609960902b0::t_4a79dd2015aa5d 1-34,36,38-41,43-45,48-50,53-62,64-69,71-79,81-86
+api/cms/v1/internal/handler/routes.go
+  s_bbf609960902b0::t_cf9149c148c658 267-271
+  s_bbf609960902b0::t_c9a17031d60d50 39-43
+openapi.json
+  s_bbf609960902b0::t_f9dfb26e808a1e 1-1232
+ent/internal/schema.go
+  s_bbf609960902b0::t_f8d2d9153592c0 9
+web/tsconfig.node.json
+  s_bbf609960902b0::t_018301fa6d48d4 1-10
+Makefile
+  s_bbf609960902b0::t_0898f0a38042c7 1
+  h_a3f313f3d96276 59-61
+web/src/api/auth.ts
+  s_bbf609960902b0::t_bf83a6afbf6791 10-16
+  s_bbf609960902b0::t_f43bd9b05e5879 1-9,17-25
+web/src/views/system/log/login.vue
+  s_bbf609960902b0::t_0c4a92ffdf1dda 1-103
+api/cms/v1/internal/middleware/spa.go
+  s_bbf609960902b0::t_1fc5c6d24bcb92 1-7,10-17,22,24-29,31-52,55-70
+  s_bbf609960902b0::t_51ab453e9865cd 8-9,18-21,23,30,53-54
+web/src/views/admin/role/index.vue
+  s_bbf609960902b0::t_00277ae8fe8d3d 2-88,90-220
+  s_bbf609960902b0::t_0e97d04ff27c25 1,89
+web/src/layout/components/Sidebar.vue
+  s_bbf609960902b0::t_268d90ef972cbd 1-56
+web/src/views/admin/user/index.vue
+  s_bbf609960902b0::t_10d62d73dcd02d 1-313
+web/src/layout/components/Header.vue
+  s_bbf609960902b0::t_b5ff30a4a86c2a 1-68
+web/src/api/log.ts
+  s_bbf609960902b0::t_5f74a0a8ea2977 1-9
+web/vite.config.ts
+  s_bbf609960902b0::t_1323bd73000c47 1-22
+api/cms/v1/internal/types/types.go
+  s_bbf609960902b0::t_b15a8df91a1040 499-501,506-509
+  s_bbf609960902b0::t_941c1eb4a27c69 502-505
+  s_bbf609960902b0::t_86ac5a5301065d 213-222
+Dockerfile
+  s_bbf609960902b0::t_0ef71552c3c528 1-10,21,35,42-43
+.gitignore
+  s_bbf609960902b0::t_0f14a8603cb096 55-58
+cmd/apidoc/main.go
+  s_bbf609960902b0::t_048fdf5b0dc2cc 1-359
+ent/adminuser.go
+  s_bbf609960902b0::t_f8d2d9153592c0 52-55,111,115,233-245,351-358
+ent/adminuser/adminuser.go
+  s_bbf609960902b0::t_f8d2d9153592c0 48-51,99-100,143-146,234-243
+docker-compose.yml
+  h_a3f313f3d96276 39
+web/src/api/dept.ts
+  s_bbf609960902b0::t_bb3ee23a3c4475 3-27,29-41
+web/src/views/profile/index.vue
+  s_bbf609960902b0::t_b0afa6b0f52f47 1-123
+web/tsconfig.json
+  s_bbf609960902b0::t_28e3e5b8529031 1-21
+internal/common/error_code.go
+  s_bbf609960902b0::t_d2c415b35dddc6 21
+  s_bbf609960902b0::t_6883cc8eb9fd42 93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "1f4ffd7fce78ff16223f2f6adc5efb90e605e113",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 4900
+    }
+  }
+}
