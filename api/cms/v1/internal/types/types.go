@@ -210,7 +210,16 @@ type LoginReq struct {
 }
 
 type LoginResp struct {
-	Token string `json:"token"` // 登录成功返回 token
+	AccessToken  string `json:"access_token"`  // 访问令牌，短期有效
+	RefreshToken string `json:"refresh_token"` // 刷新令牌，长期有效
+}
+
+type RefreshTokenReq struct {
+	RefreshToken string `json:"refresh_token"` // 刷新令牌
+}
+
+type RefreshTokenResp struct {
+	AccessToken string `json:"access_token"` // 新的访问令牌
 }
 
 type MyMenuItem struct {
@@ -486,4 +495,15 @@ type UploadFileResp struct {
 	URL      string `json:"url"`
 	Filename string `json:"filename"`
 	Size     int64  `json:"size"`
+}
+
+// DashboardStatsResp 仪表盘统计数据
+type DashboardStatsResp struct {
+	AdminCount      int64 `json:"admin_count"`       // 管理员总数
+	DeptCount       int64 `json:"dept_count"`        // 部门总数
+	RoleCount       int64 `json:"role_count"`        // 角色总数
+	PermissionCount int64 `json:"permission_count"`  // 权限总数
+	TodayLoginCount int64 `json:"today_login_count"` // 今日登录成功次数
+	TodayFailLogin  int64 `json:"today_fail_login"`  // 今日登录失败次数
+	WeekOpCount     int64 `json:"week_op_count"`     // 近 7 天操作日志数
 }

@@ -32,6 +32,7 @@ func (l *CmsLogic) Cms() (resp *types.LoginResp, err error) {
 	// TODO: Implement your business logic here
 	// This is a placeholder implementation
 	return &types.LoginResp{
-		Token: "your-jwt-token-here",
+		AccessToken:  "your-jwt-token-here",
+		RefreshToken: "your-refresh-token-here",
 	}, nil
 }

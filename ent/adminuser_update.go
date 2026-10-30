@@ -281,6 +281,47 @@ func (_u *AdminUserUpdate) ClearResetExpire() *AdminUserUpdate {
 	return _u
 }
 
+// SetLoginFailCount sets the "login_fail_count" field.
+func (_u *AdminUserUpdate) SetLoginFailCount(v int) *AdminUserUpdate {
+	_u.mutation.ResetLoginFailCount()
+	_u.mutation.SetLoginFailCount(v)
+	return _u
+}
+
+// SetNillableLoginFailCount sets the "login_fail_count" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableLoginFailCount(v *int) *AdminUserUpdate {
+	if v != nil {
+		_u.SetLoginFailCount(*v)
+	}
+	return _u
+}
+
+// AddLoginFailCount adds value to the "login_fail_count" field.
+func (_u *AdminUserUpdate) AddLoginFailCount(v int) *AdminUserUpdate {
+	_u.mutation.AddLoginFailCount(v)
+	return _u
+}
+
+// SetLockedUntil sets the "locked_until" field.
+func (_u *AdminUserUpdate) SetLockedUntil(v time.Time) *AdminUserUpdate {
+	_u.mutation.SetLockedUntil(v)
+	return _u
+}
+
+// SetNillableLockedUntil sets the "locked_until" field if the given value is not nil.
+func (_u *AdminUserUpdate) SetNillableLockedUntil(v *time.Time) *AdminUserUpdate {
+	if v != nil {
+		_u.SetLockedUntil(*v)
+	}
+	return _u
+}
+
+// ClearLockedUntil clears the value of the "locked_until" field.
+func (_u *AdminUserUpdate) ClearLockedUntil() *AdminUserUpdate {
+	_u.mutation.ClearLockedUntil()
+	return _u
+}
+
 // SetDepartmentID sets the "department" edge to the Department entity by ID.
 func (_u *AdminUserUpdate) SetDepartmentID(id int64) *AdminUserUpdate {
 	_u.mutation.SetDepartmentID(id)
@@ -437,6 +478,11 @@ func (_u *AdminUserUpdate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "AdminUser.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.LoginFailCount(); ok {
+		if err := adminuser.LoginFailCountValidator(v); err != nil {
+			return &ValidationError{Name: "login_fail_count", err: fmt.Errorf(`ent: validator failed for field "AdminUser.login_fail_count": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -514,6 +560,18 @@ func (_u *AdminUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ResetExpireCleared() {
 		_spec.ClearField(adminuser.FieldResetExpire, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LoginFailCount(); ok {
+		_spec.SetField(adminuser.FieldLoginFailCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedLoginFailCount(); ok {
+		_spec.AddField(adminuser.FieldLoginFailCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.LockedUntil(); ok {
+		_spec.SetField(adminuser.FieldLockedUntil, field.TypeTime, value)
+	}
+	if _u.mutation.LockedUntilCleared() {
+		_spec.ClearField(adminuser.FieldLockedUntil, field.TypeTime)
 	}
 	if _u.mutation.DepartmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -916,6 +974,47 @@ func (_u *AdminUserUpdateOne) ClearResetExpire() *AdminUserUpdateOne {
 	return _u
 }
 
+// SetLoginFailCount sets the "login_fail_count" field.
+func (_u *AdminUserUpdateOne) SetLoginFailCount(v int) *AdminUserUpdateOne {
+	_u.mutation.ResetLoginFailCount()
+	_u.mutation.SetLoginFailCount(v)
+	return _u
+}
+
+// SetNillableLoginFailCount sets the "login_fail_count" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableLoginFailCount(v *int) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetLoginFailCount(*v)
+	}
+	return _u
+}
+
+// AddLoginFailCount adds value to the "login_fail_count" field.
+func (_u *AdminUserUpdateOne) AddLoginFailCount(v int) *AdminUserUpdateOne {
+	_u.mutation.AddLoginFailCount(v)
+	return _u
+}
+
+// SetLockedUntil sets the "locked_until" field.
+func (_u *AdminUserUpdateOne) SetLockedUntil(v time.Time) *AdminUserUpdateOne {
+	_u.mutation.SetLockedUntil(v)
+	return _u
+}
+
+// SetNillableLockedUntil sets the "locked_until" field if the given value is not nil.
+func (_u *AdminUserUpdateOne) SetNillableLockedUntil(v *time.Time) *AdminUserUpdateOne {
+	if v != nil {
+		_u.SetLockedUntil(*v)
+	}
+	return _u
+}
+
+// ClearLockedUntil clears the value of the "locked_until" field.
+func (_u *AdminUserUpdateOne) ClearLockedUntil() *AdminUserUpdateOne {
+	_u.mutation.ClearLockedUntil()
+	return _u
+}
+
 // SetDepartmentID sets the "department" edge to the Department entity by ID.
 func (_u *AdminUserUpdateOne) SetDepartmentID(id int64) *AdminUserUpdateOne {
 	_u.mutation.SetDepartmentID(id)
@@ -1085,6 +1184,11 @@ func (_u *AdminUserUpdateOne) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "AdminUser.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.LoginFailCount(); ok {
+		if err := adminuser.LoginFailCountValidator(v); err != nil {
+			return &ValidationError{Name: "login_fail_count", err: fmt.Errorf(`ent: validator failed for field "AdminUser.login_fail_count": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -1179,6 +1283,18 @@ func (_u *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, er
 	}
 	if _u.mutation.ResetExpireCleared() {
 		_spec.ClearField(adminuser.FieldResetExpire, field.TypeTime)
+	}
+	if value, ok := _u.mutation.LoginFailCount(); ok {
+		_spec.SetField(adminuser.FieldLoginFailCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedLoginFailCount(); ok {
+		_spec.AddField(adminuser.FieldLoginFailCount, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.LockedUntil(); ok {
+		_spec.SetField(adminuser.FieldLockedUntil, field.TypeTime, value)
+	}
+	if _u.mutation.LockedUntilCleared() {
+		_spec.ClearField(adminuser.FieldLockedUntil, field.TypeTime)
 	}
 	if _u.mutation.DepartmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

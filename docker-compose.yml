@@ -36,6 +36,7 @@ services:
     command: ["/app/cms", "-f", "etc/cms-api.yaml"]
     environment:
       TZ: Asia/Shanghai
+      WEB_DIST: "/app/web/dist"
       MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
     ports:
       - "8888:8888"

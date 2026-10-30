@@ -229,6 +229,12 @@ func init() {
 	adminuserDescIsActive := adminuserFields[9].Descriptor()
 	// adminuser.DefaultIsActive holds the default value on creation for the is_active field.
 	adminuser.DefaultIsActive = adminuserDescIsActive.Default.(bool)
+	// adminuserDescLoginFailCount is the schema descriptor for login_fail_count field.
+	adminuserDescLoginFailCount := adminuserFields[13].Descriptor()
+	// adminuser.DefaultLoginFailCount holds the default value on creation for the login_fail_count field.
+	adminuser.DefaultLoginFailCount = adminuserDescLoginFailCount.Default.(int)
+	// adminuser.LoginFailCountValidator is a validator for the "login_fail_count" field. It is called by the builders before save.
+	adminuser.LoginFailCountValidator = adminuserDescLoginFailCount.Validators[0].(func(int) error)
 	// adminuserDescID is the schema descriptor for id field.
 	adminuserDescID := adminuserFields[0].Descriptor()
 	// adminuser.IDValidator is a validator for the "id" field. It is called by the builders before save.

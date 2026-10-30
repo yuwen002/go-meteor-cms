@@ -52,3 +52,7 @@ cmd/**/dist/
 public/uploads/*
 !public/uploads/avatars/
 !public/uploads/avatars/meteor-default.jpg
+
+# 前端依赖与构建产物
+node_modules/
+web/dist

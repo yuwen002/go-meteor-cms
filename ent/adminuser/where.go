@@ -130,6 +130,16 @@ func ResetExpire(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldResetExpire, v))
 }
 
+// LoginFailCount applies equality check predicate on the "login_fail_count" field. It's identical to LoginFailCountEQ.
+func LoginFailCount(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldLoginFailCount, v))
+}
+
+// LockedUntil applies equality check predicate on the "locked_until" field. It's identical to LockedUntilEQ.
+func LockedUntil(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldLockedUntil, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldCreatedAt, v))
@@ -903,6 +913,96 @@ func ResetExpireIsNil() predicate.AdminUser {
 // ResetExpireNotNil applies the NotNil predicate on the "reset_expire" field.
 func ResetExpireNotNil() predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldNotNull(FieldResetExpire))
+}
+
+// LoginFailCountEQ applies the EQ predicate on the "login_fail_count" field.
+func LoginFailCountEQ(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldLoginFailCount, v))
+}
+
+// LoginFailCountNEQ applies the NEQ predicate on the "login_fail_count" field.
+func LoginFailCountNEQ(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldLoginFailCount, v))
+}
+
+// LoginFailCountIn applies the In predicate on the "login_fail_count" field.
+func LoginFailCountIn(vs ...int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldLoginFailCount, vs...))
+}
+
+// LoginFailCountNotIn applies the NotIn predicate on the "login_fail_count" field.
+func LoginFailCountNotIn(vs ...int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldLoginFailCount, vs...))
+}
+
+// LoginFailCountGT applies the GT predicate on the "login_fail_count" field.
+func LoginFailCountGT(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldLoginFailCount, v))
+}
+
+// LoginFailCountGTE applies the GTE predicate on the "login_fail_count" field.
+func LoginFailCountGTE(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldLoginFailCount, v))
+}
+
+// LoginFailCountLT applies the LT predicate on the "login_fail_count" field.
+func LoginFailCountLT(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldLoginFailCount, v))
+}
+
+// LoginFailCountLTE applies the LTE predicate on the "login_fail_count" field.
+func LoginFailCountLTE(v int) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldLoginFailCount, v))
+}
+
+// LockedUntilEQ applies the EQ predicate on the "locked_until" field.
+func LockedUntilEQ(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldLockedUntil, v))
+}
+
+// LockedUntilNEQ applies the NEQ predicate on the "locked_until" field.
+func LockedUntilNEQ(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldLockedUntil, v))
+}
+
+// LockedUntilIn applies the In predicate on the "locked_until" field.
+func LockedUntilIn(vs ...time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldLockedUntil, vs...))
+}
+
+// LockedUntilNotIn applies the NotIn predicate on the "locked_until" field.
+func LockedUntilNotIn(vs ...time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldLockedUntil, vs...))
+}
+
+// LockedUntilGT applies the GT predicate on the "locked_until" field.
+func LockedUntilGT(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldLockedUntil, v))
+}
+
+// LockedUntilGTE applies the GTE predicate on the "locked_until" field.
+func LockedUntilGTE(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldLockedUntil, v))
+}
+
+// LockedUntilLT applies the LT predicate on the "locked_until" field.
+func LockedUntilLT(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldLockedUntil, v))
+}
+
+// LockedUntilLTE applies the LTE predicate on the "locked_until" field.
+func LockedUntilLTE(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldLockedUntil, v))
+}
+
+// LockedUntilIsNil applies the IsNil predicate on the "locked_until" field.
+func LockedUntilIsNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIsNull(FieldLockedUntil))
+}
+
+// LockedUntilNotNil applies the NotNil predicate on the "locked_until" field.
+func LockedUntilNotNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotNull(FieldLockedUntil))
 }
 
 // HasDepartment applies the HasEdge predicate on the "department" edge.

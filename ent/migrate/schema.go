@@ -178,6 +178,8 @@ var (
 		{Name: "last_login_at", Type: field.TypeTime, Nullable: true, Comment: "最后登录时间"},
 		{Name: "reset_token", Type: field.TypeString, Nullable: true, Comment: "密码重置令牌"},
 		{Name: "reset_expire", Type: field.TypeTime, Nullable: true, Comment: "密码重置令牌过期时间"},
+		{Name: "login_fail_count", Type: field.TypeInt, Comment: "连续登录失败次数，达到阈值后锁定账号", Default: 0},
+		{Name: "locked_until", Type: field.TypeTime, Nullable: true, Comment: "账号锁定截止时间，过期前禁止登录（NULL 表示未锁定）"},
 		{Name: "dept_id", Type: field.TypeInt64, Nullable: true, Comment: "所属部门ID"},
 	}
 	// AdminUsersTable holds the schema information for the "admin_users" table.
@@ -189,7 +191,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "admin_users_departments_admin_users",
-				Columns:    []*schema.Column{AdminUsersColumns[15]},
+				Columns:    []*schema.Column{AdminUsersColumns[17]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

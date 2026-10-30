@@ -12,6 +12,15 @@ Database:
 Auth:
   AccessSecret: "8x!A%D*G-KaPdSgVkYp3s6v9y$B?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2"   # 用于签发 Token
   AccessExpire: 86400             # Token 有效期，单位秒
+  RefreshSecret: "rEfReSh-6KpVq2Jx!YmN3sLz8Wb@TcE5HgU7DfA1"   # 刷新令牌专用密钥，与 AccessSecret 区分
+  RefreshExpire: 604800          # 刷新令牌有效期，单位秒（默认 7 天）
+
+Login:
+  MaxFailCount: 5                 # 连续登录失败达到该次数后锁定账号
+  LockMinutes: 15                 # 锁定持续时间（分钟）
+
+# 前端站点地址，用于拼接找回密码等邮件中的跳转链接；留空则仅下发裸令牌
+WebBaseURL: ""
 
 Maintenance:
   TokenBlacklistCleanInterval: 3600   # 过期 token 黑名单清理间隔（秒），<=0 时按 3600 处理

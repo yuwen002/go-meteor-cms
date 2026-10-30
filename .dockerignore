@@ -10,3 +10,7 @@ docs
 *.log
 coverage.out
 README.md
+
+# 前端依赖与构建产物不应进入后端构建上下文
+web/node_modules
+web/dist

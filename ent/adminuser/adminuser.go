@@ -45,6 +45,10 @@ const (
 	FieldResetToken = "reset_token"
 	// FieldResetExpire holds the string denoting the reset_expire field in the database.
 	FieldResetExpire = "reset_expire"
+	// FieldLoginFailCount holds the string denoting the login_fail_count field in the database.
+	FieldLoginFailCount = "login_fail_count"
+	// FieldLockedUntil holds the string denoting the locked_until field in the database.
+	FieldLockedUntil = "locked_until"
 	// EdgeDepartment holds the string denoting the department edge name in mutations.
 	EdgeDepartment = "department"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
@@ -92,6 +96,8 @@ var Columns = []string{
 	FieldLastLoginAt,
 	FieldResetToken,
 	FieldResetExpire,
+	FieldLoginFailCount,
+	FieldLockedUntil,
 }
 
 var (
@@ -134,6 +140,10 @@ var (
 	DefaultIsSuper bool
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
 	DefaultIsActive bool
+	// DefaultLoginFailCount holds the default value on creation for the "login_fail_count" field.
+	DefaultLoginFailCount int
+	// LoginFailCountValidator is a validator for the "login_fail_count" field. It is called by the builders before save.
+	LoginFailCountValidator func(int) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(int64) error
 )
@@ -219,6 +229,16 @@ func ByResetToken(opts ...sql.OrderTermOption) OrderOption {
 // ByResetExpire orders the results by the reset_expire field.
 func ByResetExpire(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldResetExpire, opts...).ToFunc()
+}
+
+// ByLoginFailCount orders the results by the login_fail_count field.
+func ByLoginFailCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLoginFailCount, opts...).ToFunc()
+}
+
+// ByLockedUntil orders the results by the locked_until field.
+func ByLockedUntil(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLockedUntil, opts...).ToFunc()
 }
 
 // ByDepartmentField orders the results by department field.

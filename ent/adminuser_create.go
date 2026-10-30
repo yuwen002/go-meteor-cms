@@ -217,6 +217,34 @@ func (_c *AdminUserCreate) SetNillableResetExpire(v *time.Time) *AdminUserCreate
 	return _c
 }
 
+// SetLoginFailCount sets the "login_fail_count" field.
+func (_c *AdminUserCreate) SetLoginFailCount(v int) *AdminUserCreate {
+	_c.mutation.SetLoginFailCount(v)
+	return _c
+}
+
+// SetNillableLoginFailCount sets the "login_fail_count" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableLoginFailCount(v *int) *AdminUserCreate {
+	if v != nil {
+		_c.SetLoginFailCount(*v)
+	}
+	return _c
+}
+
+// SetLockedUntil sets the "locked_until" field.
+func (_c *AdminUserCreate) SetLockedUntil(v time.Time) *AdminUserCreate {
+	_c.mutation.SetLockedUntil(v)
+	return _c
+}
+
+// SetNillableLockedUntil sets the "locked_until" field if the given value is not nil.
+func (_c *AdminUserCreate) SetNillableLockedUntil(v *time.Time) *AdminUserCreate {
+	if v != nil {
+		_c.SetLockedUntil(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *AdminUserCreate) SetID(v int64) *AdminUserCreate {
 	_c.mutation.SetID(v)
@@ -335,6 +363,10 @@ func (_c *AdminUserCreate) defaults() error {
 		v := adminuser.DefaultIsActive
 		_c.mutation.SetIsActive(v)
 	}
+	if _, ok := _c.mutation.LoginFailCount(); !ok {
+		v := adminuser.DefaultLoginFailCount
+		_c.mutation.SetLoginFailCount(v)
+	}
 	return nil
 }
 
@@ -370,6 +402,14 @@ func (_c *AdminUserCreate) check() error {
 	}
 	if _, ok := _c.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "AdminUser.is_active"`)}
+	}
+	if _, ok := _c.mutation.LoginFailCount(); !ok {
+		return &ValidationError{Name: "login_fail_count", err: errors.New(`ent: missing required field "AdminUser.login_fail_count"`)}
+	}
+	if v, ok := _c.mutation.LoginFailCount(); ok {
+		if err := adminuser.LoginFailCountValidator(v); err != nil {
+			return &ValidationError{Name: "login_fail_count", err: fmt.Errorf(`ent: validator failed for field "AdminUser.login_fail_count": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := adminuser.IDValidator(v); err != nil {
@@ -463,6 +503,14 @@ func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ResetExpire(); ok {
 		_spec.SetField(adminuser.FieldResetExpire, field.TypeTime, value)
 		_node.ResetExpire = &value
+	}
+	if value, ok := _c.mutation.LoginFailCount(); ok {
+		_spec.SetField(adminuser.FieldLoginFailCount, field.TypeInt, value)
+		_node.LoginFailCount = value
+	}
+	if value, ok := _c.mutation.LockedUntil(); ok {
+		_spec.SetField(adminuser.FieldLockedUntil, field.TypeTime, value)
+		_node.LockedUntil = &value
 	}
 	if nodes := _c.mutation.DepartmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

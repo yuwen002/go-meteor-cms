@@ -6,6 +6,7 @@ package logic
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -74,14 +75,24 @@ func (l *ForgotPasswordLogic) ForgotPassword(req *types.ForgotPasswordReq) (resp
 	}
 
 	// 4. 发送邮件（未配置 SMTP 时降级为控制台输出）
+	// 若配置了 WebBaseURL，邮件直接给出可点击的重置链接；否则仅下发裸令牌，由前端自行拼接。
+	var body string
+	if link := l.svcCtx.Config.WebBaseURL; link != "" {
+		resetLink := strings.TrimRight(link, "/") + "/reset-password?token=" + resetToken
+		body = fmt.Sprintf(
+			"你好，%s：\n\n我们收到了重置你账号密码的请求。\n\n请点击下面链接（1 小时内有效）完成密码重置：\n%s\n\n如果这不是你本人的操作，请忽略本邮件，你的密码不会被修改。\n",
+			u.Username, resetLink,
+		)
+	} else {
+		body = fmt.Sprintf(
+			"你好，%s：\n\n我们收到了重置你账号密码的请求。\n\n请在 1 小时内使用下面的重置令牌完成密码重置：\n\n%s\n\n如果这不是你本人的操作，请忽略本邮件，你的密码不会被修改。\n",
+			u.Username, resetToken,
+		)
+	}
 	err = l.svcCtx.MailSender.Send(mail.Message{
 		To:      []string{u.Email},
 		Subject: "【Go Meteor CMS】重置密码",
-		Body: fmt.Sprintf(
-			"你好，%s：\n\n我们收到了重置你账号密码的请求。\n\n请在 1 小时内使用下面的重置令牌完成密码重置：\n\n%s\n\n如果这不是你本人的操作，请忽略本邮件，你的密码不会被修改。\n",
-			u.Username,
-			resetToken,
-		),
+		Body:    body,
 	})
 	if err != nil {
 		l.Logger.Errorf("发送重置密码邮件失败: %v", err)

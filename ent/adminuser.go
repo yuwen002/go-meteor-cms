@@ -49,6 +49,10 @@ type AdminUser struct {
 	ResetToken *string `json:"reset_token,omitempty"`
 	// 密码重置令牌过期时间
 	ResetExpire *time.Time `json:"reset_expire,omitempty"`
+	// 连续登录失败次数，达到阈值后锁定账号
+	LoginFailCount int `json:"login_fail_count,omitempty"`
+	// 账号锁定截止时间，过期前禁止登录（NULL 表示未锁定）
+	LockedUntil *time.Time `json:"locked_until,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AdminUserQuery when eager-loading is set.
 	Edges        AdminUserEdges `json:"edges"`
@@ -104,11 +108,11 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case adminuser.FieldIsSuper, adminuser.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case adminuser.FieldID, adminuser.FieldDeptID:
+		case adminuser.FieldID, adminuser.FieldDeptID, adminuser.FieldLoginFailCount:
 			values[i] = new(sql.NullInt64)
 		case adminuser.FieldUsername, adminuser.FieldPasswordHash, adminuser.FieldNickname, adminuser.FieldEmail, adminuser.FieldPhone, adminuser.FieldAvatar, adminuser.FieldResetToken:
 			values[i] = new(sql.NullString)
-		case adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt, adminuser.FieldDeletedAt, adminuser.FieldLastLoginAt, adminuser.FieldResetExpire:
+		case adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt, adminuser.FieldDeletedAt, adminuser.FieldLastLoginAt, adminuser.FieldResetExpire, adminuser.FieldLockedUntil:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -226,6 +230,19 @@ func (_m *AdminUser) assignValues(columns []string, values []any) error {
 				_m.ResetExpire = new(time.Time)
 				*_m.ResetExpire = value.Time
 			}
+		case adminuser.FieldLoginFailCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field login_fail_count", values[i])
+			} else if value.Valid {
+				_m.LoginFailCount = int(value.Int64)
+			}
+		case adminuser.FieldLockedUntil:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field locked_until", values[i])
+			} else if value.Valid {
+				_m.LockedUntil = new(time.Time)
+				*_m.LockedUntil = value.Time
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -329,6 +346,14 @@ func (_m *AdminUser) String() string {
 	builder.WriteString(", ")
 	if v := _m.ResetExpire; v != nil {
 		builder.WriteString("reset_expire=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("login_fail_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LoginFailCount))
+	builder.WriteString(", ")
+	if v := _m.LockedUntil; v != nil {
+		builder.WriteString("locked_until=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteByte(')')

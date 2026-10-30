@@ -37,6 +37,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: resetPasswordByTokenHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodPost,
+					Path:    "/admin/refresh",
+					Handler: refreshTokenHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodGet,
 					Path:    "/api/captcha",
 					Handler: GetCaptchaHandler(serverCtx),
@@ -258,6 +263,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/admin/upload",
 					Handler: uploadFileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/dashboard/stats",
+					Handler: dashboardStatsHandler(serverCtx),
 				},
 			}...,
 		),

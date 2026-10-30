@@ -16,8 +16,10 @@ type Config struct {
 		Source string
 	}
 	Auth struct {
-		AccessSecret string
-		AccessExpire int64
+		AccessSecret  string
+		AccessExpire  int64
+		RefreshSecret string // 刷新令牌专用密钥，与 AccessSecret 区分，避免 access 泄露后 refresh 被冒用
+		RefreshExpire int64  `json:",default=604800"` // 刷新令牌有效期，单位秒（默认 7 天）
 	}
 	Mail struct {
 		Enabled  bool
@@ -33,5 +35,16 @@ type Config struct {
 		// AuditLogRetentionDays 操作/登录日志保留天数，<=0 表示永久保留（不清理）
 		AuditLogRetentionDays int `json:",default=90"`
 	}
-	Upload baseconfig.Upload
+	Login struct {
+		// MaxFailCount 连续登录失败达到该次数后锁定账号，<=0 时不启用锁定
+		MaxFailCount int `json:",default=5"`
+		// LockMinutes 锁定持续时间（分钟），<=0 时按 15 处理
+		LockMinutes int `json:",default=15"`
+	}
+	// WebBaseURL 前端站点地址，用于拼接找回密码等邮件中的跳转链接；为空时仅下发裸令牌
+	WebBaseURL string
+	// StaticDir 前端构建产物（dist）目录；非空时由本服务直接托管 SPA（含 history 路由回退）。
+	// 容器化部署通常通过环境变量 WEB_DIST 注入，本地开发留空即可（仅暴露 API）。
+	StaticDir string
+	Upload    baseconfig.Upload
 }

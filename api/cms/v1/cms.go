@@ -13,6 +13,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/config"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/handler"
+	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/middleware"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/internal/pkg/cleanup"
 
@@ -35,6 +36,10 @@ func main() {
 	if dsn := os.Getenv("MYSQL_DSN"); dsn != "" {
 		c.Database.Source = dsn
 	}
+	// 前端构建产物目录：容器化部署时通过 WEB_DIST 注入，本地开发留空（仅暴露 API）
+	if dir := os.Getenv("WEB_DIST"); dir != "" {
+		c.StaticDir = dir
+	}
 
 	// 静态资源：让 public/uploads 下的文件可通过 /uploads/xxx 访问。
 	// WithFileServer 是 RunOption，必须在创建 server 时传入；它仅拦截 GET 且
@@ -43,6 +48,9 @@ func main() {
 	server := rest.MustNewServer(c.RestConf,
 		rest.WithFileServer(uploadURLPrefix, http.Dir(uploadDir)))
 	defer server.Stop()
+
+	// 若配置了前端产物目录，则直接托管 SPA（含 history 路由回退）
+	server.Use(middleware.NewSPAMiddleware(c.StaticDir))
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

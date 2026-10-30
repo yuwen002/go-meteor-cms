@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
@@ -55,10 +56,34 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
+	// 账号是否处于锁定状态（连续登录失败过多）
+	if user.LockedUntil != nil && user.LockedUntil.After(time.Now()) {
+		remaining := int(time.Until(*user.LockedUntil).Minutes())
+		if remaining < 1 {
+			remaining = 1
+		}
+		l.recordLoginLog(user.ID, user.Username, "账号已锁定")
+		return nil, common.NewBizErrorWithMsg(
+			common.ErrAccountLocked,
+			fmt.Sprintf("账号已被临时锁定，请 %d 分钟后再试", remaining),
+		)
+	}
+
 	// 验证密码
 	if !utils.CheckPassword(user.PasswordHash, req.Password) {
 		l.recordLoginLog(user.ID, user.Username, "密码错误")
+		l.increaseLoginFail(user)
 		return nil, common.NewBizError(common.ErrLoginFailed)
+	}
+
+	// 密码正确：清零失败计数与锁定时间
+	if user.LoginFailCount > 0 || user.LockedUntil != nil {
+		if _, e := l.svcCtx.EntClient.AdminUser.UpdateOneID(user.ID).
+			SetLoginFailCount(0).
+			ClearLockedUntil().
+			Save(l.ctx); e != nil {
+			logx.Errorf("登录成功后重置失败计数失败: %v", e)
+		}
 	}
 
 	// 检查用户账号是否激活
@@ -70,16 +95,26 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	// 登录成功
 	l.recordLoginLogSuccess(user.ID, user.Username)
 
-	// 签发 JWT
-	tokenStr, err := utils.GenerateToken(l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire, map[string]interface{}{
-		"user_id":    user.ID,           // 用户ID
-		"username":   user.Username,     // 用户名
-		"nickname":   user.Nickname,     // 用户昵称
-		"email":      user.Email,        // 邮箱
-		"phone":      user.Phone,        // 手机号
-		"is_super":   user.IsSuper,      // 是否超级管理员
-		"is_active":  user.IsActive,     // 是否激活
-		"login_time": time.Now().Unix(), // 登录时间戳
+	// 签发访问令牌（短期有效）
+	accessToken, err := utils.GenerateToken(l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire, map[string]interface{}{
+		"user_id":    user.ID,
+		"username":   user.Username,
+		"nickname":   user.Nickname,
+		"email":      user.Email,
+		"phone":      user.Phone,
+		"is_super":   user.IsSuper,
+		"is_active":  user.IsActive,
+		"login_time": time.Now().Unix(),
+	})
+	if err != nil {
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	// 签发刷新令牌（长期有效，token_type 固定为 refresh，防止被当作 access 使用）
+	refreshToken, err := utils.GenerateToken(l.svcCtx.Config.Auth.RefreshSecret, l.svcCtx.Config.Auth.RefreshExpire, map[string]interface{}{
+		"user_id":    user.ID,
+		"username":   user.Username,
+		"token_type": "refresh",
 	})
 	if err != nil {
 		return nil, common.NewBizError(common.ErrInternalServer)
@@ -103,7 +138,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 		}
 	}()
 
-	return &types.LoginResp{Token: tokenStr}, nil
+	return &types.LoginResp{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
 
 // recordLoginLogSuccess 记录一次成功的登录
@@ -140,4 +175,26 @@ func (l *LoginLogic) saveLoginLog(userID int64, username string, status int, rea
 			logx.WithContext(ctx).Errorf("写入登录日志失败: %v", err)
 		}
 	}()
+}
+
+// increaseLoginFail 登录失败后累加失败次数；达到阈值（Login.MaxFailCount）时锁定账号一段时间。
+// 锁定判定在 Login 入口处完成，这里只负责写计数与锁定时间。
+func (l *LoginLogic) increaseLoginFail(user *ent.AdminUser) {
+	maxFail := l.svcCtx.Config.Login.MaxFailCount
+	if maxFail <= 0 {
+		return // 未启用锁定
+	}
+	lockMin := l.svcCtx.Config.Login.LockMinutes
+	if lockMin <= 0 {
+		lockMin = 15
+	}
+
+	newCount := user.LoginFailCount + 1
+	update := l.svcCtx.EntClient.AdminUser.UpdateOneID(user.ID).SetLoginFailCount(newCount)
+	if newCount >= maxFail {
+		update = update.SetLockedUntil(time.Now().Add(time.Duration(lockMin) * time.Minute))
+	}
+	if _, err := update.Save(l.ctx); err != nil {
+		logx.Errorf("更新登录失败计数失败: %v", err)
+	}
 }

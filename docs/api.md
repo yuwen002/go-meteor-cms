@@ -52,6 +52,7 @@ Authorization: Bearer <token>
 | POST | `/admin/register` | 注册管理员 |
 | POST | `/admin/forgot-password` | 申请密码重置令牌（账号不存在也返回成功，防账号枚举） |
 | POST | `/admin/reset-password` | 用令牌设置新密码，令牌一次性、1 小时有效 |
+| POST | `/admin/refresh` | 用 refresh_token 换取新的 access_token |
 
 ### 登录
 
@@ -59,10 +60,35 @@ Authorization: Bearer <token>
 // 请求
 { "username": "admin", "password": "123456", "captcha_id": "xxx", "captcha": "1234" }
 // 响应
-{ "code": 0, "msg": "success", "data": { "token": "xxx", "expire": 1750000000 } }
+{
+  "code": 0, "msg": "success",
+  "data": {
+    "access_token": "eyJhbGci...（短期，默认 24h）",
+    "refresh_token": "eyJhbGci...（长期，默认 7d，用于刷新）"
+  }
+}
 ```
 
-失败场景：`4001` 参数缺失、`2006` 验证码错误、`2010` 用户名或密码错误、`2007` 账号未激活。
+失败场景：`4001` 参数缺失、`2006` 验证码错误、`2010` 用户名或密码错误、`2007` 账号未激活、`2011` 账号已被临时锁定。
+
+> **登录失败锁定**：连续登录失败次数达到 `Login.MaxFailCount`（默认 5）后，账号被锁定 `Login.LockMinutes`（默认 15）分钟；锁定期间登录返回 `2011` 并提示剩余锁定分钟数。登录成功后自动清零失败计数。该机制仅针对已存在的账号，账号不存在时不计数（避免被用于探测账号是否存在）。
+>
+> **令牌刷新**：access_token 过期后，用登录时拿到的 refresh_token 调用 `POST /admin/refresh` 换取新的 access_token，无需重新登录。refresh_token 与 access_token 使用不同密钥签发，且携带 `token_type=refresh` 标识，不可互换。
+
+### 刷新令牌
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| POST | `/admin/refresh` | 用 refresh_token 换取新的 access_token |
+
+```json
+// 请求
+{ "refresh_token": "eyJhbGci..." }
+// 响应
+{ "code": 0, "msg": "success", "data": { "access_token": "eyJhbGci..." } }
+```
+
+> 刷新令牌使用独立密钥（`Auth.RefreshSecret`）与更长有效期（`Auth.RefreshExpire`，默认 7 天）。用户被删除或禁用时刷新立即失效。刷新接口本身**不要求** access_token 鉴权。
 
 ### 图形验证码
 
@@ -339,4 +365,40 @@ Authorization: Bearer <token>
 
 > 回填头像：把返回的 `url` 通过 `PUT /admin/profile` 的 `avatar` 字段更新即可；更新头像时会自动清理旧头像文件（默认头像除外）。
 > 上传目录（`public/uploads/*`，默认头像除外）已在 `.gitignore` 忽略，避免运行时文件污染仓库。
+
+---
+
+## 仪表盘统计
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/admin/dashboard/stats` | 后台首页统计指标，需登录（JWT 鉴权） |
+
+### GET `/admin/dashboard/stats`
+
+聚合常用运营指标，单项统计失败不影响其余字段返回（失败项记日志、值为 0）。
+
+**响应 data**：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| admin_count | int64 | 管理员总数（admin_users） |
+| dept_count | int64 | 部门总数（departments） |
+| role_count | int64 | 角色总数（admin_roles） |
+| permission_count | int64 | 权限总数（admin_permissions） |
+| today_login_count | int64 | 今日登录成功次数（login_logs.status=0 且 login_at 为今日） |
+| today_fail_login | int64 | 今日登录失败次数（login_logs.status=1 且 login_at 为今日） |
+| week_op_count | int64 | 近 7 天操作日志数（operation_logs.created_at 在 7 天内） |
+
+**示例**：
+
+```json
+{
+  "code": 0, "msg": "success",
+  "data": {
+    "admin_count": 3, "dept_count": 5, "role_count": 4, "permission_count": 42,
+    "today_login_count": 12, "today_fail_login": 1, "week_op_count": 318
+  }
+}
+```
 

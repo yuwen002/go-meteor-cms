@@ -21,7 +21,8 @@ type (
 	}
 	// 登录响应
 	LoginResp {
-		Token string `json:"token"` // 登录成功返回 token
+		AccessToken  string `json:"access_token"`  // 访问令牌，短期有效
+		RefreshToken string `json:"refresh_token"` // 刷新令牌，长期有效，用于换取新的访问令牌
 	}
 	// 忘记密码接口
 	ForgotPasswordReq {
@@ -44,6 +45,14 @@ type (
 	ResetPasswordByTokenReq {
 		Token       string `json:"token" validate:"required"` // 重置令牌
 		NewPassword string `json:"new_password" validate:"required,min=6"` // 新密码，至少 6 位
+	}
+	// 刷新访问令牌请求
+	RefreshTokenReq {
+		RefreshToken string `json:"refresh_token" validate:"required"` // 刷新令牌
+	}
+	// 刷新访问令牌响应
+	RefreshTokenResp {
+		AccessToken string `json:"access_token"` // 新的访问令牌
 	}
 )
 
@@ -68,6 +77,10 @@ service cms-api {
 	// 通过邮件中的重置令牌设置新密码（忘记密码流程的第二步）
 	@handler resetPasswordByToken
 	post /admin/reset-password (ResetPasswordByTokenReq) returns (RegisterResp)
+
+	// 使用刷新令牌换取新的访问令牌（无需 access token）
+	@handler refreshToken
+	post /admin/refresh (RefreshTokenReq) returns (RefreshTokenResp)
 }
 
 type (
@@ -660,5 +673,20 @@ service cms-api {
 	// 上传文件（头像等）
 	@handler uploadFile
 	post /admin/upload returns (UploadFileResp)
+
+	// 仪表盘统计数据
+	@handler dashboardStats
+	get /admin/dashboard/stats returns (DashboardStatsResp)
+}
+
+// 仪表盘统计数据
+type DashboardStatsResp {
+	AdminCount      int64 `json:"admin_count"`
+	DeptCount       int64 `json:"dept_count"`
+	RoleCount       int64 `json:"role_count"`
+	PermissionCount int64 `json:"permission_count"`
+	TodayLoginCount int64 `json:"today_login_count"`
+	TodayFailLogin  int64 `json:"today_fail_login"`
+	WeekOpCount     int64 `json:"week_op_count"`
 }
 

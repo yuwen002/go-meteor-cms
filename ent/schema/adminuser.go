@@ -92,6 +92,16 @@ func (AdminUser) Fields() []ent.Field {
 			Comment("密码重置令牌过期时间").
 			Optional().
 			Nillable(),
+
+		field.Int("login_fail_count").
+			Comment("连续登录失败次数，达到阈值后锁定账号").
+			Default(0).
+			NonNegative(),
+
+		field.Time("locked_until").
+			Comment("账号锁定截止时间，过期前禁止登录（NULL 表示未锁定）").
+			Optional().
+			Nillable(),
 	}
 }
 

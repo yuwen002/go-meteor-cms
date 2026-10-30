@@ -3837,35 +3837,38 @@ func (m *AdminRolePermissionMutation) ResetEdge(name string) error {
 // AdminUserMutation represents an operation that mutates the AdminUser nodes in the graph.
 type AdminUserMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int64
-	created_at        *time.Time
-	updated_at        *time.Time
-	deleted_at        *time.Time
-	username          *string
-	password_hash     *string
-	nickname          *string
-	email             *string
-	phone             *string
-	avatar            *string
-	is_super          *bool
-	is_active         *bool
-	last_login_at     *time.Time
-	reset_token       *string
-	reset_expire      *time.Time
-	clearedFields     map[string]struct{}
-	department        *int64
-	cleareddepartment bool
-	roles             map[int64]struct{}
-	removedroles      map[int64]struct{}
-	clearedroles      bool
-	user_roles        map[int64]struct{}
-	removeduser_roles map[int64]struct{}
-	cleareduser_roles bool
-	done              bool
-	oldValue          func(context.Context) (*AdminUser, error)
-	predicates        []predicate.AdminUser
+	op                  Op
+	typ                 string
+	id                  *int64
+	created_at          *time.Time
+	updated_at          *time.Time
+	deleted_at          *time.Time
+	username            *string
+	password_hash       *string
+	nickname            *string
+	email               *string
+	phone               *string
+	avatar              *string
+	is_super            *bool
+	is_active           *bool
+	last_login_at       *time.Time
+	reset_token         *string
+	reset_expire        *time.Time
+	login_fail_count    *int
+	addlogin_fail_count *int
+	locked_until        *time.Time
+	clearedFields       map[string]struct{}
+	department          *int64
+	cleareddepartment   bool
+	roles               map[int64]struct{}
+	removedroles        map[int64]struct{}
+	clearedroles        bool
+	user_roles          map[int64]struct{}
+	removeduser_roles   map[int64]struct{}
+	cleareduser_roles   bool
+	done                bool
+	oldValue            func(context.Context) (*AdminUser, error)
+	predicates          []predicate.AdminUser
 }
 
 var _ ent.Mutation = (*AdminUserMutation)(nil)
@@ -4616,6 +4619,111 @@ func (m *AdminUserMutation) ResetResetExpire() {
 	delete(m.clearedFields, adminuser.FieldResetExpire)
 }
 
+// SetLoginFailCount sets the "login_fail_count" field.
+func (m *AdminUserMutation) SetLoginFailCount(i int) {
+	m.login_fail_count = &i
+	m.addlogin_fail_count = nil
+}
+
+// LoginFailCount returns the value of the "login_fail_count" field in the mutation.
+func (m *AdminUserMutation) LoginFailCount() (r int, exists bool) {
+	v := m.login_fail_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLoginFailCount returns the old "login_fail_count" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldLoginFailCount(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLoginFailCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLoginFailCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLoginFailCount: %w", err)
+	}
+	return oldValue.LoginFailCount, nil
+}
+
+// AddLoginFailCount adds i to the "login_fail_count" field.
+func (m *AdminUserMutation) AddLoginFailCount(i int) {
+	if m.addlogin_fail_count != nil {
+		*m.addlogin_fail_count += i
+	} else {
+		m.addlogin_fail_count = &i
+	}
+}
+
+// AddedLoginFailCount returns the value that was added to the "login_fail_count" field in this mutation.
+func (m *AdminUserMutation) AddedLoginFailCount() (r int, exists bool) {
+	v := m.addlogin_fail_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLoginFailCount resets all changes to the "login_fail_count" field.
+func (m *AdminUserMutation) ResetLoginFailCount() {
+	m.login_fail_count = nil
+	m.addlogin_fail_count = nil
+}
+
+// SetLockedUntil sets the "locked_until" field.
+func (m *AdminUserMutation) SetLockedUntil(t time.Time) {
+	m.locked_until = &t
+}
+
+// LockedUntil returns the value of the "locked_until" field in the mutation.
+func (m *AdminUserMutation) LockedUntil() (r time.Time, exists bool) {
+	v := m.locked_until
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLockedUntil returns the old "locked_until" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldLockedUntil(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLockedUntil is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLockedUntil requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLockedUntil: %w", err)
+	}
+	return oldValue.LockedUntil, nil
+}
+
+// ClearLockedUntil clears the value of the "locked_until" field.
+func (m *AdminUserMutation) ClearLockedUntil() {
+	m.locked_until = nil
+	m.clearedFields[adminuser.FieldLockedUntil] = struct{}{}
+}
+
+// LockedUntilCleared returns if the "locked_until" field was cleared in this mutation.
+func (m *AdminUserMutation) LockedUntilCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldLockedUntil]
+	return ok
+}
+
+// ResetLockedUntil resets all changes to the "locked_until" field.
+func (m *AdminUserMutation) ResetLockedUntil() {
+	m.locked_until = nil
+	delete(m.clearedFields, adminuser.FieldLockedUntil)
+}
+
 // SetDepartmentID sets the "department" edge to the Department entity by id.
 func (m *AdminUserMutation) SetDepartmentID(id int64) {
 	m.department = &id
@@ -4798,7 +4906,7 @@ func (m *AdminUserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminUserMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, adminuser.FieldCreatedAt)
 	}
@@ -4844,6 +4952,12 @@ func (m *AdminUserMutation) Fields() []string {
 	if m.reset_expire != nil {
 		fields = append(fields, adminuser.FieldResetExpire)
 	}
+	if m.login_fail_count != nil {
+		fields = append(fields, adminuser.FieldLoginFailCount)
+	}
+	if m.locked_until != nil {
+		fields = append(fields, adminuser.FieldLockedUntil)
+	}
 	return fields
 }
 
@@ -4882,6 +4996,10 @@ func (m *AdminUserMutation) Field(name string) (ent.Value, bool) {
 		return m.ResetToken()
 	case adminuser.FieldResetExpire:
 		return m.ResetExpire()
+	case adminuser.FieldLoginFailCount:
+		return m.LoginFailCount()
+	case adminuser.FieldLockedUntil:
+		return m.LockedUntil()
 	}
 	return nil, false
 }
@@ -4921,6 +5039,10 @@ func (m *AdminUserMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldResetToken(ctx)
 	case adminuser.FieldResetExpire:
 		return m.OldResetExpire(ctx)
+	case adminuser.FieldLoginFailCount:
+		return m.OldLoginFailCount(ctx)
+	case adminuser.FieldLockedUntil:
+		return m.OldLockedUntil(ctx)
 	}
 	return nil, fmt.Errorf("unknown AdminUser field %s", name)
 }
@@ -5035,6 +5157,20 @@ func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetResetExpire(v)
 		return nil
+	case adminuser.FieldLoginFailCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLoginFailCount(v)
+		return nil
+	case adminuser.FieldLockedUntil:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLockedUntil(v)
+		return nil
 	}
 	return fmt.Errorf("unknown AdminUser field %s", name)
 }
@@ -5043,6 +5179,9 @@ func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *AdminUserMutation) AddedFields() []string {
 	var fields []string
+	if m.addlogin_fail_count != nil {
+		fields = append(fields, adminuser.FieldLoginFailCount)
+	}
 	return fields
 }
 
@@ -5051,6 +5190,8 @@ func (m *AdminUserMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *AdminUserMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case adminuser.FieldLoginFailCount:
+		return m.AddedLoginFailCount()
 	}
 	return nil, false
 }
@@ -5060,6 +5201,13 @@ func (m *AdminUserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *AdminUserMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case adminuser.FieldLoginFailCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLoginFailCount(v)
+		return nil
 	}
 	return fmt.Errorf("unknown AdminUser numeric field %s", name)
 }
@@ -5091,6 +5239,9 @@ func (m *AdminUserMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(adminuser.FieldResetExpire) {
 		fields = append(fields, adminuser.FieldResetExpire)
+	}
+	if m.FieldCleared(adminuser.FieldLockedUntil) {
+		fields = append(fields, adminuser.FieldLockedUntil)
 	}
 	return fields
 }
@@ -5129,6 +5280,9 @@ func (m *AdminUserMutation) ClearField(name string) error {
 		return nil
 	case adminuser.FieldResetExpire:
 		m.ClearResetExpire()
+		return nil
+	case adminuser.FieldLockedUntil:
+		m.ClearLockedUntil()
 		return nil
 	}
 	return fmt.Errorf("unknown AdminUser nullable field %s", name)
@@ -5182,6 +5336,12 @@ func (m *AdminUserMutation) ResetField(name string) error {
 		return nil
 	case adminuser.FieldResetExpire:
 		m.ResetResetExpire()
+		return nil
+	case adminuser.FieldLoginFailCount:
+		m.ResetLoginFailCount()
+		return nil
+	case adminuser.FieldLockedUntil:
+		m.ResetLockedUntil()
 		return nil
 	}
 	return fmt.Errorf("unknown AdminUser field %s", name)

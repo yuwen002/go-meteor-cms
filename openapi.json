@@ -1,0 +1,1232 @@
+{
+  "components": {
+    "schemas": {}
+  },
+  "info": {
+    "description": "由 cms.api 自动生成的 OpenAPI 文档（make gen-doc）。所有接口统一响应结构为 { code:int, msg:string, data:any }，其中 data 即下方各接口标注的响应模型。",
+    "title": "Go Meteor CMS API",
+    "version": "v1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/admin/admin-users": {
+      "get": {
+        "operationId": "adminList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminListReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminList"
+      }
+    },
+    "/admin/admin-users/create": {
+      "post": {
+        "operationId": "adminCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminCreate"
+      }
+    },
+    "/admin/admin-users/me/change-password": {
+      "put": {
+        "operationId": "changeMyPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeMyPasswordReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "changeMyPassword"
+      }
+    },
+    "/admin/admin-users/reset-password": {
+      "put": {
+        "operationId": "resetAdminPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetAdminPasswordReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "resetAdminPassword"
+      }
+    },
+    "/admin/admin-users/{id}": {
+      "delete": {
+        "operationId": "adminDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAdminReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminDelete"
+      },
+      "get": {
+        "operationId": "adminDetail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminDetail"
+      },
+      "put": {
+        "operationId": "adminUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminUpdate"
+      }
+    },
+    "/admin/admin-users/{id}/bind-department": {
+      "put": {
+        "operationId": "adminBindDepartment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminBindDeptReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminBindDepartment"
+      }
+    },
+    "/admin/admin-users/{id}/disable": {
+      "put": {
+        "operationId": "disableAdmin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisableAdminReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "disableAdmin"
+      }
+    },
+    "/admin/admin-users/{id}/enable": {
+      "put": {
+        "operationId": "enableAdmin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableAdminReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "enableAdmin"
+      }
+    },
+    "/admin/admin-users/{id}/roles": {
+      "get": {
+        "operationId": "adminRoleList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRoleListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminRoleList"
+      },
+      "put": {
+        "operationId": "adminRoleAssign",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminRoleAssignReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminRoleAssign"
+      }
+    },
+    "/admin/admin-users/{id}/roles/:role_id": {
+      "delete": {
+        "operationId": "adminRoleRemove",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminRoleRemoveReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminRoleRemove"
+      }
+    },
+    "/admin/dashboard/stats": {
+      "get": {
+        "operationId": "dashboardStats",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "dashboardStats"
+      }
+    },
+    "/admin/departments": {
+      "post": {
+        "operationId": "departmentCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentCreateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "departmentCreate"
+      }
+    },
+    "/admin/departments/tree": {
+      "get": {
+        "operationId": "departmentTree",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "departmentTree"
+      }
+    },
+    "/admin/departments/{id}": {
+      "delete": {
+        "operationId": "departmentDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentDeleteReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "departmentDelete"
+      },
+      "get": {
+        "operationId": "departmentDetail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "departmentDetail"
+      },
+      "put": {
+        "operationId": "departmentUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentUpdateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "departmentUpdate"
+      }
+    },
+    "/admin/forgot-password": {
+      "post": {
+        "operationId": "forgotPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "forgotPassword"
+      }
+    },
+    "/admin/login": {
+      "post": {
+        "operationId": "Login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "Login"
+      }
+    },
+    "/admin/logout": {
+      "post": {
+        "operationId": "adminLogout",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminLogout"
+      }
+    },
+    "/admin/logs/logins": {
+      "get": {
+        "operationId": "loginLogList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginLogListReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginLogListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "loginLogList"
+      }
+    },
+    "/admin/logs/operations": {
+      "get": {
+        "operationId": "operationLogList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationLogListReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationLogListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "operationLogList"
+      }
+    },
+    "/admin/permissions": {
+      "get": {
+        "operationId": "permissionList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionListReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "permissionList"
+      },
+      "post": {
+        "operationId": "permissionCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionCreateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "permissionCreate"
+      }
+    },
+    "/admin/permissions/tree": {
+      "get": {
+        "operationId": "permissionTree",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "permissionTree"
+      }
+    },
+    "/admin/permissions/{id}": {
+      "delete": {
+        "operationId": "permissionDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionDeleteReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "permissionDelete"
+      },
+      "get": {
+        "operationId": "permissionDetail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "permissionDetail"
+      },
+      "put": {
+        "operationId": "permissionUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionUpdateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "permissionUpdate"
+      }
+    },
+    "/admin/profile": {
+      "get": {
+        "operationId": "myProfile",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "myProfile"
+      },
+      "put": {
+        "operationId": "updateMyProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "updateMyProfile"
+      }
+    },
+    "/admin/profile/permissions": {
+      "get": {
+        "operationId": "myPermissions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "myPermissions"
+      }
+    },
+    "/admin/refresh": {
+      "post": {
+        "operationId": "refreshToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshTokenResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "refreshToken"
+      }
+    },
+    "/admin/register": {
+      "post": {
+        "operationId": "registerAdmin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "registerAdmin"
+      }
+    },
+    "/admin/reset-password": {
+      "post": {
+        "operationId": "resetPasswordByToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordByTokenReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "resetPasswordByToken"
+      }
+    },
+    "/admin/roles": {
+      "get": {
+        "operationId": "roleList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleListReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleList"
+      },
+      "post": {
+        "operationId": "roleCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleCreate"
+      }
+    },
+    "/admin/roles/{id}": {
+      "delete": {
+        "operationId": "roleDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleDeleteReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleDelete"
+      },
+      "get": {
+        "operationId": "roleDetail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleDetail"
+      },
+      "put": {
+        "operationId": "roleUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleUpdateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleUpdate"
+      }
+    },
+    "/admin/roles/{id}/departments": {
+      "get": {
+        "operationId": "roleDeptList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDeptResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleDeptList"
+      },
+      "put": {
+        "operationId": "roleDeptAssign",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleDeptReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "roleDeptAssign"
+      }
+    },
+    "/admin/roles/{id}/permissions": {
+      "get": {
+        "operationId": "rolePermissionList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePermissionIDsResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "rolePermissionList"
+      },
+      "put": {
+        "operationId": "rolePermissionAssign",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePermissionAssignReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "rolePermissionAssign"
+      }
+    },
+    "/admin/roles/{id}/permissions-with-names": {
+      "get": {
+        "operationId": "rolePermissionListWithNames",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleDetailReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePermissionListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "rolePermissionListWithNames"
+      }
+    },
+    "/admin/test-token": {
+      "get": {
+        "operationId": "testToken",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "testToken"
+      }
+    },
+    "/admin/upload": {
+      "post": {
+        "operationId": "uploadFile",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "uploadFile"
+      }
+    },
+    "/api/captcha": {
+      "get": {
+        "operationId": "GetCaptcha",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "GetCaptcha"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ]
+}
