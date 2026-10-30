@@ -1,0 +1,41 @@
+web/src/router/index.ts
+  s_bbf609960902b0::t_7447f0bfd49ae3 100,104,106
+  h_a3f313f3d96276 103
+  s_bbf609960902b0::t_65b80cbdf5d038 133-134,136
+web/src/stores/user.ts
+  s_bbf609960902b0::t_e3515bf4847f67 3,16
+  s_bbf609960902b0::t_f8bff5eb51bcc2 54
+  s_bbf609960902b0::t_cd5a341f2d49d4 44,46-47
+  s_bbf609960902b0::t_691eeb222f73e6 24-27
+web/src/layout/components/Sidebar.vue
+  s_bbf609960902b0::t_c59fbe98933729 10-17,25,30
+internal/seed/permissions.go
+  s_bbf609960902b0::t_b9cbe91fc5d156 149-152
+web/src/layout/components/MenuItem.vue
+  s_bbf609960902b0::t_3eef743a39c999 1-38
+web/src/api/user.ts
+  s_bbf609960902b0::t_bb61c5a3b172ca 87,89
+  s_bbf609960902b0::t_ac49dbeea27d95 3-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "476a56622f016c0394826b6243488a40f5f6adc1",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4-preview"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 90
+    }
+  }
+}
