@@ -90,6 +90,9 @@ Authorization: Bearer <token>
 
 > 刷新令牌使用独立密钥（`Auth.RefreshSecret`）与更长有效期（`Auth.RefreshExpire`，默认 7 天）。用户被删除或禁用时刷新立即失效。刷新接口本身**不要求** access_token 鉴权。
 
+> **刷新令牌轮换与并发宽限期**：每次刷新会签发新的 refresh token 并将旧令牌写入黑名单，防止长期复用。为避免并发请求同时用同一个旧令牌刷新时被误判为失效，服务端保留 `Auth.RefreshGraceSeconds`（默认 5 秒）宽限期：刚被轮换的旧令牌在此窗口内仍被接受，超出则判定为盗用重放并拒绝。
+> 注意：登出同样会把 refresh token 写入黑名单，因此在登出后的宽限期内理论上存在极短的有效窗口（客户端已即时清除令牌，风险极低）。如需零宽限，可将 `RefreshGraceSeconds` 设为 0 并配合前端的刷新串行化。
+
 > **前端无感刷新**：access_token 过期（后端返回 `code=2001`）时，前端自动用 refresh_token 调用 `/admin/refresh` 换新 token 并重试原请求（并发请求排队共享一次刷新）；刷新接口自身失败或无 refresh_token 时才跳转登录页。前端登出（`POST /admin/logout`）会在请求头携带 `X-Refresh-Token`，后端将其与 access_token 一并加入黑名单（TTL = `Auth.RefreshExpire`），此后该 refresh_token 无法再换发 access_token，实现真正的"登出即失效"。
 
 ### 图形验证码
@@ -372,13 +375,13 @@ Authorization: Bearer <token>
 
 ## 文件管理
 
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/admin/files` | 列出上传目录下的文件（支持目录、关键字、分页） |
-| POST | `/admin/files/delete` | 删除指定文件（空目录也可删） |
-| PUT | `/admin/files/rename` | 同级目录内重命名 |
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/files` | `system:file:list` | 列出上传目录下的文件（支持目录、关键字、分页） |
+| POST | `/admin/files/delete` | `system:file:delete` | 删除指定文件（空目录也可删） |
+| PUT | `/admin/files/rename` | `system:file:rename` | 同级目录内重命名 |
 
-> 以上接口均需登录（JWT 鉴权），但不强制特定权限码，用于对已上传资源的可视化运维。路径均相对上传根目录，服务端做防穿越校验（`../` 会被拒绝）。
+> 以上接口需登录（JWT 鉴权）并具备对应权限码，超级管理员天然放行；权限清单由迁移时的种子数据自动写入（`internal/seed/permissions.go`）。路径均相对上传根目录，服务端做防穿越校验（`../` 会被拒绝）。
 
 ### GET `/admin/files`
 

@@ -273,10 +273,10 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		),
 	)
 
-	// 文件管理：需登录，但不强制权限码（任何已登录管理员均可管理上传文件）
+	// 文件管理：需登录，且按 system:file:* 权限码鉴权（超级管理员天然放行）
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ClientInfoMiddleware, serverCtx.JwtMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Middleware{serverCtx.ClientInfoMiddleware, serverCtx.JwtMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,

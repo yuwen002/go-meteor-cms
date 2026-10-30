@@ -37,7 +37,7 @@ const allMenus: MenuEntry[] = [
   { path: '/system/roles', title: '角色管理', permission: 'system:role:list', icon: 'Avatar' },
   { path: '/system/depts', title: '部门管理', permission: 'system:dept:list', icon: 'OfficeBuilding' },
   { path: '/system/permissions', title: '权限管理', permission: 'system:permission:list', icon: 'Lock' },
-  { path: '/system/files', title: '文件管理', icon: 'Folder' },
+  { path: '/system/files', title: '文件管理', permission: 'system:file:list', icon: 'Folder' },
   { path: '/system/operation-log', title: '操作日志', permission: 'system:log:operation_list', icon: 'Document' },
   { path: '/system/login-log', title: '登录日志', permission: 'system:log:login_list', icon: 'Clock' },
   { path: '/profile', title: '个人中心', icon: 'Setting' },

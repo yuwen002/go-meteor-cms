@@ -1,5 +1,6 @@
 import axios, {
   type AxiosInstance,
+  type AxiosRequestConfig,
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios'
@@ -113,4 +114,8 @@ service.interceptors.response.use(
   },
 )
 
-export default service
+// 响应拦截器已把响应解包为业务 data（即 {code,msg,data} 中的 data），运行时不再是 AxiosResponse。
+// 这里显式对外承诺「返回业务数据类型」，避免调用方被推断成 AxiosResponse 而无法访问业务字段。
+type RequestFunc = <T = any>(config: AxiosRequestConfig) => Promise<T>
+
+export default service as unknown as RequestFunc

@@ -146,6 +146,16 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeAPI, ParentName: "日志管理", Method: "GET", APIPath: "/admin/logs/logins", Sort: 52},
 	{Name: "上传文件", Permission: "system:upload:file", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 25},
 	{Name: "上传文件", Permission: "system:upload:file", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "POST", APIPath: "/admin/upload", Sort: 25},
+
+	// ---------- 文件管理 ----------
+	{Name: "文件管理", Permission: "system:file:list", Type: PermissionTypeMenu,
+		Path: "/system/files", Component: "views/system/file/index.vue", Icon: "file", Sort: 60},
+	{Name: "查看文件", Permission: "system:file:list", Type: PermissionTypeButton, ParentName: "文件管理", Sort: 61},
+	{Name: "查看文件", Permission: "system:file:list", Type: PermissionTypeAPI, ParentName: "文件管理", Method: "GET", APIPath: "/admin/files", Sort: 61},
+	{Name: "重命名文件", Permission: "system:file:rename", Type: PermissionTypeButton, ParentName: "文件管理", Sort: 62},
+	{Name: "重命名文件", Permission: "system:file:rename", Type: PermissionTypeAPI, ParentName: "文件管理", Method: "PUT", APIPath: "/admin/files/rename", Sort: 62},
+	{Name: "删除文件", Permission: "system:file:delete", Type: PermissionTypeButton, ParentName: "文件管理", Sort: 63},
+	{Name: "删除文件", Permission: "system:file:delete", Type: PermissionTypeAPI, ParentName: "文件管理", Method: "POST", APIPath: "/admin/files/delete", Sort: 63},
 }
 
 // legacyPermissions 历史版本的权限标识，已被 DefaultPermissions 中的新标识取代。

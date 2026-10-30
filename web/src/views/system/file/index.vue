@@ -31,7 +31,7 @@
           <template #default="{ row }">
             <span class="name-cell">
               <span class="icon">{{ row.is_dir ? '📁' : '📄' }}</span>
-              <a v-if="row.is_dir" class="link" @click="openDir(row)">{{ row.name }}</a>
+              <a v-if="row.is_dir" class="link" @click="openDir(asRow(row))">{{ row.name }}</a>
               <span v-else>{{ row.name }}</span>
             </span>
           </template>
@@ -47,10 +47,10 @@
         </el-table-column>
         <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="row.is_dir" link type="primary" @click="openDir(row)">打开</el-button>
-            <el-button v-else link type="primary" @click="preview(row)">预览</el-button>
-            <el-button link type="primary" @click="onRename(row)">重命名</el-button>
-            <el-button link type="danger" @click="onDelete(row)">删除</el-button>
+            <el-button v-if="row.is_dir" link type="primary" @click="openDir(asRow(row))">打开</el-button>
+            <el-button v-else link type="primary" @click="preview(asRow(row))">预览</el-button>
+            <el-button v-if="canRename" link type="primary" @click="onRename(asRow(row))">重命名</el-button>
+            <el-button v-if="canDelete" link type="danger" @click="onDelete(asRow(row))">删除</el-button>
           </template>
         </el-table-column>
         <template #empty>
@@ -83,7 +83,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 import { deleteFile, getFileList, renameFile, type FileItem } from '@/api/file'
+
+// el-table 作用域插槽的 row 为 DefaultRow，这里显式收敛为 FileItem
+const asRow = (row: unknown) => row as FileItem
+
+const userStore = useUserStore()
+const canRename = computed(() => userStore.hasPermission('system:file:rename'))
+const canDelete = computed(() => userStore.hasPermission('system:file:delete'))
 
 const loading = ref(false)
 const list = ref<FileItem[]>([])

@@ -20,6 +20,10 @@ type Config struct {
 		AccessExpire  int64
 		RefreshSecret string // 刷新令牌专用密钥，与 AccessSecret 区分，避免 access 泄露后 refresh 被冒用
 		RefreshExpire int64  `json:",default=604800"` // 刷新令牌有效期，单位秒（默认 7 天）
+		// RefreshGraceSeconds 刷新令牌轮换后的并发宽限期（秒），默认 5。
+		// 轮换会把旧令牌签入黑名单，同一旧令牌在宽限期内重复提交仍被接受，避免并发请求误登出；
+		// 超出宽限期判定为盗用重放并拒绝。
+		RefreshGraceSeconds int `json:",default=5"`
 	}
 	Mail struct {
 		Enabled  bool

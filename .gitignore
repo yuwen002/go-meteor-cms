@@ -56,3 +56,8 @@ public/uploads/*
 # 前端依赖与构建产物
 node_modules/
 web/dist
+
+# TypeScript 增量构建信息，以及 vue-tsc -b 生成的 vite.config 临时产物
+*.tsbuildinfo
+web/vite.config.js
+web/vite.config.d.ts

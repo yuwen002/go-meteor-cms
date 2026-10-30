@@ -42,16 +42,14 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 		return nil, common.NewBizError(common.ErrInvalidToken)
 	}
 
-	// 检查刷新令牌是否已被吊销（登出时写入黑名单）
-	rtHash := utils.GenerateTokenHash(req.RefreshToken)
-	blacked, berr := l.svcCtx.EntClient.TokenBlacklist.
-		Query().
-		Where(tokenblacklist.TokenHashEQ(rtHash)).
-		Exist(l.ctx)
-	if berr != nil {
+	// 检查刷新令牌是否已被吊销
+	// 轮换会把旧令牌立即写入黑名单，但并发场景下同一旧令牌可能在极短时间内被重复提交，
+	// 因此在 Auth.RefreshGraceSeconds 宽限期内仍视为有效（避免误登出），超过宽限期判定为重放并拒绝。
+	usable, ok := l.refreshTokenUsable(utils.GenerateTokenHash(req.RefreshToken))
+	if !ok {
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
-	if blacked {
+	if !usable {
 		return nil, common.NewBizError(common.ErrInvalidToken)
 	}
 
@@ -121,4 +119,29 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 	}
 
 	return &types.RefreshTokenResp{AccessToken: accessToken, RefreshToken: newRefreshToken}, nil
+}
+
+// refreshTokenUsable 判断刷新令牌是否仍可使用：
+//   - 不在黑名单：可用；
+//   - 已在黑名单：仅当该记录是「刚写入」的（即轮换导致的并发重放）时，在宽限期内放行；
+//     超出宽限期视为盗用重放，拒绝。
+//
+// 返回值 (usable, ok)：ok=false 表示查询异常，调用方应按服务端错误处理。
+func (l *RefreshTokenLogic) refreshTokenUsable(hash string) (usable bool, ok bool) {
+	entry, err := l.svcCtx.EntClient.TokenBlacklist.
+		Query().
+		Where(tokenblacklist.TokenHashEQ(hash)).
+		Only(l.ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return true, true
+		}
+		logx.Errorf("query token blacklist failed: %v", err)
+		return false, false
+	}
+	grace := l.svcCtx.Config.Auth.RefreshGraceSeconds
+	if grace <= 0 {
+		grace = 5
+	}
+	return time.Since(entry.CreatedAt) <= time.Duration(grace)*time.Second, true
 }

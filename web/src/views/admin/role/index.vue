@@ -43,9 +43,9 @@
         <el-table-column prop="sort" label="排序" width="70" />
         <el-table-column label="操作" width="230" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openPerm(row)">分配权限</el-button>
-            <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
-            <el-button link type="danger" :disabled="row.is_system" @click="handleDelete(row)">删除</el-button>
+            <el-button link type="primary" @click="openPerm(asRow(row))">分配权限</el-button>
+            <el-button link type="primary" @click="openEdit(asRow(row))">编辑</el-button>
+            <el-button link type="danger" :disabled="row.is_system" @click="handleDelete(asRow(row))">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -98,6 +98,9 @@ import {
 import { getPermissionTree } from '@/api/permission'
 import type { RoleItem, RoleForm } from '@/api/role'
 import type { PermissionTreeItem } from '@/api/permission'
+
+// el-table 作用域插槽的 row 为 DefaultRow，这里显式收敛为 RoleItem
+const asRow = (row: unknown) => row as RoleItem
 
 const dataScopeOptions = [
   { value: 1, label: '全部数据' },

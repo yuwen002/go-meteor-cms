@@ -38,12 +38,12 @@
         </el-table-column>
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
-            <el-button link type="warning" @click="openResetPwd(row)">重置密码</el-button>
-            <el-button link type="info" @click="openAssignRole(row)">分配角色</el-button>
-            <el-button v-if="row.isActive" link type="warning" @click="doDisable(row)">禁用</el-button>
-            <el-button v-else link type="success" @click="doEnable(row)">启用</el-button>
-            <el-button link type="danger" @click="doDelete(row)">删除</el-button>
+            <el-button link type="primary" @click="openEdit(asRow(row))">编辑</el-button>
+            <el-button link type="warning" @click="openResetPwd(asRow(row))">重置密码</el-button>
+            <el-button link type="info" @click="openAssignRole(asRow(row))">分配角色</el-button>
+            <el-button v-if="row.isActive" link type="warning" @click="doDisable(asRow(row))">禁用</el-button>
+            <el-button v-else link type="success" @click="doEnable(asRow(row))">启用</el-button>
+            <el-button link type="danger" @click="doDelete(asRow(row))">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -131,6 +131,9 @@ import {
   assignAdminRoles,
 } from '@/api/user'
 import { getRoles } from '@/api/role'
+
+// el-table 作用域插槽的 row 为 DefaultRow，这里显式收敛为 AdminRow
+const asRow = (row: unknown) => row as AdminRow
 
 interface AdminRow {
   id: number
