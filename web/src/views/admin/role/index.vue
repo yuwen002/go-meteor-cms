@@ -20,7 +20,7 @@
 
     <el-card shadow="never">
       <div class="toolbar">
-        <el-button type="primary" @click="openCreate">新增角色</el-button>
+        <el-button type="primary" @click="openCreate" v-if="canAdd">新增角色</el-button>
       </div>
       <el-table :data="list" v-loading="loading" border>
         <el-table-column prop="name" label="名称" />
@@ -43,9 +43,9 @@
         <el-table-column prop="sort" label="排序" width="70" />
         <el-table-column label="操作" width="230" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openPerm(asRow(row))">分配权限</el-button>
-            <el-button link type="primary" @click="openEdit(asRow(row))">编辑</el-button>
-            <el-button link type="danger" :disabled="row.is_system" @click="handleDelete(asRow(row))">删除</el-button>
+            <el-button link type="primary" @click="openPerm(asRow(row))" v-if="canAssignPerm">分配权限</el-button>
+            <el-button link type="primary" @click="openEdit(asRow(row))" v-if="canEdit">编辑</el-button>
+            <el-button link type="danger" :disabled="row.is_system" @click="handleDelete(asRow(row))" v-if="canDelete">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -89,7 +89,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { computed, ref, reactive, onMounted, nextTick } from 'vue'
+import { useUserStore } from '@/stores/user'
+
+// 按钮级权限：种子中 Type=2 按钮与 Type=3 接口使用同一标识，授权一次即可同时生效
+const userStore = useUserStore()
+const canAdd = computed(() => userStore.hasPermission('system:role:add'))
+const canEdit = computed(() => userStore.hasPermission('system:role:edit'))
+const canDelete = computed(() => userStore.hasPermission('system:role:delete'))
+const canAssignPerm = computed(() => userStore.hasPermission('system:role:perm_assign'))
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getRoles, createRole, updateRole, deleteRole,

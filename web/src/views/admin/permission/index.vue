@@ -2,10 +2,10 @@
   <div class="perm-page">
     <el-card shadow="never">
       <div class="toolbar">
-        <el-button type="primary" @click="openCreate(null)">新增根权限</el-button>
-        <el-button :disabled="!selected" @click="openCreate(selected)">新增子权限</el-button>
-        <el-button :disabled="!selected" @click="openEdit">编辑</el-button>
-        <el-button type="danger" :disabled="!selected" @click="handleDelete">删除</el-button>
+        <el-button type="primary" @click="openCreate(null)" v-if="canAdd">新增根权限</el-button>
+        <el-button :disabled="!selected" @click="openCreate(selected)" v-if="canAdd">新增子权限</el-button>
+        <el-button :disabled="!selected" @click="openEdit" v-if="canEdit">编辑</el-button>
+        <el-button type="danger" :disabled="!selected" @click="handleDelete" v-if="canDelete">删除</el-button>
         <span class="tip">点击树节点选中后可编辑或新增子权限</span>
       </div>
       <el-tree :data="tree" :props="{ label: 'name', children: 'children' }" node-key="id"
@@ -53,6 +53,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useUserStore } from '@/stores/user'
+
+// 按钮级权限：种子中 Type=2 按钮与 Type=3 接口使用同一标识，授权一次即可同时生效
+const userStore = useUserStore()
+const canAdd = computed(() => userStore.hasPermission('system:permission:add'))
+const canEdit = computed(() => userStore.hasPermission('system:permission:edit'))
+const canDelete = computed(() => userStore.hasPermission('system:permission:delete'))
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getPermissionTree, getPermissionDetail, createPermission, updatePermission, deletePermission } from '@/api/permission'
 import type { PermissionTreeItem, PermissionForm } from '@/api/permission'

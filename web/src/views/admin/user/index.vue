@@ -10,7 +10,7 @@
           <el-button @click="resetQuery">重置</el-button>
         </el-form-item>
         <el-form-item style="margin-left: auto">
-          <el-button type="success" @click="openCreate">新增管理员</el-button>
+          <el-button type="success" @click="openCreate" v-if="canAdd">新增管理员</el-button>
         </el-form-item>
       </el-form>
 
@@ -38,12 +38,12 @@
         </el-table-column>
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openEdit(asRow(row))">编辑</el-button>
-            <el-button link type="warning" @click="openResetPwd(asRow(row))">重置密码</el-button>
-            <el-button link type="info" @click="openAssignRole(asRow(row))">分配角色</el-button>
-            <el-button v-if="row.isActive" link type="warning" @click="doDisable(asRow(row))">禁用</el-button>
-            <el-button v-else link type="success" @click="doEnable(asRow(row))">启用</el-button>
-            <el-button link type="danger" @click="doDelete(asRow(row))">删除</el-button>
+            <el-button link type="primary" @click="openEdit(asRow(row))" v-if="canEdit">编辑</el-button>
+            <el-button link type="warning" @click="openResetPwd(asRow(row))" v-if="canResetPwd">重置密码</el-button>
+            <el-button link type="info" @click="openAssignRole(asRow(row))" v-if="canAssignRole">分配角色</el-button>
+            <el-button v-if="row.isActive && canDisable" link type="warning" @click="doDisable(asRow(row))">禁用</el-button>
+            <el-button v-else-if="canEnable" link type="success" @click="doEnable(asRow(row))">启用</el-button>
+            <el-button link type="danger" @click="doDelete(asRow(row))" v-if="canDelete">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -117,7 +117,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+
+// 按钮级权限：种子中 Type=2 按钮与 Type=3 接口使用同一标识，授权一次即可同时生效
+const userStore = useUserStore()
+const canAdd = computed(() => userStore.hasPermission('system:admin_user:add'))
+const canEdit = computed(() => userStore.hasPermission('system:admin_user:edit'))
+const canDelete = computed(() => userStore.hasPermission('system:admin_user:delete'))
+const canDisable = computed(() => userStore.hasPermission('system:admin_user:disable'))
+const canEnable = computed(() => userStore.hasPermission('system:admin_user:enable'))
+const canResetPwd = computed(() => userStore.hasPermission('system:admin_user:reset_pwd'))
+const canAssignRole = computed(() => userStore.hasPermission('system:admin_user:role_assign'))
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getAdminList,

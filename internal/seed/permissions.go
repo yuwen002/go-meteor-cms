@@ -55,15 +55,19 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "控制台", Permission: "system:dashboard:view", Type: PermissionTypeMenu,
 		Path: "/dashboard", Component: "views/dashboard/index.vue", Icon: "dashboard", Sort: 1},
 	{Name: "管理员管理", Permission: "system:admin_user:list", Type: PermissionTypeMenu,
-		Path: "/admin/admin-users", Component: "views/admin/user/list.vue", Icon: "user", Sort: 10},
+		Path: "/system/users", Component: "views/admin/user/index.vue", Icon: "user", Sort: 10},
 	{Name: "部门管理", Permission: "system:dept:list", Type: PermissionTypeMenu,
-		Path: "/admin/departments", Component: "views/admin/dept/list.vue", Icon: "dept", Sort: 20},
+		Path: "/system/depts", Component: "views/admin/dept/index.vue", Icon: "dept", Sort: 20},
 	{Name: "角色管理", Permission: "system:role:list", Type: PermissionTypeMenu,
-		Path: "/admin/roles", Component: "views/admin/role/list.vue", Icon: "role", Sort: 30},
+		Path: "/system/roles", Component: "views/admin/role/index.vue", Icon: "role", Sort: 30},
 	{Name: "权限管理", Permission: "system:permission:list", Type: PermissionTypeMenu,
-		Path: "/admin/permissions", Component: "views/admin/permission/list.vue", Icon: "permission", Sort: 40},
+		Path: "/system/permissions", Component: "views/admin/permission/index.vue", Icon: "permission", Sort: 40},
 	{Name: "日志管理", Permission: "system:log:operation_list", Type: PermissionTypeMenu,
-		Path: "/admin/logs/operations", Component: "views/admin/log/operation.vue", Icon: "log", Sort: 50},
+		Path: "/system/operation-log", Component: "views/system/log/operation.vue", Icon: "log", Sort: 50},
+
+	// ---------- 控制台（菜单与统计接口同用一个标识） ----------
+	{Name: "查看控制台", Permission: "system:dashboard:view", Type: PermissionTypeButton, ParentName: "控制台", Sort: 2},
+	{Name: "查看控制台", Permission: "system:dashboard:view", Type: PermissionTypeAPI, ParentName: "控制台", Method: "GET", APIPath: "/admin/dashboard/stats", Sort: 2},
 
 	// ---------- 管理员管理（Type=2 按钮 / Type=3 API） ----------
 	{Name: "查看管理员", Permission: "system:admin_user:list", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 11},
