@@ -81,6 +81,27 @@ func (l *AdminLogoutLogic) AdminLogout() (resp *types.CommonResp, err error) {
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
+	// 一并吊销刷新令牌：从中间件写入 context 的 X-Refresh-Token 读取并写入黑名单
+	// （TTL 用 RefreshExpire，可被清理任务回收）
+	if rt := utils.GetRefreshTokenFromCtx(l.ctx); rt != "" {
+		rtHash := utils.GenerateTokenHash(rt)
+		exists2, e2 := l.svcCtx.EntClient.TokenBlacklist.
+			Query().
+			Where(tokenblacklist.TokenHashEQ(rtHash)).
+			Exist(l.ctx)
+		if e2 == nil && !exists2 {
+			rtExp := time.Now().Add(time.Duration(l.svcCtx.Config.Auth.RefreshExpire) * time.Second)
+			if _, e3 := l.svcCtx.EntClient.TokenBlacklist.Create().
+				SetTokenHash(rtHash).
+				SetToken(rt).
+				SetExpiredAt(rtExp).
+				Save(l.ctx); e3 != nil {
+				logx.Errorf("Failed to add refresh token to blacklist: %v", e3)
+				return nil, common.NewBizError(common.ErrInternalServer)
+			}
+		}
+	}
+
 	return &types.CommonResp{
 		ID:      0,
 		Message: "Logout successful",

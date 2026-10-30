@@ -12,6 +12,8 @@ const (
 	UserKey ctxKey = "user"
 	// TokenKey 当前请求 token 在 context 中的键
 	TokenKey ctxKey = "token"
+	// RefreshTokenKey 登出时由中间件从 X-Refresh-Token 头写入的刷新令牌键
+	RefreshTokenKey ctxKey = "refresh_token"
 )
 
 // WithUserCtx 将用户信息存储到 context 中
@@ -50,6 +52,21 @@ func WithTokenCtx(ctx context.Context, token string) context.Context {
 // GetTokenFromCtx 从 context 中获取 token，不存在时返回空字符串
 func GetTokenFromCtx(ctx context.Context) string {
 	if val := ctx.Value(TokenKey); val != nil {
+		if token, ok := val.(string); ok {
+			return token
+		}
+	}
+	return ""
+}
+
+// WithRefreshTokenCtx 将刷新令牌写入 context（由 RefreshTokenHeader 中间件调用）
+func WithRefreshTokenCtx(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, RefreshTokenKey, token)
+}
+
+// GetRefreshTokenFromCtx 从 context 中获取刷新令牌，不存在时返回空字符串
+func GetRefreshTokenFromCtx(ctx context.Context) string {
+	if val := ctx.Value(RefreshTokenKey); val != nil {
 		if token, ok := val.(string); ok {
 			return token
 		}

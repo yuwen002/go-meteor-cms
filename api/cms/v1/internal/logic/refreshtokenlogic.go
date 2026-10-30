@@ -8,6 +8,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
+	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
@@ -38,6 +39,19 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 
 	// 校验令牌类型，防止用 access token 冒充 refresh token
 	if typ, _ := claims["token_type"].(string); typ != "refresh" {
+		return nil, common.NewBizError(common.ErrInvalidToken)
+	}
+
+	// 检查刷新令牌是否已被吊销（登出时写入黑名单）
+	rtHash := utils.GenerateTokenHash(req.RefreshToken)
+	blacked, berr := l.svcCtx.EntClient.TokenBlacklist.
+		Query().
+		Where(tokenblacklist.TokenHashEQ(rtHash)).
+		Exist(l.ctx)
+	if berr != nil {
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if blacked {
 		return nil, common.NewBizError(common.ErrInvalidToken)
 	}
 

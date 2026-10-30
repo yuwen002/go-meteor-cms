@@ -51,6 +51,8 @@ func main() {
 
 	// 若配置了前端产物目录，则直接托管 SPA（含 history 路由回退）
 	server.Use(middleware.NewSPAMiddleware(c.StaticDir))
+	// 将登出请求携带的 X-Refresh-Token 透传进 context，供登出接口一并吊销
+	server.Use(middleware.NewRefreshTokenHeaderMiddleware())
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

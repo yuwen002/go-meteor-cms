@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { getRefreshToken } from '@/utils/auth'
 
 export interface LoginData {
   username: string
@@ -21,5 +22,9 @@ export function getCaptcha() {
 }
 
 export function logout() {
-  return request({ url: '/admin/logout', method: 'post' })
+  return request({
+    url: '/admin/logout',
+    method: 'post',
+    headers: { 'X-Refresh-Token': getRefreshToken() },
+  })
 }

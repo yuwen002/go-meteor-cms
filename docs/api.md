@@ -90,6 +90,8 @@ Authorization: Bearer <token>
 
 > 刷新令牌使用独立密钥（`Auth.RefreshSecret`）与更长有效期（`Auth.RefreshExpire`，默认 7 天）。用户被删除或禁用时刷新立即失效。刷新接口本身**不要求** access_token 鉴权。
 
+> **前端无感刷新**：access_token 过期（后端返回 `code=2001`）时，前端自动用 refresh_token 调用 `/admin/refresh` 换新 token 并重试原请求（并发请求排队共享一次刷新）；刷新接口自身失败或无 refresh_token 时才跳转登录页。前端登出（`POST /admin/logout`）会在请求头携带 `X-Refresh-Token`，后端将其与 access_token 一并加入黑名单（TTL = `Auth.RefreshExpire`），此后该 refresh_token 无法再换发 access_token，实现真正的"登出即失效"。
+
 ### 图形验证码
 
 ```json
