@@ -1,0 +1,53 @@
+internal/seed/permissions.go
+  s_bbf609960902b0::t_97831f89de66a8 149-158
+web/src/layout/components/Sidebar.vue
+  s_bbf609960902b0::t_8ec28684380602 40
+web/src/views/admin/user/index.vue
+  s_bbf609960902b0::t_77cf0841a1054f 41-46,135-137
+web/package.json
+  s_bbf609960902b0::t_7ab8d10e5f3c5c 20
+docs/api.md
+  s_bbf609960902b0::t_9e4791cfd67887 378-382,384
+  s_bbf609960902b0::t_3184d44ca4194b 93-95
+web/src/views/admin/role/index.vue
+  s_bbf609960902b0::t_f6cb80a83a698e 46-48
+api/cms/v1/internal/config/config.go
+  s_bbf609960902b0::t_126f55ee83ed65 23-26
+web/src/views/system/file/index.vue
+  s_bbf609960902b0::t_0ae72ff248d83f 50-51
+  s_bbf609960902b0::t_05d5173e25cbcf 52-53
+  s_bbf609960902b0::t_dc9766bf7eca6c 86,91-95
+api/cms/v1/etc/cms-api.yaml
+  s_bbf609960902b0::t_fd9c1e78675900 17
+.gitignore
+  s_bbf609960902b0::t_05b3a2d12e5861 59-63
+web/src/utils/request.ts
+  h_a3f313f3d96276 3
+api/cms/v1/internal/handler/routes.go
+  s_bbf609960902b0::t_39d600413fb851 276,279
+api/cms/v1/internal/logic/refreshtokenlogic.go
+  s_bbf609960902b0::t_6ce18aeb220389 45-49,52
+  s_bbf609960902b0::t_83802c35eaab52 123-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "65232b58580baca2733f1505d1bbc2edd4b27cac",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4-preview"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 118
+    }
+  }
+}
