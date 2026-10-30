@@ -93,6 +93,30 @@ func (f DepartmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DepartmentMutation", m)
 }
 
+// The LoginLogFunc type is an adapter to allow the use of ordinary
+// function as LoginLog mutator.
+type LoginLogFunc func(context.Context, *ent.LoginLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LoginLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LoginLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LoginLogMutation", m)
+}
+
+// The OperationLogFunc type is an adapter to allow the use of ordinary
+// function as OperationLog mutator.
+type OperationLogFunc func(context.Context, *ent.OperationLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OperationLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OperationLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OperationLogMutation", m)
+}
+
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary
 // function as TokenBlacklist mutator.
 type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistMutation) (ent.Value, error)

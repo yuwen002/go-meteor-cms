@@ -27,5 +27,11 @@ type AdminUserRole func(*sql.Selector)
 // Department is the predicate function for department builders.
 type Department func(*sql.Selector)
 
+// LoginLog is the predicate function for loginlog builders.
+type LoginLog func(*sql.Selector)
+
+// OperationLog is the predicate function for operationlog builders.
+type OperationLog func(*sql.Selector)
+
 // TokenBlacklist is the predicate function for tokenblacklist builders.
 type TokenBlacklist func(*sql.Selector)

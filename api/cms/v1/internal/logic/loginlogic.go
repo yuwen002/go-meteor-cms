@@ -30,11 +30,13 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	// 验证验证码
 	if req.Captcha == "" || req.CaptchaID == "" {
+		l.recordLoginLog(0, req.Username, common.GetErrorMessage(common.ErrMissingCaptcha))
 		return nil, common.NewBizError(common.ErrMissingCaptcha)
 	}
 
 	// 验证验证码
 	if !utils.VerifyCaptcha(req.CaptchaID, req.Captcha) {
+		l.recordLoginLog(0, req.Username, common.GetErrorMessage(common.ErrInvalidCaptcha))
 		return nil, common.NewBizError(common.ErrInvalidCaptcha)
 	}
 
@@ -47,6 +49,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	if err != nil {
 		if ent.IsNotFound(err) {
 			// 用户名不存在与密码错误返回同一错误，避免账号枚举
+			l.recordLoginLog(0, req.Username, "账号不存在")
 			return nil, common.NewBizError(common.ErrLoginFailed)
 		}
 		return nil, common.NewBizError(common.ErrInternalServer)
@@ -54,13 +57,18 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 
 	// 验证密码
 	if !utils.CheckPassword(user.PasswordHash, req.Password) {
+		l.recordLoginLog(user.ID, user.Username, "密码错误")
 		return nil, common.NewBizError(common.ErrLoginFailed)
 	}
 
 	// 检查用户账号是否激活
 	if !user.IsActive {
+		l.recordLoginLog(user.ID, user.Username, "账号未激活")
 		return nil, common.NewBizError(common.ErrAccountInactive)
 	}
+
+	// 登录成功
+	l.recordLoginLogSuccess(user.ID, user.Username)
 
 	// 签发 JWT
 	tokenStr, err := utils.GenerateToken(l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire, map[string]interface{}{
@@ -96,4 +104,40 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	}()
 
 	return &types.LoginResp{Token: tokenStr}, nil
+}
+
+// recordLoginLogSuccess 记录一次成功的登录
+func (l *LoginLogic) recordLoginLogSuccess(userID int64, username string) {
+	l.saveLoginLog(userID, username, 0, "")
+}
+
+// recordLoginLog 记录一次失败的登录，reason 仅用于内部审计，不返回给调用方
+func (l *LoginLogic) recordLoginLog(userID int64, username, reason string) {
+	l.saveLoginLog(userID, username, 1, reason)
+}
+
+// saveLoginLog 异步写入登录日志，避免影响登录接口耗时
+func (l *LoginLogic) saveLoginLog(userID int64, username string, status int, reason string) {
+	ip := utils.GetClientIP(l.ctx)
+	ua := utils.Truncate(utils.GetUserAgent(l.ctx), 512)
+
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		create := l.svcCtx.EntClient.LoginLog.Create().
+			SetUserID(userID).
+			SetUsername(username).
+			SetIP(ip).
+			SetUserAgent(ua).
+			SetStatus(status).
+			SetLoginAt(time.Now())
+		if reason != "" {
+			create = create.SetFailReason(reason)
+		}
+
+		if _, err := create.Save(ctx); err != nil {
+			logx.WithContext(ctx).Errorf("写入登录日志失败: %v", err)
+		}
+	}()
 }

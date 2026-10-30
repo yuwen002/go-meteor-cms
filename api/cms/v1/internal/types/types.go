@@ -174,6 +174,34 @@ type ForgotPasswordResp struct {
 	Message string `json:"message"` // 返回提示
 }
 
+type LoginLogItem struct {
+	ID         int64  `json:"id"`
+	UserID     int64  `json:"user_id"`
+	Username   string `json:"username"`
+	IP         string `json:"ip"`
+	UserAgent  string `json:"user_agent"`
+	Status     int    `json:"status"`
+	FailReason string `json:"fail_reason"`
+	LoginAt    string `json:"login_at"`
+}
+
+type LoginLogListReq struct {
+	Page      int    `form:"page,default=1"`
+	PageSize  int    `form:"page_size,default=20"`
+	UserID    int64  `form:"user_id,optional"`
+	Username  string `form:"username,optional"`
+	Status    int    `form:"status,optional"`
+	StartTime string `form:"start_time,optional"`
+	EndTime   string `form:"end_time,optional"`
+}
+
+type LoginLogListResp struct {
+	Total    int64          `json:"total"`
+	Page     int            `json:"page"`
+	PageSize int            `json:"page_size"`
+	List     []LoginLogItem `json:"list"`
+}
+
 type LoginReq struct {
 	Username  string `json:"username" validate:"required"`   // 必填
 	Password  string `json:"password" validate:"required"`   // 必填
@@ -201,6 +229,42 @@ type MyPermissionResp struct {
 	IsSuper     bool         `json:"is_super"`
 	Menus       []MyMenuItem `json:"menus"`
 	Permissions []string     `json:"permissions"`
+}
+
+type OperationLogItem struct {
+	ID         int64  `json:"id"`
+	UserID     int64  `json:"user_id"`
+	Username   string `json:"username"`
+	Module     string `json:"module"`
+	Action     string `json:"action"`
+	Method     string `json:"method"`
+	Path       string `json:"path"`
+	IP         string `json:"ip"`
+	UserAgent  string `json:"user_agent"`
+	Status     int    `json:"status"`
+	ErrorMsg   string `json:"error_msg"`
+	DurationMs int64  `json:"duration_ms"`
+	Params     string `json:"params"`
+	CreatedAt  string `json:"created_at"`
+}
+
+type OperationLogListReq struct {
+	Page      int    `form:"page,default=1"`
+	PageSize  int    `form:"page_size,default=20"`
+	UserID    int64  `form:"user_id,optional"`
+	Username  string `form:"username,optional"`
+	Module    string `form:"module,optional"`
+	Path      string `form:"path,optional"`
+	Status    int    `form:"status,optional"`
+	StartTime string `form:"start_time,optional"`
+	EndTime   string `form:"end_time,optional"`
+}
+
+type OperationLogListResp struct {
+	Total    int64              `json:"total"`
+	Page     int                `json:"page"`
+	PageSize int                `json:"page_size"`
+	List     []OperationLogItem `json:"list"`
 }
 
 type PermissionCreateReq struct {
@@ -415,4 +479,11 @@ type UpdateProfileReq struct {
 	Nickname *string `json:"nickname,optional"`
 	Email    *string `json:"email,optional"`
 	Phone    *string `json:"phone,optional"`
+	Avatar   *string `json:"avatar,optional"`
+}
+
+type UploadFileResp struct {
+	URL      string `json:"url"`
+	Filename string `json:"filename"`
+	Size     int64  `json:"size"`
 }

@@ -69,6 +69,10 @@ func (l *UpdateMyProfileLogic) UpdateMyProfile(req *types.UpdateProfileReq) (res
 		update = update.SetPhone(*req.Phone)
 		changed = true
 	}
+	if req.Avatar != nil {
+		update = update.SetAvatar(utils.Truncate(*req.Avatar, 512))
+		changed = true
+	}
 
 	if !changed {
 		user, err := l.svcCtx.EntClient.AdminUser.Get(l.ctx, userID)

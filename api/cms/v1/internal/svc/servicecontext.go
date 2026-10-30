@@ -14,11 +14,13 @@ import (
 )
 
 type ServiceContext struct {
-	Config               config.Config
-	EntClient            *ent.Client
-	JwtMiddleware        rest.Middleware
-	PermissionMiddleware rest.Middleware
-	MailSender           mail.Sender
+	Config                 config.Config
+	EntClient              *ent.Client
+	JwtMiddleware          rest.Middleware
+	PermissionMiddleware   rest.Middleware
+	MailSender             mail.Sender
+	OperationLogMiddleware rest.Middleware
+	ClientInfoMiddleware   rest.Middleware
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -46,10 +48,12 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	return &ServiceContext{
-		Config:               c,
-		EntClient:            client,
-		JwtMiddleware:        middleware.NewJwtMiddleware(&c, client),
-		PermissionMiddleware: middleware.NewPermissionMiddleware(&c, client),
-		MailSender:           sender,
+		Config:                 c,
+		EntClient:              client,
+		JwtMiddleware:          middleware.NewJwtMiddleware(&c, client),
+		PermissionMiddleware:   middleware.NewPermissionMiddleware(&c, client),
+		MailSender:             sender,
+		OperationLogMiddleware: middleware.NewOperationLogMiddleware(c, client),
+		ClientInfoMiddleware:   middleware.NewClientInfoMiddleware().Handle,
 	}
 }

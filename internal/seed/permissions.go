@@ -62,6 +62,8 @@ var DefaultPermissions = []PermissionSpec{
 		Path: "/admin/roles", Component: "views/admin/role/list.vue", Icon: "role", Sort: 30},
 	{Name: "权限管理", Permission: "system:permission:list", Type: PermissionTypeMenu,
 		Path: "/admin/permissions", Component: "views/admin/permission/list.vue", Icon: "permission", Sort: 40},
+	{Name: "日志管理", Permission: "system:log:operation_list", Type: PermissionTypeMenu,
+		Path: "/admin/logs/operations", Component: "views/admin/log/operation.vue", Icon: "log", Sort: 50},
 
 	// ---------- 管理员管理（Type=2 按钮 / Type=3 API） ----------
 	{Name: "查看管理员", Permission: "system:admin_user:list", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 11},
@@ -136,6 +138,14 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "编辑权限", Permission: "system:permission:edit", Type: PermissionTypeAPI, ParentName: "权限管理", Method: "PUT", APIPath: "/admin/permissions/:id", Sort: 45},
 	{Name: "删除权限", Permission: "system:permission:delete", Type: PermissionTypeButton, ParentName: "权限管理", Sort: 46},
 	{Name: "删除权限", Permission: "system:permission:delete", Type: PermissionTypeAPI, ParentName: "权限管理", Method: "DELETE", APIPath: "/admin/permissions/:id", Sort: 46},
+
+	// ---------- 日志管理 ----------
+	{Name: "查看操作日志", Permission: "system:log:operation_list", Type: PermissionTypeButton, ParentName: "日志管理", Sort: 51},
+	{Name: "查看操作日志", Permission: "system:log:operation_list", Type: PermissionTypeAPI, ParentName: "日志管理", Method: "GET", APIPath: "/admin/logs/operations", Sort: 51},
+	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeButton, ParentName: "日志管理", Sort: 52},
+	{Name: "查看登录日志", Permission: "system:log:login_list", Type: PermissionTypeAPI, ParentName: "日志管理", Method: "GET", APIPath: "/admin/logs/logins", Sort: 52},
+	{Name: "上传文件", Permission: "system:upload:file", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 25},
+	{Name: "上传文件", Permission: "system:upload:file", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "POST", APIPath: "/admin/upload", Sort: 25},
 }
 
 // legacyPermissions 历史版本的权限标识，已被 DefaultPermissions 中的新标识取代。

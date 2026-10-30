@@ -7,6 +7,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -21,6 +22,9 @@ import (
 
 var configFile = flag.String("f", "api/cms/v1/etc/cms-api.yaml", "the config file")
 
+// uploadURLPrefix 上传文件的访问路径前缀
+const uploadURLPrefix = "/uploads"
+
 func main() {
 	flag.Parse()
 
@@ -32,7 +36,12 @@ func main() {
 		c.Database.Source = dsn
 	}
 
-	server := rest.MustNewServer(c.RestConf)
+	// 静态资源：让 public/uploads 下的文件可通过 /uploads/xxx 访问。
+	// WithFileServer 是 RunOption，必须在创建 server 时传入；它仅拦截 GET 且
+	// 路径以 /uploads/ 前缀开头且文件存在的请求，其余请求仍走 API 路由。
+	uploadDir := c.Upload.Defaults().Dir
+	server := rest.MustNewServer(c.RestConf,
+		rest.WithFileServer(uploadURLPrefix, http.Dir(uploadDir)))
 	defer server.Stop()
 
 	ctx := svc.NewServiceContext(c)

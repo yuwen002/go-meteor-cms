@@ -3,7 +3,11 @@
 
 package config
 
-import "github.com/zeromicro/go-zero/rest"
+import (
+	baseconfig "github.com/yuwen002/go-meteor-cms/internal/config"
+
+	"github.com/zeromicro/go-zero/rest"
+)
 
 type Config struct {
 	rest.RestConf
@@ -27,4 +31,5 @@ type Config struct {
 		// TokenBlacklistCleanInterval 过期 token 黑名单的清理间隔（秒），<=0 时按 3600 秒处理
 		TokenBlacklistCleanInterval int
 	}
+	Upload baseconfig.Upload
 }

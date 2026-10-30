@@ -1,6 +1,9 @@
 Name: cms-api
 Host: 0.0.0.0
 Port: 8888
+# 全局请求体上限（字节）。需大于 Upload.MaxSizeMB（默认 5MB），否则大文件在到达业务层大小校验前
+# 就被 go-zero 以 413 拒绝。这里取 8MB 作为上限，超 5MB 的合法请求由业务层返回友好的 4001。
+MaxBytes: 8388608
 
 Database:
   Driver: "mysql"
@@ -12,6 +15,16 @@ Auth:
 
 Maintenance:
   TokenBlacklistCleanInterval: 3600   # 过期 token 黑名单清理间隔（秒），<=0 时按 3600 处理
+
+Upload:
+  Dir: "public/uploads"                 # 文件保存根目录
+  MaxSizeMB: 5                          # 单个文件大小上限（MB）
+  AllowedExts:                          # 允许的扩展名白名单
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".gif"
+    - ".webp"
 
 Mail:
   Enabled: false                  # false 时邮件只输出到日志，不发真实邮件

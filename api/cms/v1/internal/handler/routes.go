@@ -13,38 +13,41 @@ import (
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/admin/forgot-password",
-				Handler: forgotPasswordHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/admin/login",
-				Handler: LoginHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/admin/register",
-				Handler: registerAdminHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/admin/reset-password",
-				Handler: resetPasswordByTokenHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/api/captcha",
-				Handler: GetCaptchaHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ClientInfoMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/forgot-password",
+					Handler: forgotPasswordHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/login",
+					Handler: LoginHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/register",
+					Handler: registerAdminHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/reset-password",
+					Handler: resetPasswordByTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/api/captcha",
+					Handler: GetCaptchaHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.JwtMiddleware, serverCtx.PermissionMiddleware},
+			[]rest.Middleware{serverCtx.ClientInfoMiddleware, serverCtx.JwtMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -140,6 +143,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/admin/logout",
 					Handler: adminLogoutHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/logs/logins",
+					Handler: loginLogListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/admin/logs/operations",
+					Handler: operationLogListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
@@ -240,6 +253,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/admin/test-token",
 					Handler: testTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/upload",
+					Handler: uploadFileHandler(serverCtx),
 				},
 			}...,
 		),

@@ -19,6 +19,8 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
+	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
+	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -87,6 +89,8 @@ func checkColumn(t, c string) error {
 			adminuser.Table:           adminuser.ValidColumn,
 			adminuserrole.Table:       adminuserrole.ValidColumn,
 			department.Table:          department.ValidColumn,
+			loginlog.Table:            loginlog.ValidColumn,
+			operationlog.Table:        operationlog.ValidColumn,
 			tokenblacklist.Table:      tokenblacklist.ValidColumn,
 		})
 	})

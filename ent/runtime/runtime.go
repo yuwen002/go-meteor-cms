@@ -12,6 +12,8 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
+	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
+	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/schema"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
@@ -297,6 +299,116 @@ func init() {
 	departmentDescID := departmentFields[0].Descriptor()
 	// department.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	department.IDValidator = departmentDescID.Validators[0].(func(int64) error)
+	loginlogMixin := schema.LoginLog{}.Mixin()
+	loginlogMixinHooks1 := loginlogMixin[1].Hooks()
+	loginlog.Hooks[0] = loginlogMixinHooks1[0]
+	loginlogMixinInters1 := loginlogMixin[1].Interceptors()
+	loginlog.Interceptors[0] = loginlogMixinInters1[0]
+	loginlogMixinFields0 := loginlogMixin[0].Fields()
+	_ = loginlogMixinFields0
+	loginlogFields := schema.LoginLog{}.Fields()
+	_ = loginlogFields
+	// loginlogDescCreatedAt is the schema descriptor for created_at field.
+	loginlogDescCreatedAt := loginlogMixinFields0[0].Descriptor()
+	// loginlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	loginlog.DefaultCreatedAt = loginlogDescCreatedAt.Default.(func() time.Time)
+	// loginlogDescUpdatedAt is the schema descriptor for updated_at field.
+	loginlogDescUpdatedAt := loginlogMixinFields0[1].Descriptor()
+	// loginlog.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	loginlog.DefaultUpdatedAt = loginlogDescUpdatedAt.Default.(func() time.Time)
+	// loginlog.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	loginlog.UpdateDefaultUpdatedAt = loginlogDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// loginlogDescUsername is the schema descriptor for username field.
+	loginlogDescUsername := loginlogFields[2].Descriptor()
+	// loginlog.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
+	loginlog.UsernameValidator = loginlogDescUsername.Validators[0].(func(string) error)
+	// loginlogDescIP is the schema descriptor for ip field.
+	loginlogDescIP := loginlogFields[3].Descriptor()
+	// loginlog.IPValidator is a validator for the "ip" field. It is called by the builders before save.
+	loginlog.IPValidator = loginlogDescIP.Validators[0].(func(string) error)
+	// loginlogDescUserAgent is the schema descriptor for user_agent field.
+	loginlogDescUserAgent := loginlogFields[4].Descriptor()
+	// loginlog.UserAgentValidator is a validator for the "user_agent" field. It is called by the builders before save.
+	loginlog.UserAgentValidator = loginlogDescUserAgent.Validators[0].(func(string) error)
+	// loginlogDescStatus is the schema descriptor for status field.
+	loginlogDescStatus := loginlogFields[5].Descriptor()
+	// loginlog.DefaultStatus holds the default value on creation for the status field.
+	loginlog.DefaultStatus = loginlogDescStatus.Default.(int)
+	// loginlogDescFailReason is the schema descriptor for fail_reason field.
+	loginlogDescFailReason := loginlogFields[6].Descriptor()
+	// loginlog.FailReasonValidator is a validator for the "fail_reason" field. It is called by the builders before save.
+	loginlog.FailReasonValidator = loginlogDescFailReason.Validators[0].(func(string) error)
+	// loginlogDescLoginAt is the schema descriptor for login_at field.
+	loginlogDescLoginAt := loginlogFields[7].Descriptor()
+	// loginlog.DefaultLoginAt holds the default value on creation for the login_at field.
+	loginlog.DefaultLoginAt = loginlogDescLoginAt.Default.(func() time.Time)
+	// loginlogDescID is the schema descriptor for id field.
+	loginlogDescID := loginlogFields[0].Descriptor()
+	// loginlog.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	loginlog.IDValidator = loginlogDescID.Validators[0].(func(int64) error)
+	operationlogMixin := schema.OperationLog{}.Mixin()
+	operationlogMixinHooks1 := operationlogMixin[1].Hooks()
+	operationlog.Hooks[0] = operationlogMixinHooks1[0]
+	operationlogMixinInters1 := operationlogMixin[1].Interceptors()
+	operationlog.Interceptors[0] = operationlogMixinInters1[0]
+	operationlogMixinFields0 := operationlogMixin[0].Fields()
+	_ = operationlogMixinFields0
+	operationlogFields := schema.OperationLog{}.Fields()
+	_ = operationlogFields
+	// operationlogDescCreatedAt is the schema descriptor for created_at field.
+	operationlogDescCreatedAt := operationlogMixinFields0[0].Descriptor()
+	// operationlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	operationlog.DefaultCreatedAt = operationlogDescCreatedAt.Default.(func() time.Time)
+	// operationlogDescUpdatedAt is the schema descriptor for updated_at field.
+	operationlogDescUpdatedAt := operationlogMixinFields0[1].Descriptor()
+	// operationlog.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	operationlog.DefaultUpdatedAt = operationlogDescUpdatedAt.Default.(func() time.Time)
+	// operationlog.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	operationlog.UpdateDefaultUpdatedAt = operationlogDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// operationlogDescUsername is the schema descriptor for username field.
+	operationlogDescUsername := operationlogFields[2].Descriptor()
+	// operationlog.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
+	operationlog.UsernameValidator = operationlogDescUsername.Validators[0].(func(string) error)
+	// operationlogDescModule is the schema descriptor for module field.
+	operationlogDescModule := operationlogFields[3].Descriptor()
+	// operationlog.ModuleValidator is a validator for the "module" field. It is called by the builders before save.
+	operationlog.ModuleValidator = operationlogDescModule.Validators[0].(func(string) error)
+	// operationlogDescAction is the schema descriptor for action field.
+	operationlogDescAction := operationlogFields[4].Descriptor()
+	// operationlog.ActionValidator is a validator for the "action" field. It is called by the builders before save.
+	operationlog.ActionValidator = operationlogDescAction.Validators[0].(func(string) error)
+	// operationlogDescMethod is the schema descriptor for method field.
+	operationlogDescMethod := operationlogFields[5].Descriptor()
+	// operationlog.MethodValidator is a validator for the "method" field. It is called by the builders before save.
+	operationlog.MethodValidator = operationlogDescMethod.Validators[0].(func(string) error)
+	// operationlogDescPath is the schema descriptor for path field.
+	operationlogDescPath := operationlogFields[6].Descriptor()
+	// operationlog.PathValidator is a validator for the "path" field. It is called by the builders before save.
+	operationlog.PathValidator = operationlogDescPath.Validators[0].(func(string) error)
+	// operationlogDescIP is the schema descriptor for ip field.
+	operationlogDescIP := operationlogFields[7].Descriptor()
+	// operationlog.IPValidator is a validator for the "ip" field. It is called by the builders before save.
+	operationlog.IPValidator = operationlogDescIP.Validators[0].(func(string) error)
+	// operationlogDescUserAgent is the schema descriptor for user_agent field.
+	operationlogDescUserAgent := operationlogFields[8].Descriptor()
+	// operationlog.UserAgentValidator is a validator for the "user_agent" field. It is called by the builders before save.
+	operationlog.UserAgentValidator = operationlogDescUserAgent.Validators[0].(func(string) error)
+	// operationlogDescStatus is the schema descriptor for status field.
+	operationlogDescStatus := operationlogFields[9].Descriptor()
+	// operationlog.DefaultStatus holds the default value on creation for the status field.
+	operationlog.DefaultStatus = operationlogDescStatus.Default.(int)
+	// operationlogDescErrorMsg is the schema descriptor for error_msg field.
+	operationlogDescErrorMsg := operationlogFields[10].Descriptor()
+	// operationlog.ErrorMsgValidator is a validator for the "error_msg" field. It is called by the builders before save.
+	operationlog.ErrorMsgValidator = operationlogDescErrorMsg.Validators[0].(func(string) error)
+	// operationlogDescDurationMs is the schema descriptor for duration_ms field.
+	operationlogDescDurationMs := operationlogFields[11].Descriptor()
+	// operationlog.DefaultDurationMs holds the default value on creation for the duration_ms field.
+	operationlog.DefaultDurationMs = operationlogDescDurationMs.Default.(int64)
+	// operationlogDescID is the schema descriptor for id field.
+	operationlogDescID := operationlogFields[0].Descriptor()
+	// operationlog.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	operationlog.IDValidator = operationlogDescID.Validators[0].(func(int64) error)
 	tokenblacklistMixin := schema.TokenBlacklist{}.Mixin()
 	tokenblacklistMixinFields0 := tokenblacklistMixin[0].Fields()
 	_ = tokenblacklistMixinFields0
@@ -341,6 +453,6 @@ func init() {
 }
 
 const (
-	Version = "v0.14.5"                                         // Version of ent codegen.
-	Sum     = "h1:Rj2WOYJtCkWyFo6a+5wB3EfBRP0rnx1fMk6gGA0UUe4=" // Sum of ent codegen.
+	Version = "v0.14.6"                                         // Version of ent codegen.
+	Sum     = "h1:/f2696BpwuWAEEG6PVGWflg6+Inrpq4pRWuNlWz/Skk=" // Sum of ent codegen.
 )

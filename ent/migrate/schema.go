@@ -288,6 +288,102 @@ var (
 			},
 		},
 	}
+	// LoginLogsColumns holds the columns for the "login_logs" table.
+	LoginLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "user_id", Type: field.TypeInt64, Nullable: true, Comment: "管理员ID，登录失败且账号不存在时为空"},
+		{Name: "username", Type: field.TypeString, Size: 50, Comment: "尝试登录的账号"},
+		{Name: "ip", Type: field.TypeString, Nullable: true, Size: 45, Comment: "来源IP，兼容 IPv6"},
+		{Name: "user_agent", Type: field.TypeString, Nullable: true, Size: 512, Comment: "客户端标识"},
+		{Name: "status", Type: field.TypeInt, Comment: "登录结果：0 成功，1 失败", Default: 0},
+		{Name: "fail_reason", Type: field.TypeString, Nullable: true, Size: 255, Comment: "失败原因"},
+		{Name: "login_at", Type: field.TypeTime, Comment: "登录时间"},
+	}
+	// LoginLogsTable holds the schema information for the "login_logs" table.
+	LoginLogsTable = &schema.Table{
+		Name:       "login_logs",
+		Comment:    "登录日志表，记录登录成功与失败尝试",
+		Columns:    LoginLogsColumns,
+		PrimaryKey: []*schema.Column{LoginLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "loginlog_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{LoginLogsColumns[1]},
+			},
+			{
+				Name:    "loginlog_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{LoginLogsColumns[3]},
+			},
+			{
+				Name:    "loginlog_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{LoginLogsColumns[4]},
+			},
+			{
+				Name:    "loginlog_username",
+				Unique:  false,
+				Columns: []*schema.Column{LoginLogsColumns[5]},
+			},
+			{
+				Name:    "loginlog_login_at",
+				Unique:  false,
+				Columns: []*schema.Column{LoginLogsColumns[10]},
+			},
+		},
+	}
+	// OperationLogsColumns holds the columns for the "operation_logs" table.
+	OperationLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "user_id", Type: field.TypeInt64, Nullable: true, Comment: "操作人ID，未登录时为空"},
+		{Name: "username", Type: field.TypeString, Nullable: true, Size: 50, Comment: "操作人账号"},
+		{Name: "module", Type: field.TypeString, Nullable: true, Size: 50, Comment: "业务模块，如 管理员管理"},
+		{Name: "action", Type: field.TypeString, Nullable: true, Size: 100, Comment: "操作描述，如 新增管理员"},
+		{Name: "method", Type: field.TypeString, Size: 10, Comment: "HTTP 方法"},
+		{Name: "path", Type: field.TypeString, Size: 255, Comment: "请求路径"},
+		{Name: "ip", Type: field.TypeString, Nullable: true, Size: 45, Comment: "来源IP，兼容 IPv6"},
+		{Name: "user_agent", Type: field.TypeString, Nullable: true, Size: 512, Comment: "客户端标识"},
+		{Name: "status", Type: field.TypeInt, Comment: "操作结果：0 成功，1 失败", Default: 0},
+		{Name: "error_msg", Type: field.TypeString, Nullable: true, Size: 512, Comment: "失败原因"},
+		{Name: "duration_ms", Type: field.TypeInt64, Comment: "耗时（毫秒）", Default: 0},
+		{Name: "params", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "请求参数快照，敏感字段已脱敏并截断"},
+	}
+	// OperationLogsTable holds the schema information for the "operation_logs" table.
+	OperationLogsTable = &schema.Table{
+		Name:       "operation_logs",
+		Comment:    "操作日志表，记录受保护接口的调用情况",
+		Columns:    OperationLogsColumns,
+		PrimaryKey: []*schema.Column{OperationLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "operationlog_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OperationLogsColumns[1]},
+			},
+			{
+				Name:    "operationlog_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{OperationLogsColumns[3]},
+			},
+			{
+				Name:    "operationlog_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{OperationLogsColumns[4]},
+			},
+			{
+				Name:    "operationlog_status",
+				Unique:  false,
+				Columns: []*schema.Column{OperationLogsColumns[12]},
+			},
+		},
+	}
 	// TokenBlacklistsColumns holds the columns for the "token_blacklists" table.
 	TokenBlacklistsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
@@ -330,6 +426,8 @@ var (
 		AdminUsersTable,
 		AdminUserRolesTable,
 		DepartmentsTable,
+		LoginLogsTable,
+		OperationLogsTable,
 		TokenBlacklistsTable,
 	}
 )

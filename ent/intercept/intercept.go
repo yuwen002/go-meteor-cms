@@ -15,6 +15,8 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
+	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
+	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
@@ -264,6 +266,60 @@ func (f TraverseDepartment) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.DepartmentQuery", q)
 }
 
+// The LoginLogFunc type is an adapter to allow the use of ordinary function as a Querier.
+type LoginLogFunc func(context.Context, *ent.LoginLogQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f LoginLogFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.LoginLogQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.LoginLogQuery", q)
+}
+
+// The TraverseLoginLog type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseLoginLog func(context.Context, *ent.LoginLogQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseLoginLog) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseLoginLog) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.LoginLogQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.LoginLogQuery", q)
+}
+
+// The OperationLogFunc type is an adapter to allow the use of ordinary function as a Querier.
+type OperationLogFunc func(context.Context, *ent.OperationLogQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f OperationLogFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.OperationLogQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.OperationLogQuery", q)
+}
+
+// The TraverseOperationLog type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseOperationLog func(context.Context, *ent.OperationLogQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseOperationLog) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseOperationLog) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.OperationLogQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.OperationLogQuery", q)
+}
+
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary function as a Querier.
 type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistQuery) (ent.Value, error)
 
@@ -308,6 +364,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AdminUserRoleQuery, predicate.AdminUserRole, adminuserrole.OrderOption]{typ: ent.TypeAdminUserRole, tq: q}, nil
 	case *ent.DepartmentQuery:
 		return &query[*ent.DepartmentQuery, predicate.Department, department.OrderOption]{typ: ent.TypeDepartment, tq: q}, nil
+	case *ent.LoginLogQuery:
+		return &query[*ent.LoginLogQuery, predicate.LoginLog, loginlog.OrderOption]{typ: ent.TypeLoginLog, tq: q}, nil
+	case *ent.OperationLogQuery:
+		return &query[*ent.OperationLogQuery, predicate.OperationLog, operationlog.OrderOption]{typ: ent.TypeOperationLog, tq: q}, nil
 	case *ent.TokenBlacklistQuery:
 		return &query[*ent.TokenBlacklistQuery, predicate.TokenBlacklist, tokenblacklist.OrderOption]{typ: ent.TypeTokenBlacklist, tq: q}, nil
 	default:

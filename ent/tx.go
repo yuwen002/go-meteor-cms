@@ -26,6 +26,10 @@ type Tx struct {
 	AdminUserRole *AdminUserRoleClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
+	// LoginLog is the client for interacting with the LoginLog builders.
+	LoginLog *LoginLogClient
+	// OperationLog is the client for interacting with the OperationLog builders.
+	OperationLog *OperationLogClient
 	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
 	TokenBlacklist *TokenBlacklistClient
 
@@ -166,6 +170,8 @@ func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.AdminUserRole = NewAdminUserRoleClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
+	tx.LoginLog = NewLoginLogClient(tx.config)
+	tx.OperationLog = NewOperationLogClient(tx.config)
 	tx.TokenBlacklist = NewTokenBlacklistClient(tx.config)
 }
 

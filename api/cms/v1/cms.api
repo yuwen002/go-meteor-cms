@@ -47,6 +47,9 @@ type (
 	}
 )
 
+@server (
+	middleware: ClientInfoMiddleware
+)
 service cms-api {
 	// 获取验证码
 	@handler GetCaptcha
@@ -417,11 +420,82 @@ type (
 		Nickname *string `json:"nickname,optional"`
 		Email    *string `json:"email,optional"`
 		Phone    *string `json:"phone,optional"`
+		Avatar   *string `json:"avatar,optional"`
+	}
+	// 操作日志列表请求
+	OperationLogListReq {
+		Page      int    `form:"page,default=1"`
+		PageSize  int    `form:"page_size,default=20"`
+		UserID    int64  `form:"user_id,optional"`
+		Username  string `form:"username,optional"`
+		Module    string `form:"module,optional"`
+		Path      string `form:"path,optional"`
+		Status    int    `form:"status,optional"`
+		StartTime string `form:"start_time,optional"`
+		EndTime   string `form:"end_time,optional"`
+	}
+	// 操作日志项
+	OperationLogItem {
+		ID         int64  `json:"id"`
+		UserID     int64  `json:"user_id"`
+		Username   string `json:"username"`
+		Module     string `json:"module"`
+		Action     string `json:"action"`
+		Method     string `json:"method"`
+		Path       string `json:"path"`
+		IP         string `json:"ip"`
+		UserAgent  string `json:"user_agent"`
+		Status     int    `json:"status"`
+		ErrorMsg   string `json:"error_msg"`
+		DurationMs int64  `json:"duration_ms"`
+		Params     string `json:"params"`
+		CreatedAt  string `json:"created_at"`
+	}
+	// 操作日志列表响应
+	OperationLogListResp {
+		Total    int64              `json:"total"`
+		Page     int                `json:"page"`
+		PageSize int                `json:"page_size"`
+		List     []OperationLogItem `json:"list"`
+	}
+	// 登录日志列表请求
+	LoginLogListReq {
+		Page      int    `form:"page,default=1"`
+		PageSize  int    `form:"page_size,default=20"`
+		UserID    int64  `form:"user_id,optional"`
+		Username  string `form:"username,optional"`
+		Status    int    `form:"status,optional"`
+		StartTime string `form:"start_time,optional"`
+		EndTime   string `form:"end_time,optional"`
+	}
+	// 登录日志项
+	LoginLogItem {
+		ID         int64  `json:"id"`
+		UserID     int64  `json:"user_id"`
+		Username   string `json:"username"`
+		IP         string `json:"ip"`
+		UserAgent  string `json:"user_agent"`
+		Status     int    `json:"status"`
+		FailReason string `json:"fail_reason"`
+		LoginAt    string `json:"login_at"`
+	}
+	// 登录日志列表响应
+	LoginLogListResp {
+		Total    int64          `json:"total"`
+		Page     int            `json:"page"`
+		PageSize int            `json:"page_size"`
+		List     []LoginLogItem `json:"list"`
+	}
+	// 文件上传响应
+	UploadFileResp {
+		URL      string `json:"url"`
+		Filename string `json:"filename"`
+		Size     int64  `json:"size"`
 	}
 )
 
 @server (
-	middleware: JwtMiddleware,PermissionMiddleware
+	middleware: ClientInfoMiddleware,JwtMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
 service cms-api {
 	@handler testToken
@@ -574,5 +648,17 @@ service cms-api {
 	// 更新当前登录管理员的个人资料（不允许修改角色与启用状态）
 	@handler updateMyProfile
 	put /admin/profile (UpdateProfileReq) returns (AdminProfileResp)
+
+	// 操作日志列表
+	@handler operationLogList
+	get /admin/logs/operations (OperationLogListReq) returns (OperationLogListResp)
+
+	// 登录日志列表
+	@handler loginLogList
+	get /admin/logs/logins (LoginLogListReq) returns (LoginLogListResp)
+
+	// 上传文件（头像等）
+	@handler uploadFile
+	post /admin/upload returns (UploadFileResp)
 }
 
