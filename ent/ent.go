@@ -21,6 +21,9 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
+	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
+	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
+	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -91,6 +94,9 @@ func checkColumn(t, c string) error {
 			department.Table:          department.ValidColumn,
 			loginlog.Table:            loginlog.ValidColumn,
 			operationlog.Table:        operationlog.ValidColumn,
+			sysconfig.Table:           sysconfig.ValidColumn,
+			sysdict.Table:             sysdict.ValidColumn,
+			sysdictitem.Table:         sysdictitem.ValidColumn,
 			tokenblacklist.Table:      tokenblacklist.ValidColumn,
 		})
 	})

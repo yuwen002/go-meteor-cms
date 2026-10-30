@@ -18,6 +18,9 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
+	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
+	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
+	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -320,6 +323,87 @@ func (f TraverseOperationLog) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.OperationLogQuery", q)
 }
 
+// The SysConfigFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SysConfigFunc func(context.Context, *ent.SysConfigQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SysConfigFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SysConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SysConfigQuery", q)
+}
+
+// The TraverseSysConfig type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSysConfig func(context.Context, *ent.SysConfigQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSysConfig) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSysConfig) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SysConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SysConfigQuery", q)
+}
+
+// The SysDictFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SysDictFunc func(context.Context, *ent.SysDictQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SysDictFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SysDictQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SysDictQuery", q)
+}
+
+// The TraverseSysDict type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSysDict func(context.Context, *ent.SysDictQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSysDict) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSysDict) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SysDictQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SysDictQuery", q)
+}
+
+// The SysDictItemFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SysDictItemFunc func(context.Context, *ent.SysDictItemQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SysDictItemFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SysDictItemQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SysDictItemQuery", q)
+}
+
+// The TraverseSysDictItem type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSysDictItem func(context.Context, *ent.SysDictItemQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSysDictItem) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSysDictItem) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SysDictItemQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SysDictItemQuery", q)
+}
+
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary function as a Querier.
 type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistQuery) (ent.Value, error)
 
@@ -368,6 +452,12 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.LoginLogQuery, predicate.LoginLog, loginlog.OrderOption]{typ: ent.TypeLoginLog, tq: q}, nil
 	case *ent.OperationLogQuery:
 		return &query[*ent.OperationLogQuery, predicate.OperationLog, operationlog.OrderOption]{typ: ent.TypeOperationLog, tq: q}, nil
+	case *ent.SysConfigQuery:
+		return &query[*ent.SysConfigQuery, predicate.SysConfig, sysconfig.OrderOption]{typ: ent.TypeSysConfig, tq: q}, nil
+	case *ent.SysDictQuery:
+		return &query[*ent.SysDictQuery, predicate.SysDict, sysdict.OrderOption]{typ: ent.TypeSysDict, tq: q}, nil
+	case *ent.SysDictItemQuery:
+		return &query[*ent.SysDictItemQuery, predicate.SysDictItem, sysdictitem.OrderOption]{typ: ent.TypeSysDictItem, tq: q}, nil
 	case *ent.TokenBlacklistQuery:
 		return &query[*ent.TokenBlacklistQuery, predicate.TokenBlacklist, tokenblacklist.OrderOption]{typ: ent.TypeTokenBlacklist, tq: q}, nil
 	default:

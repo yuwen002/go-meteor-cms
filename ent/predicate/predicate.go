@@ -33,5 +33,14 @@ type LoginLog func(*sql.Selector)
 // OperationLog is the predicate function for operationlog builders.
 type OperationLog func(*sql.Selector)
 
+// SysConfig is the predicate function for sysconfig builders.
+type SysConfig func(*sql.Selector)
+
+// SysDict is the predicate function for sysdict builders.
+type SysDict func(*sql.Selector)
+
+// SysDictItem is the predicate function for sysdictitem builders.
+type SysDictItem func(*sql.Selector)
+
 // TokenBlacklist is the predicate function for tokenblacklist builders.
 type TokenBlacklist func(*sql.Selector)

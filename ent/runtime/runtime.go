@@ -15,6 +15,9 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/schema"
+	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
+	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
+	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -407,6 +410,221 @@ func init() {
 	operationlogDescID := operationlogFields[0].Descriptor()
 	// operationlog.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	operationlog.IDValidator = operationlogDescID.Validators[0].(func(int64) error)
+	sysconfigMixin := schema.SysConfig{}.Mixin()
+	sysconfigMixinFields0 := sysconfigMixin[0].Fields()
+	_ = sysconfigMixinFields0
+	sysconfigFields := schema.SysConfig{}.Fields()
+	_ = sysconfigFields
+	// sysconfigDescCreatedAt is the schema descriptor for created_at field.
+	sysconfigDescCreatedAt := sysconfigMixinFields0[0].Descriptor()
+	// sysconfig.DefaultCreatedAt holds the default value on creation for the created_at field.
+	sysconfig.DefaultCreatedAt = sysconfigDescCreatedAt.Default.(func() time.Time)
+	// sysconfigDescUpdatedAt is the schema descriptor for updated_at field.
+	sysconfigDescUpdatedAt := sysconfigMixinFields0[1].Descriptor()
+	// sysconfig.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	sysconfig.DefaultUpdatedAt = sysconfigDescUpdatedAt.Default.(func() time.Time)
+	// sysconfig.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	sysconfig.UpdateDefaultUpdatedAt = sysconfigDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// sysconfigDescConfigKey is the schema descriptor for config_key field.
+	sysconfigDescConfigKey := sysconfigFields[1].Descriptor()
+	// sysconfig.ConfigKeyValidator is a validator for the "config_key" field. It is called by the builders before save.
+	sysconfig.ConfigKeyValidator = func() func(string) error {
+		validators := sysconfigDescConfigKey.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(config_key string) error {
+			for _, fn := range fns {
+				if err := fn(config_key); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysconfigDescConfigValue is the schema descriptor for config_value field.
+	sysconfigDescConfigValue := sysconfigFields[2].Descriptor()
+	// sysconfig.ConfigValueValidator is a validator for the "config_value" field. It is called by the builders before save.
+	sysconfig.ConfigValueValidator = sysconfigDescConfigValue.Validators[0].(func(string) error)
+	// sysconfigDescName is the schema descriptor for name field.
+	sysconfigDescName := sysconfigFields[3].Descriptor()
+	// sysconfig.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	sysconfig.NameValidator = func() func(string) error {
+		validators := sysconfigDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysconfigDescRemark is the schema descriptor for remark field.
+	sysconfigDescRemark := sysconfigFields[4].Descriptor()
+	// sysconfig.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	sysconfig.RemarkValidator = sysconfigDescRemark.Validators[0].(func(string) error)
+	// sysconfigDescIsSystem is the schema descriptor for is_system field.
+	sysconfigDescIsSystem := sysconfigFields[5].Descriptor()
+	// sysconfig.DefaultIsSystem holds the default value on creation for the is_system field.
+	sysconfig.DefaultIsSystem = sysconfigDescIsSystem.Default.(bool)
+	// sysconfigDescID is the schema descriptor for id field.
+	sysconfigDescID := sysconfigFields[0].Descriptor()
+	// sysconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	sysconfig.IDValidator = sysconfigDescID.Validators[0].(func(int64) error)
+	sysdictMixin := schema.SysDict{}.Mixin()
+	sysdictMixinFields0 := sysdictMixin[0].Fields()
+	_ = sysdictMixinFields0
+	sysdictFields := schema.SysDict{}.Fields()
+	_ = sysdictFields
+	// sysdictDescCreatedAt is the schema descriptor for created_at field.
+	sysdictDescCreatedAt := sysdictMixinFields0[0].Descriptor()
+	// sysdict.DefaultCreatedAt holds the default value on creation for the created_at field.
+	sysdict.DefaultCreatedAt = sysdictDescCreatedAt.Default.(func() time.Time)
+	// sysdictDescUpdatedAt is the schema descriptor for updated_at field.
+	sysdictDescUpdatedAt := sysdictMixinFields0[1].Descriptor()
+	// sysdict.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	sysdict.DefaultUpdatedAt = sysdictDescUpdatedAt.Default.(func() time.Time)
+	// sysdict.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	sysdict.UpdateDefaultUpdatedAt = sysdictDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// sysdictDescCode is the schema descriptor for code field.
+	sysdictDescCode := sysdictFields[1].Descriptor()
+	// sysdict.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	sysdict.CodeValidator = func() func(string) error {
+		validators := sysdictDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysdictDescName is the schema descriptor for name field.
+	sysdictDescName := sysdictFields[2].Descriptor()
+	// sysdict.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	sysdict.NameValidator = func() func(string) error {
+		validators := sysdictDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysdictDescDescription is the schema descriptor for description field.
+	sysdictDescDescription := sysdictFields[3].Descriptor()
+	// sysdict.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	sysdict.DescriptionValidator = sysdictDescDescription.Validators[0].(func(string) error)
+	// sysdictDescStatus is the schema descriptor for status field.
+	sysdictDescStatus := sysdictFields[4].Descriptor()
+	// sysdict.DefaultStatus holds the default value on creation for the status field.
+	sysdict.DefaultStatus = sysdictDescStatus.Default.(int)
+	// sysdictDescSort is the schema descriptor for sort field.
+	sysdictDescSort := sysdictFields[5].Descriptor()
+	// sysdict.DefaultSort holds the default value on creation for the sort field.
+	sysdict.DefaultSort = sysdictDescSort.Default.(int)
+	// sysdictDescID is the schema descriptor for id field.
+	sysdictDescID := sysdictFields[0].Descriptor()
+	// sysdict.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	sysdict.IDValidator = sysdictDescID.Validators[0].(func(int64) error)
+	sysdictitemMixin := schema.SysDictItem{}.Mixin()
+	sysdictitemMixinFields0 := sysdictitemMixin[0].Fields()
+	_ = sysdictitemMixinFields0
+	sysdictitemFields := schema.SysDictItem{}.Fields()
+	_ = sysdictitemFields
+	// sysdictitemDescCreatedAt is the schema descriptor for created_at field.
+	sysdictitemDescCreatedAt := sysdictitemMixinFields0[0].Descriptor()
+	// sysdictitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	sysdictitem.DefaultCreatedAt = sysdictitemDescCreatedAt.Default.(func() time.Time)
+	// sysdictitemDescUpdatedAt is the schema descriptor for updated_at field.
+	sysdictitemDescUpdatedAt := sysdictitemMixinFields0[1].Descriptor()
+	// sysdictitem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	sysdictitem.DefaultUpdatedAt = sysdictitemDescUpdatedAt.Default.(func() time.Time)
+	// sysdictitem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	sysdictitem.UpdateDefaultUpdatedAt = sysdictitemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// sysdictitemDescDictCode is the schema descriptor for dict_code field.
+	sysdictitemDescDictCode := sysdictitemFields[1].Descriptor()
+	// sysdictitem.DictCodeValidator is a validator for the "dict_code" field. It is called by the builders before save.
+	sysdictitem.DictCodeValidator = func() func(string) error {
+		validators := sysdictitemDescDictCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(dict_code string) error {
+			for _, fn := range fns {
+				if err := fn(dict_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysdictitemDescLabel is the schema descriptor for label field.
+	sysdictitemDescLabel := sysdictitemFields[2].Descriptor()
+	// sysdictitem.LabelValidator is a validator for the "label" field. It is called by the builders before save.
+	sysdictitem.LabelValidator = func() func(string) error {
+		validators := sysdictitemDescLabel.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(label string) error {
+			for _, fn := range fns {
+				if err := fn(label); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysdictitemDescValue is the schema descriptor for value field.
+	sysdictitemDescValue := sysdictitemFields[3].Descriptor()
+	// sysdictitem.ValueValidator is a validator for the "value" field. It is called by the builders before save.
+	sysdictitem.ValueValidator = func() func(string) error {
+		validators := sysdictitemDescValue.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(value string) error {
+			for _, fn := range fns {
+				if err := fn(value); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sysdictitemDescStatus is the schema descriptor for status field.
+	sysdictitemDescStatus := sysdictitemFields[4].Descriptor()
+	// sysdictitem.DefaultStatus holds the default value on creation for the status field.
+	sysdictitem.DefaultStatus = sysdictitemDescStatus.Default.(int)
+	// sysdictitemDescSort is the schema descriptor for sort field.
+	sysdictitemDescSort := sysdictitemFields[5].Descriptor()
+	// sysdictitem.DefaultSort holds the default value on creation for the sort field.
+	sysdictitem.DefaultSort = sysdictitemDescSort.Default.(int)
+	// sysdictitemDescID is the schema descriptor for id field.
+	sysdictitemDescID := sysdictitemFields[0].Descriptor()
+	// sysdictitem.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	sysdictitem.IDValidator = sysdictitemDescID.Validators[0].(func(int64) error)
 	tokenblacklistMixin := schema.TokenBlacklist{}.Mixin()
 	tokenblacklistMixinFields0 := tokenblacklistMixin[0].Fields()
 	_ = tokenblacklistMixinFields0

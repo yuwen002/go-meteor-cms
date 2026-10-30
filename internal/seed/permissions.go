@@ -162,6 +162,38 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "重命名文件", Permission: "system:file:rename", Type: PermissionTypeAPI, ParentName: "文件管理", Method: "PUT", APIPath: "/admin/files/rename", Sort: 62},
 	{Name: "删除文件", Permission: "system:file:delete", Type: PermissionTypeButton, ParentName: "文件管理", Sort: 63},
 	{Name: "删除文件", Permission: "system:file:delete", Type: PermissionTypeAPI, ParentName: "文件管理", Method: "POST", APIPath: "/admin/files/delete", Sort: 63},
+
+	// ---------- 数据字典 ----------
+	{Name: "字典管理", Permission: "system:dict:list", Type: PermissionTypeMenu,
+		Path: "/system/dicts", Component: "views/system/dict/index.vue", Icon: "dict", Sort: 70},
+	{Name: "查看字典", Permission: "system:dict:list", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 71},
+	{Name: "查看字典", Permission: "system:dict:list", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "GET", APIPath: "/admin/dicts", Sort: 71},
+	{Name: "新增字典", Permission: "system:dict:add", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 72},
+	{Name: "新增字典", Permission: "system:dict:add", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "POST", APIPath: "/admin/dicts", Sort: 72},
+	{Name: "编辑字典", Permission: "system:dict:edit", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 73},
+	{Name: "编辑字典", Permission: "system:dict:edit", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "PUT", APIPath: "/admin/dicts/:id", Sort: 73},
+	{Name: "删除字典", Permission: "system:dict:delete", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 74},
+	{Name: "删除字典", Permission: "system:dict:delete", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "DELETE", APIPath: "/admin/dicts/:id", Sort: 74},
+	{Name: "查看字典项", Permission: "system:dict_item:list", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 75},
+	{Name: "查看字典项", Permission: "system:dict_item:list", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "GET", APIPath: "/admin/dicts/items", Sort: 75},
+	{Name: "新增字典项", Permission: "system:dict_item:add", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 76},
+	{Name: "新增字典项", Permission: "system:dict_item:add", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "POST", APIPath: "/admin/dicts/items", Sort: 76},
+	{Name: "编辑字典项", Permission: "system:dict_item:edit", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 77},
+	{Name: "编辑字典项", Permission: "system:dict_item:edit", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "PUT", APIPath: "/admin/dicts/items/:id", Sort: 77},
+	{Name: "删除字典项", Permission: "system:dict_item:delete", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 78},
+	{Name: "删除字典项", Permission: "system:dict_item:delete", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "DELETE", APIPath: "/admin/dicts/items/:id", Sort: 78},
+
+	// ---------- 系统配置 ----------
+	{Name: "系统配置", Permission: "system:config:list", Type: PermissionTypeMenu,
+		Path: "/system/configs", Component: "views/system/config/index.vue", Icon: "setting", Sort: 80},
+	{Name: "查看配置", Permission: "system:config:list", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 81},
+	{Name: "查看配置", Permission: "system:config:list", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "GET", APIPath: "/admin/configs", Sort: 81},
+	{Name: "新增配置", Permission: "system:config:add", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 82},
+	{Name: "新增配置", Permission: "system:config:add", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "POST", APIPath: "/admin/configs", Sort: 82},
+	{Name: "编辑配置", Permission: "system:config:edit", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 83},
+	{Name: "编辑配置", Permission: "system:config:edit", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "PUT", APIPath: "/admin/configs/:id", Sort: 83},
+	{Name: "删除配置", Permission: "system:config:delete", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 84},
+	{Name: "删除配置", Permission: "system:config:delete", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "DELETE", APIPath: "/admin/configs/:id", Sort: 84},
 }
 
 // legacyPermissions 历史版本的权限标识，已被 DefaultPermissions 中的新标识取代。

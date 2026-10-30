@@ -56,6 +56,7 @@ type Config struct {
 	WebBaseURL string
 	// StaticDir 前端构建产物（dist）目录；非空时由本服务直接托管 SPA（含 history 路由回退）。
 	// 容器化部署通常通过环境变量 WEB_DIST 注入，本地开发留空即可（仅暴露 API）。
-	StaticDir string
+	// optional：仅托管 API 时配置文件里可以不写这一项，否则 go-zero 严格解析会直接启动失败。
+	StaticDir string `json:",optional"`
 	Upload    baseconfig.Upload
 }

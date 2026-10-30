@@ -155,14 +155,19 @@ Authorization: Bearer <token>
   "data": {
     "is_super": false,
     "menus": [
-      { "id": 2, "name": "管理员管理", "path": "/admin/admin-users",
-        "component": "views/admin/user/list.vue", "icon": "user",
-        "permission": "system:admin_user:list", "children": [] }
+      { "id": 2, "name": "管理员管理", "path": "/system/users",
+        "component": "views/admin/user/index.vue", "icon": "user",
+        "permission": "system:admin_user:list", "sort": 10, "children": [] }
     ],
     "permissions": ["system:admin_user:list", "system:admin_user:add"]
   }
 }
 ```
+
+> `menus` 为已按权限过滤并按 `sort` 升序的菜单树，前端侧边栏直接据此渲染（动态菜单），
+> `icon` 是语义键（如 `user / dict / setting`），由前端映射为具体图标组件。
+> 超级管理员返回全部菜单，且 `is_super=true` 时后端鉴权与前端守卫均直接放行。
+> 登录成功后前端只需拉取一次（用 `accessLoaded` 标记），零权限用户也不会重复请求。
 
 ---
 
@@ -403,6 +408,48 @@ Authorization: Bearer <token>
 ### PUT `/admin/files/rename`
 
 请求体：`{ "path": "...", "new_name": "新名称" }`。`new_name` 不含路径分隔符，且目标名称不得已存在。
+
+---
+
+## 数据字典
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/dicts` | `system:dict:list` | 字典类型列表（关键字、状态、分页） |
+| POST | `/admin/dicts` | `system:dict:add` | 新增字典类型，编码唯一 |
+| PUT | `/admin/dicts/:id` | `system:dict:edit` | 修改字典类型（名称/描述/状态/排序） |
+| DELETE | `/admin/dicts/:id` | `system:dict:delete` | 删除字典类型，级联删除其下字典项 |
+| GET | `/admin/dicts/items` | `system:dict_item:list` | 某字典下的字典项列表，`dict_code` 必填 |
+| POST | `/admin/dicts/items` | `system:dict_item:add` | 新增字典项，同字典内 value 唯一 |
+| PUT | `/admin/dicts/items/:id` | `system:dict_item:edit` | 修改字典项 |
+| DELETE | `/admin/dicts/items/:id` | `system:dict_item:delete` | 删除字典项 |
+
+**错误码**：`5601` 字典不存在、`5602` 字典编码已存在、`5603/5604/5605` 字典增删改失败、`5606` 字典项不存在、`5607` 字典项已存在。
+
+### GET `/admin/dicts`
+
+**请求参数（query）**：`keyword`（编码/名称模糊）、`status`（1 启用 / 0 禁用）、`page`（默认 1）、`page_size`（默认 20，上限 100）。
+
+**响应 data**：`list[]`（`id / code / name / description / status / sort / created_at`）、`total`。
+
+### GET `/admin/dicts/items`
+
+**请求参数（query）**：`dict_code`（**必填**）、`keyword`（标签/值模糊）、`status`。响应 data：`list[]`（`id / dict_code / label / value / status / sort`）。
+
+---
+
+## 系统配置
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/configs` | `system:config:list` | 配置列表（按配置键/名称模糊） |
+| POST | `/admin/configs` | `system:config:add` | 新增配置，`config_key` 唯一，新增项固定为非内置 |
+| PUT | `/admin/configs/:id` | `system:config:edit` | 修改配置值/名称/备注 |
+| DELETE | `/admin/configs/:id` | `system:config:delete` | 删除配置；`is_system=true` 的内置项拒绝删除 |
+
+**错误码**：`5701` 配置不存在、`5702` 配置键已存在、`5703/5704` 配置增删改失败、`5705` 内置配置不可删除。
+
+**响应 data**：`list[]`（`id / config_key / config_value / name / remark / is_system / created_at`）——不分页。
 
 ---
 

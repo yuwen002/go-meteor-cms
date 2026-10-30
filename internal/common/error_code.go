@@ -80,6 +80,22 @@ const (
 	ErrPermissionInUse             = 5410 // 权限正在使用中，禁止删除
 	ErrPermissionNameCannotBeEmpty = 5411 // 权限名称不能为空
 	ErrPermissionTypeInvalid       = 5412 // 权限类型无效
+
+	// Dictionary errors (5600-5699)
+	ErrDictNotFound     = 5601 // 字典不存在
+	ErrDictCodeExists   = 5602 // 字典编码已存在
+	ErrDictCreateFail   = 5603 // 创建字典失败
+	ErrDictUpdateFail   = 5604 // 更新字典失败
+	ErrDictDeleteFail   = 5605 // 删除字典失败
+	ErrDictItemNotFound = 5606 // 字典项不存在
+	ErrDictItemExists   = 5607 // 同一字典下该字典项已存在
+
+	// System config errors (5700-5799)
+	ErrConfigNotFound     = 5701 // 配置不存在
+	ErrConfigKeyExists    = 5702 // 配置键已存在
+	ErrConfigCreateFail   = 5703 // 创建配置失败
+	ErrConfigUpdateFail   = 5704 // 更新配置失败
+	ErrConfigDeleteSystem = 5705 // 系统内置配置禁止删除
 )
 
 var errorMessages = map[int]string{
@@ -150,6 +166,20 @@ var errorMessages = map[int]string{
 	ErrPermissionInUse:             "权限正在使用中，禁止删除",
 	ErrPermissionNameCannotBeEmpty: "权限名称不能为空",
 	ErrPermissionTypeInvalid:       "权限类型无效",
+	// Dictionary error messages
+	ErrDictNotFound:     "字典不存在",
+	ErrDictCodeExists:   "字典编码已存在",
+	ErrDictCreateFail:   "创建字典失败",
+	ErrDictUpdateFail:   "更新字典失败",
+	ErrDictDeleteFail:   "删除字典失败",
+	ErrDictItemNotFound: "字典项不存在",
+	ErrDictItemExists:   "该字典下已存在相同的字典项",
+	// System config error messages
+	ErrConfigNotFound:     "配置不存在",
+	ErrConfigKeyExists:    "配置键已存在",
+	ErrConfigCreateFail:   "创建配置失败",
+	ErrConfigUpdateFail:   "更新配置失败",
+	ErrConfigDeleteSystem: "系统内置配置禁止删除",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

@@ -30,6 +30,7 @@ const iconMap: Record<string, string> = {
   document: 'Document',
   clock: 'Clock',
   file: 'Folder',
+  dict: 'Collection',
   setting: 'Setting',
 }
 

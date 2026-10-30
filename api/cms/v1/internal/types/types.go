@@ -233,11 +233,13 @@ type FileItem struct {
 	IsDir    bool   `json:"is_dir"`
 }
 
+// FileListReq 走 GET 查询串，必须用 form 标签：httpx 的 form 解析器只认 form 标签，
+// 用 json 标签时 query 参数会被静默忽略（搜索/分页失效）。
 type FileListReq struct {
-	Dir      string `json:"dir,optional"`     // 子目录，相对上传根；为空表示根目录
-	Keyword  string `json:"keyword,optional"` // 按文件名模糊匹配
-	Page     int64  `json:"page,optional"`
-	PageSize int64  `json:"page_size,optional"`
+	Dir      string `form:"dir,optional"`     // 子目录，相对上传根；为空表示根目录
+	Keyword  string `form:"keyword,optional"` // 按文件名模糊匹配
+	Page     int64  `form:"page,optional"`
+	PageSize int64  `form:"page_size,optional"`
 }
 
 type FileListResp struct {
@@ -253,6 +255,130 @@ type FileDeleteReq struct {
 type FileRenameReq struct {
 	Path    string `json:"path"`
 	NewName string `json:"new_name"` // 新名称（不含路径分隔符）
+}
+
+// ---------- 数据字典 ----------
+
+type DictItem struct {
+	ID          int64  `json:"id"`
+	Code        string `json:"code"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      int    `json:"status"`
+	Sort        int    `json:"sort"`
+	CreatedAt   string `json:"created_at"`
+}
+
+// DictListReq GET 查询串，标签用 form（httpx 只对 form 标签做 query 绑定）
+type DictListReq struct {
+	Keyword  string `form:"keyword,optional"`
+	Status   *int   `form:"status,optional"`
+	Page     int64  `form:"page,optional"`
+	PageSize int64  `form:"page_size,optional"`
+}
+
+type DictListResp struct {
+	List  []DictItem `json:"list"`
+	Total int64      `json:"total"`
+}
+
+type DictCreateReq struct {
+	Code        string `json:"code"`
+	Name        string `json:"name"`
+	Description string `json:"description,optional"`
+	Status      int    `json:"status,optional"`
+	Sort        int    `json:"sort,optional"`
+}
+
+type DictUpdateReq struct {
+	ID          int64  `path:"id"`
+	Name        string `json:"name,optional"`
+	Description string `json:"description,optional"`
+	Status      *int   `json:"status,optional"`
+	Sort        *int   `json:"sort,optional"`
+}
+
+type DictDetailReq struct {
+	ID int64 `path:"id"`
+}
+
+type DictDataItem struct {
+	ID       int64  `json:"id"`
+	DictCode string `json:"dict_code"`
+	Label    string `json:"label"`
+	Value    string `json:"value"`
+	Status   int    `json:"status"`
+	Sort     int    `json:"sort"`
+}
+
+// DictItemListReq GET 查询串，标签用 form；dict_code 为必填（无 optional）
+type DictItemListReq struct {
+	DictCode string `form:"dict_code"`
+	Keyword  string `form:"keyword,optional"`
+	Status   *int   `form:"status,optional"`
+}
+
+type DictItemListResp struct {
+	List []DictDataItem `json:"list"`
+}
+
+type DictItemCreateReq struct {
+	DictCode string `json:"dict_code"`
+	Label    string `json:"label"`
+	Value    string `json:"value"`
+	Status   int    `json:"status,optional"`
+	Sort     int    `json:"sort,optional"`
+}
+
+type DictItemUpdateReq struct {
+	ID     int64  `path:"id"`
+	Label  string `json:"label,optional"`
+	Value  string `json:"value,optional"`
+	Status *int   `json:"status,optional"`
+	Sort   *int   `json:"sort,optional"`
+}
+
+type DictItemDetailReq struct {
+	ID int64 `path:"id"`
+}
+
+// ---------- 系统配置 ----------
+
+type ConfigItem struct {
+	ID          int64  `json:"id"`
+	ConfigKey   string `json:"config_key"`
+	ConfigValue string `json:"config_value"`
+	Name        string `json:"name"`
+	Remark      string `json:"remark"`
+	IsSystem    bool   `json:"is_system"`
+	CreatedAt   string `json:"created_at"`
+}
+
+// ConfigListReq GET 查询串，标签用 form
+type ConfigListReq struct {
+	Keyword string `form:"keyword,optional"`
+}
+
+type ConfigListResp struct {
+	List []ConfigItem `json:"list"`
+}
+
+type ConfigCreateReq struct {
+	ConfigKey   string `json:"config_key"`
+	ConfigValue string `json:"config_value,optional"`
+	Name        string `json:"name"`
+	Remark      string `json:"remark,optional"`
+}
+
+type ConfigUpdateReq struct {
+	ID          int64  `path:"id"`
+	ConfigValue string `json:"config_value,optional"`
+	Name        string `json:"name,optional"`
+	Remark      string `json:"remark,optional"`
+}
+
+type ConfigDetailReq struct {
+	ID int64 `path:"id"`
 }
 
 type MyMenuItem struct {

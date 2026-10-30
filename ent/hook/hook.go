@@ -117,6 +117,42 @@ func (f OperationLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OperationLogMutation", m)
 }
 
+// The SysConfigFunc type is an adapter to allow the use of ordinary
+// function as SysConfig mutator.
+type SysConfigFunc func(context.Context, *ent.SysConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SysConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SysConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SysConfigMutation", m)
+}
+
+// The SysDictFunc type is an adapter to allow the use of ordinary
+// function as SysDict mutator.
+type SysDictFunc func(context.Context, *ent.SysDictMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SysDictFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SysDictMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SysDictMutation", m)
+}
+
+// The SysDictItemFunc type is an adapter to allow the use of ordinary
+// function as SysDictItem mutator.
+type SysDictItemFunc func(context.Context, *ent.SysDictItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SysDictItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SysDictItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SysDictItemMutation", m)
+}
+
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary
 // function as TokenBlacklist mutator.
 type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistMutation) (ent.Value, error)

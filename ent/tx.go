@@ -30,6 +30,12 @@ type Tx struct {
 	LoginLog *LoginLogClient
 	// OperationLog is the client for interacting with the OperationLog builders.
 	OperationLog *OperationLogClient
+	// SysConfig is the client for interacting with the SysConfig builders.
+	SysConfig *SysConfigClient
+	// SysDict is the client for interacting with the SysDict builders.
+	SysDict *SysDictClient
+	// SysDictItem is the client for interacting with the SysDictItem builders.
+	SysDictItem *SysDictItemClient
 	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
 	TokenBlacklist *TokenBlacklistClient
 
@@ -172,6 +178,9 @@ func (tx *Tx) init() {
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.LoginLog = NewLoginLogClient(tx.config)
 	tx.OperationLog = NewOperationLogClient(tx.config)
+	tx.SysConfig = NewSysConfigClient(tx.config)
+	tx.SysDict = NewSysDictClient(tx.config)
+	tx.SysDictItem = NewSysDictItemClient(tx.config)
 	tx.TokenBlacklist = NewTokenBlacklistClient(tx.config)
 }
 

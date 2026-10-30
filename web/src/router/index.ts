@@ -53,6 +53,18 @@ const routes = [
         meta: { title: '文件管理', permission: 'system:file:list' },
       },
       {
+        path: 'system/dicts',
+        name: 'SystemDicts',
+        component: () => import('@/views/system/dict/index.vue'),
+        meta: { title: '字典管理', permission: 'system:dict:list' },
+      },
+      {
+        path: 'system/configs',
+        name: 'SystemConfigs',
+        component: () => import('@/views/system/config/index.vue'),
+        meta: { title: '系统配置', permission: 'system:config:list' },
+      },
+      {
         path: 'system/operation-log',
         name: 'OperationLog',
         component: () => import('@/views/system/log/operation.vue'),

@@ -374,6 +374,106 @@ var (
 			},
 		},
 	}
+	// SysConfigsColumns holds the columns for the "sys_configs" table.
+	SysConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "config_key", Type: field.TypeString, Unique: true, Size: 128, Comment: "配置键，全局唯一，如 site_name"},
+		{Name: "config_value", Type: field.TypeString, Nullable: true, Size: 2048, Comment: "配置值"},
+		{Name: "name", Type: field.TypeString, Size: 128, Comment: "配置名称（展示用）"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Size: 512, Comment: "备注说明"},
+		{Name: "is_system", Type: field.TypeBool, Comment: "是否系统内置：内置配置禁止删除，避免误删导致功能异常", Default: false},
+	}
+	// SysConfigsTable holds the schema information for the "sys_configs" table.
+	SysConfigsTable = &schema.Table{
+		Name:       "sys_configs",
+		Comment:    "系统配置表，以键值对形式存放站点级参数",
+		Columns:    SysConfigsColumns,
+		PrimaryKey: []*schema.Column{SysConfigsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "sysconfig_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{SysConfigsColumns[1]},
+			},
+			{
+				Name:    "sysconfig_config_key",
+				Unique:  true,
+				Columns: []*schema.Column{SysConfigsColumns[3]},
+			},
+		},
+	}
+	// SysDictsColumns holds the columns for the "sys_dicts" table.
+	SysDictsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "code", Type: field.TypeString, Unique: true, Size: 64, Comment: "字典编码，全局唯一，如 user_status"},
+		{Name: "name", Type: field.TypeString, Size: 128, Comment: "字典名称"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 512, Comment: "字典描述"},
+		{Name: "status", Type: field.TypeInt, Comment: "状态：1 启用 0 禁用", Default: 1},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序，从小到大", Default: 0},
+	}
+	// SysDictsTable holds the schema information for the "sys_dicts" table.
+	SysDictsTable = &schema.Table{
+		Name:       "sys_dicts",
+		Comment:    "数据字典类型表，用于维护系统中可枚举的业务字典",
+		Columns:    SysDictsColumns,
+		PrimaryKey: []*schema.Column{SysDictsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "sysdict_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{SysDictsColumns[1]},
+			},
+			{
+				Name:    "sysdict_code",
+				Unique:  true,
+				Columns: []*schema.Column{SysDictsColumns[3]},
+			},
+			{
+				Name:    "sysdict_status",
+				Unique:  false,
+				Columns: []*schema.Column{SysDictsColumns[6]},
+			},
+		},
+	}
+	// SysDictItemsColumns holds the columns for the "sys_dict_items" table.
+	SysDictItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "dict_code", Type: field.TypeString, Size: 64, Comment: "所属字典编码，冗余自 sys_dicts.code，便于按编码直接查询"},
+		{Name: "label", Type: field.TypeString, Size: 128, Comment: "显示名称"},
+		{Name: "value", Type: field.TypeString, Size: 128, Comment: "实际取值"},
+		{Name: "status", Type: field.TypeInt, Comment: "状态：1 启用 0 禁用", Default: 1},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序，从小到大", Default: 0},
+	}
+	// SysDictItemsTable holds the schema information for the "sys_dict_items" table.
+	SysDictItemsTable = &schema.Table{
+		Name:       "sys_dict_items",
+		Comment:    "数据字典项表，存放字典类型下的具体枚举值",
+		Columns:    SysDictItemsColumns,
+		PrimaryKey: []*schema.Column{SysDictItemsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "sysdictitem_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{SysDictItemsColumns[1]},
+			},
+			{
+				Name:    "sysdictitem_dict_code",
+				Unique:  false,
+				Columns: []*schema.Column{SysDictItemsColumns[3]},
+			},
+			{
+				Name:    "sysdictitem_dict_code_value",
+				Unique:  false,
+				Columns: []*schema.Column{SysDictItemsColumns[3], SysDictItemsColumns[5]},
+			},
+		},
+	}
 	// TokenBlacklistsColumns holds the columns for the "token_blacklists" table.
 	TokenBlacklistsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
@@ -418,6 +518,9 @@ var (
 		DepartmentsTable,
 		LoginLogsTable,
 		OperationLogsTable,
+		SysConfigsTable,
+		SysDictsTable,
+		SysDictItemsTable,
 		TokenBlacklistsTable,
 	}
 )
