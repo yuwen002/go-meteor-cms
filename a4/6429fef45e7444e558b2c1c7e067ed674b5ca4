@@ -1,0 +1,41 @@
+web/src/utils/request.ts
+  s_bbf609960902b0::t_5d791d549d5640 1-5,8-9,26-90,97,99-103,105
+api/cms/v1/internal/logic/refreshtokenlogic.go
+  s_bbf609960902b0::t_ad0e68fdde185b 11,45-57
+api/cms/v1/internal/logic/adminlogoutlogic.go
+  s_bbf609960902b0::t_c27031b78392cb 84-100
+api/cms/v1/cms.go
+  h_a3f313f3d96276 54-55
+internal/utils/context.go
+  s_bbf609960902b0::t_20b6df3aaabd19 62-72
+  s_bbf609960902b0::t_0a9c7aeb8c180c 15-16
+api/cms/v1/internal/middleware/refreshheader.go
+  s_bbf609960902b0::t_170178ef823668 1-21
+docs/api.md
+  s_bbf609960902b0::t_e82d1123829a7a 93-94
+web/src/api/auth.ts
+  s_bbf609960902b0::t_24ef11403eb72f 2
+  s_bbf609960902b0::t_abac90806514dd 25-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "a46429fef45e7444e558b2c1c7e067ed674b5ca4",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 157
+    }
+  }
+}
