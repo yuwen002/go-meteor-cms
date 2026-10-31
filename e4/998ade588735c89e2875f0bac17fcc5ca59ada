@@ -1,0 +1,28 @@
+web/src/layout/components/MenuItem.vue
+  s_bbf609960902b0::t_23bc0740ba70af 37-39,41-49
+internal/seed/permissions.go
+  s_bbf609960902b0::t_568801b5304801 166-169,172
+  s_bbf609960902b0::t_1f44280fa0f30b 192
+  s_bbf609960902b0::t_f147b70abf0785 281-283
+  s_bbf609960902b0::t_a5c94a525beb8a 257-259
+  s_bbf609960902b0::t_6b7f83d0359fe0 294,299-303
+api/cms/v1/internal/logic/mypermissionslogic.go
+  s_bbf609960902b0::t_356106aa442308 181-186,199,202-209
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "e4998ade588735c89e2875f0bac17fcc5ca59ada",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4-preview"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 382
+    }
+  }
+}
