@@ -178,7 +178,12 @@ func buildMenuTree(menus []*ent.AdminPermission, allowed map[string]struct{}) []
 		}
 	}
 
-	roots := make([]types.MyMenuItem, 0, len(nodes))
+	// 先统一把子节点挂到父节点上，再收集根节点。
+	// 注意：menus 按 sort 升序返回（父菜单 sort 更小，排在子菜单之前），
+	// 如果边收集根节点边挂载子节点，父节点会先被拷贝进 roots，
+	// 之后追加到 map 中指针节点上的 Children 不会反映到已拷贝的副本里，
+	// 结果是父菜单 children 为空、子菜单整体丢失。因此这里分两趟处理。
+	attached := make(map[int64]bool, len(nodes))
 	for _, m := range menus {
 		node, ok := nodes[m.ID]
 		if !ok {
@@ -191,8 +196,16 @@ func buildMenuTree(menus []*ent.AdminPermission, allowed map[string]struct{}) []
 		if parentID > 0 {
 			if parent, exists := nodes[parentID]; exists {
 				parent.Children = append(parent.Children, *node)
-				continue
+				attached[m.ID] = true
 			}
+		}
+	}
+
+	roots := make([]types.MyMenuItem, 0, len(nodes))
+	for _, m := range menus {
+		node, ok := nodes[m.ID]
+		if !ok || attached[m.ID] {
+			continue
 		}
 		roots = append(roots, *node)
 	}

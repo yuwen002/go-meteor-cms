@@ -163,9 +163,13 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "删除文件", Permission: "system:file:delete", Type: PermissionTypeButton, ParentName: "文件管理", Sort: 63},
 	{Name: "删除文件", Permission: "system:file:delete", Type: PermissionTypeAPI, ParentName: "文件管理", Method: "POST", APIPath: "/admin/files/delete", Sort: 63},
 
+	// ---------- 系统管理（分组，用于演示多级菜单层级） ----------
+	{Name: "系统管理", Permission: "system:group:system", Type: PermissionTypeMenu,
+		Path: "", Component: "", Icon: "setting", Sort: 65},
+
 	// ---------- 数据字典 ----------
 	{Name: "字典管理", Permission: "system:dict:list", Type: PermissionTypeMenu,
-		Path: "/system/dicts", Component: "views/system/dict/index.vue", Icon: "dict", Sort: 70},
+		Path: "/system/dicts", Component: "views/system/dict/index.vue", Icon: "dict", Sort: 70, ParentName: "系统管理"},
 	{Name: "查看字典", Permission: "system:dict:list", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 71},
 	{Name: "查看字典", Permission: "system:dict:list", Type: PermissionTypeAPI, ParentName: "字典管理", Method: "GET", APIPath: "/admin/dicts", Sort: 71},
 	{Name: "新增字典", Permission: "system:dict:add", Type: PermissionTypeButton, ParentName: "字典管理", Sort: 72},
@@ -185,7 +189,7 @@ var DefaultPermissions = []PermissionSpec{
 
 	// ---------- 系统配置 ----------
 	{Name: "系统配置", Permission: "system:config:list", Type: PermissionTypeMenu,
-		Path: "/system/configs", Component: "views/system/config/index.vue", Icon: "setting", Sort: 80},
+		Path: "/system/configs", Component: "views/system/config/index.vue", Icon: "setting", Sort: 80, ParentName: "系统管理"},
 	{Name: "查看配置", Permission: "system:config:list", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 81},
 	{Name: "查看配置", Permission: "system:config:list", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "GET", APIPath: "/admin/configs", Sort: 81},
 	{Name: "新增配置", Permission: "system:config:add", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 82},
@@ -250,6 +254,9 @@ func UpsertPermissions(ctx context.Context, client *ent.Client, specs []Permissi
 				SetIsActive(true)
 			if spec.Type == PermissionTypeMenu {
 				update = update.SetPath(spec.Path).SetComponent(spec.Component).SetIcon(spec.Icon)
+				if parentID > 0 {
+					update = update.SetParentID(parentID)
+				}
 			} else {
 				update = update.SetMethod(spec.Method).SetAPIPath(spec.APIPath)
 				if parentID > 0 {
@@ -271,6 +278,9 @@ func UpsertPermissions(ctx context.Context, client *ent.Client, specs []Permissi
 			SetIsActive(true)
 		if spec.Type == PermissionTypeMenu {
 			create = create.SetPath(spec.Path).SetComponent(spec.Component).SetIcon(spec.Icon)
+			if parentID > 0 {
+				create = create.SetParentID(parentID)
+			}
 		} else {
 			create = create.SetMethod(spec.Method).SetAPIPath(spec.APIPath)
 			if parentID > 0 {
@@ -281,12 +291,16 @@ func UpsertPermissions(ctx context.Context, client *ent.Client, specs []Permissi
 		return create.Save(ctx)
 	}
 
-	// 1. 菜单
+	// 1. 菜单（父级菜单需在切片中位于其子菜单之前，parentIndex 才能正确解析）
 	for _, spec := range specs {
 		if spec.Type != PermissionTypeMenu {
 			continue
 		}
-		p, err := writePermission(spec, 0)
+		var parentID int64
+		if spec.ParentName != "" {
+			parentID = parentIndex[spec.ParentName]
+		}
+		p, err := writePermission(spec, parentID)
 		if err != nil {
 			return nil, err
 		}

@@ -34,6 +34,17 @@ const iconMap: Record<string, string> = {
   setting: 'Setting',
 }
 
+// 未在映射表中的 icon 键只在控制台提示一次，便于定位后端下发了哪些未配置的图标
+const warnedKeys = new Set<string>()
+
 const hasChildren = computed(() => !!props.item.children && props.item.children.length > 0)
-const iconName = computed(() => iconMap[props.item.icon] || 'Menu')
+const iconName = computed(() => {
+  const key = props.item.icon || ''
+  const name = iconMap[key]
+  if (!name && !warnedKeys.has(key)) {
+    warnedKeys.add(key)
+    console.warn(`[menu] 未配置的菜单图标: "${key}"，已回落到 Menu（菜单：${props.item.name}）`)
+  }
+  return name || 'Menu'
+})
 </script>
