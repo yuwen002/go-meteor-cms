@@ -5,6 +5,7 @@ import (
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/logic"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
+	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -15,7 +16,7 @@ func dashboardStatsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			common.Ok(w, resp)
 		}
 	}
 }
