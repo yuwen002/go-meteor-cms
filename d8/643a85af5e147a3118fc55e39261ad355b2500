@@ -1,0 +1,26 @@
+api/cms/v1/internal/handler/cmshandler.go
+  s_bbf609960902b0::t_85db4061bc191a 12,29
+api/cms/v1/internal/handler/dashboardstatshandler.go
+  s_bbf609960902b0::t_0280d4cbc3b823 8
+  s_bbf609960902b0::t_e9c4d83d1b1e27 19
+api/cms/v1/internal/handler/refreshtokenhandler.go
+  s_bbf609960902b0::t_9bc26cf54f19ee 9
+  s_bbf609960902b0::t_9cd859609da3ef 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "d8643a85af5e147a3118fc55e39261ad355b2500",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 30
+    }
+  }
+}
