@@ -10,6 +10,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -83,6 +84,9 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 		return nil, common.NewBizError(common.ErrAccountInactive)
 	}
 
+	// 读取当前 token 版本号，写入新令牌；用于全局踢人 / 改密后旧令牌失效
+	tv, _ := tokenversion.Get(l.ctx, l.svcCtx.Redis, user.ID)
+
 	accessToken, err := utils.GenerateToken(l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire, map[string]interface{}{
 		"user_id":    user.ID,
 		"username":   user.Username,
@@ -92,6 +96,7 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 		"is_super":   user.IsSuper,
 		"is_active":  user.IsActive,
 		"login_time": time.Now().Unix(),
+		"tv":         tv,
 	})
 	if err != nil {
 		return nil, common.NewBizError(common.ErrInternalServer)
@@ -103,6 +108,7 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 		"user_id":    user.ID,
 		"username":   user.Username,
 		"token_type": "refresh",
+		"tv":         tv,
 	})
 	if err != nil {
 		return nil, common.NewBizError(common.ErrInternalServer)

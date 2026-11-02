@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -58,6 +59,11 @@ func (l *DisableAdminLogic) DisableAdmin(req *types.DisableAdminReq) (resp *type
 	if err != nil {
 		l.Logger.Errorf("禁用管理员失败: %v", err)
 		return nil, common.NewBizErrorWithMsg(common.ErrInternalServer, "禁用管理员失败")
+	}
+
+	// 禁用后吊销该用户所有会话（全局踢人）
+	if _, berr := tokenversion.Bump(l.ctx, l.svcCtx.Redis, req.ID); berr != nil {
+		l.Logger.Errorf("吊销用户旧会话失败: user_id=%d err=%v", req.ID, berr)
 	}
 
 	return &types.CommonResp{

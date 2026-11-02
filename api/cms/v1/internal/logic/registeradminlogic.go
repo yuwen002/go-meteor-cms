@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -55,6 +56,11 @@ func (l *RegisterAdminLogic) RegisterAdmin(req *types.RegisterReq) (resp *types.
 	}
 	if emailExists {
 		return nil, common.NewBizError(common.ErrAdminEmailAlreadyExists)
+	}
+
+	// 密码复杂度校验
+	if ok, msg := utils.ValidatePasswordComplexity(req.Password); !ok {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams, msg)
 	}
 
 	// 3. 加密密码

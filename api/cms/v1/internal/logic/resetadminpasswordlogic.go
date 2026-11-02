@@ -5,12 +5,12 @@ package logic
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 
@@ -46,9 +46,8 @@ func (l *ResetAdminPasswordLogic) ResetAdminPassword(req *types.ResetAdminPasswo
 	if targetID == currentUserID {
 		return nil, common.NewBizError(common.ErrCannotResetOwnPassword)
 	}
-	if !utils.ValidatePassword(req.NewPassword) {
-		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams,
-			"新密码长度不能少于 "+strconv.Itoa(utils.MinPasswordLength)+" 位")
+	if ok, msg := utils.ValidatePasswordComplexity(req.NewPassword); !ok {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams, msg)
 	}
 
 	// 3. 只有超级管理员可以重置他人密码（is_super 取 DB 真值）
@@ -90,6 +89,11 @@ func (l *ResetAdminPasswordLogic) ResetAdminPassword(req *types.ResetAdminPasswo
 	if err != nil {
 		l.Logger.Errorf("重置密码失败: %v", err)
 		return nil, common.NewBizError(common.ErrPasswordUpdateFailed)
+	}
+
+	// 重置密码后吊销目标用户所有其它会话（全局踢人）
+	if _, berr := tokenversion.Bump(l.ctx, l.svcCtx.Redis, targetID); berr != nil {
+		l.Logger.Errorf("吊销目标用户旧会话失败: user_id=%d err=%v", targetID, berr)
 	}
 
 	return &types.CommonResp{ID: targetID, Message: "密码已重置"}, nil

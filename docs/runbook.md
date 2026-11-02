@@ -161,10 +161,14 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 3. **权限三级**：菜单(1) / 按钮(2) / API(3)。按钮与 API **共用同一权限标识**（如 `system:role:add`），授权一次即可同时控制按钮显隐与接口可达。
 4. **API 权限 `api_path` 必须与 `routes.go` 真实路由一致**（含 method），否则非超管必 403。新增接口务必同步补种子权限。
 5. **路由匹配**：按"静态段命中最多者优先"，`/admin/departments/tree` 不会被 `/admin/departments/:id` 抢占。
-6. **数据权限**：`data_scope` 1~5（全部/本部门/本部门及子部门/仅自己/自定义部门）；多角色取并集；任一角色为"全部"则不过滤。当前仅在管理员列表接口生效，其他列表暂不过滤。
+6. **数据权限**：`data_scope` 1~5（全部/本部门/本部门及子部门/仅自己/自定义部门）；多角色取并集；任一角色为"全部"则不过滤。管理员列表与详情按部门范围收敛（fail-closed：范围为空→空结果 / 越权→按不存在处理）；操作/登录日志对非超管按 `user_id` 收敛为仅本人。角色/权限/部门/字典/文件等系统配置默认全局可见。
 7. **超管**：`admin_users.is_super=true` 跳过全部鉴权与数据过滤，便于调试但不应作为常规账户。
 8. **动态菜单**：侧边栏由 `GET /admin/profile/permissions` 返回的菜单树驱动（图标语义键 + `sort` 排序 + `parent_id` 层级），不写死在前端。
 9. **`is_super` 以数据库为准**：业务层判断超管一律查 DB 的 `admin_users.is_super`，**不信任 token claim**（claim 在权限变更后、旧 token 过期前仍携带旧值）。涉及 `adminupdatelogic` / `resetadminpasswordlogic` / `operationloglistlogic` / `loginloglistlogic`，统一经 `logic.currentUserIsSuper` 取数；权限中间件同理（见 `PermissionMiddleware`）。
+10. **密码复杂度**：新密码须 ≥8 位且至少含「大写/小写/数字/特殊字符」中三类（`utils.ValidatePasswordComplexity`）；创建/注册/改密/重置（含他人重置、找回密码）全入口统一校验。种子密码 `Admin123456` 满足该策略。
+11. **全局踢人 / 会话批量吊销**：token 携带 `tv`（版本号），Redis `auth:tv:<userID>` 自增即吊销该用户全部旧令牌；触发点：禁用/删除账号、改密（含他人重置、找回密码）。未配置 Redis 时降级为不校验（与限流一致）。
+12. **鉴权查库缓存**：权限中间件将「用户→角色→权限」集合与「API 路径→权限」解析按 60s TTL 内存缓存（`go-zero collection.Cache`）；`is_super`/`is_active` 仍每请求实时查库，保证权限变更即时生效。
+13. **Redis 依赖**：登录限流、token 版本（全局踢人）依赖 `cms-api.yaml` 的 `Redis`；`Host` 为空则相应能力降级（限流→内存、踢人→不校验），多实例部署务必配置以保证防护一致生效。
 
 ---
 

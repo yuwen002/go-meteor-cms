@@ -150,3 +150,27 @@ func Resolve(ctx context.Context, client *ent.Client, userID int64) (*Filter, er
 func BuildFallbackFilter(userID int64) *Filter {
 	return &Filter{Restricted: true, OnlySelf: true, UserID: userID}
 }
+
+// AllowsUser 判断给定用户（id + 所属部门）是否在当前数据权限范围内。
+// 用于单条数据（如管理员详情）的可见性判定，遵循 fail-closed：
+// 受限且无匹配时返回 false。
+func (f *Filter) AllowsUser(userID int64, deptID *int64) bool {
+	if !f.Restricted {
+		return true
+	}
+	if f.OnlySelf {
+		return userID == f.UserID
+	}
+	if len(f.DeptIDs) == 0 {
+		return false
+	}
+	if deptID == nil {
+		return false
+	}
+	for _, d := range f.DeptIDs {
+		if d == *deptID {
+			return true
+		}
+	}
+	return false
+}

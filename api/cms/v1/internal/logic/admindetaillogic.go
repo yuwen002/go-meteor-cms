@@ -10,6 +10,8 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/datascope"
+	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,6 +38,26 @@ func (l *AdminDetailLogic) AdminDetail(req *types.AdminDetailReq) (resp *types.A
 		}
 		l.Logger.Errorf("获取管理员详情失败: %v", err)
 		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	// 数据权限：非超管仅能查看数据范围内的管理员详情（fail-closed，越权统一按不存在处理）
+	uid, ok := utils.CurrentUserID(l.ctx)
+	if !ok {
+		return nil, common.NewBizError(common.ErrMissingUserContext)
+	}
+	isSuper, err := currentUserIsSuper(l.ctx, l.svcCtx.EntClient)
+	if err != nil {
+		l.Logger.Errorf("查询当前用户是否超管失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if !isSuper {
+		scope, serr := datascope.Resolve(l.ctx, l.svcCtx.EntClient, uid)
+		if serr != nil {
+			scope = datascope.BuildFallbackFilter(uid)
+		}
+		if !scope.AllowsUser(admin.ID, admin.DeptID) {
+			return nil, common.NewBizError(common.ErrAdminUserNotFound)
+		}
 	}
 
 	return &types.AdminDetailResp{

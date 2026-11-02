@@ -10,12 +10,14 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	_ "github.com/yuwen002/go-meteor-cms/ent/runtime"
 	"github.com/yuwen002/go-meteor-cms/internal/pkg/mail"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 )
 
 type ServiceContext struct {
 	Config                 config.Config
 	EntClient              *ent.Client
+	Redis                  *redis.Redis
 	JwtMiddleware          rest.Middleware
 	PermissionMiddleware   rest.Middleware
 	MailSender             mail.Sender
@@ -23,7 +25,7 @@ type ServiceContext struct {
 	ClientInfoMiddleware   rest.Middleware
 }
 
-func NewServiceContext(c config.Config) *ServiceContext {
+func NewServiceContext(c config.Config, rds *redis.Redis) *ServiceContext {
 
 	client, err := ent.Open(
 		c.Database.Driver,
@@ -50,7 +52,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:                 c,
 		EntClient:              client,
-		JwtMiddleware:          middleware.NewJwtMiddleware(&c, client),
+		Redis:                  rds,
+		JwtMiddleware:          middleware.NewJwtMiddleware(&c, client, rds),
 		PermissionMiddleware:   middleware.NewPermissionMiddleware(&c, client),
 		MailSender:             sender,
 		OperationLogMiddleware: middleware.NewOperationLogMiddleware(c, client),

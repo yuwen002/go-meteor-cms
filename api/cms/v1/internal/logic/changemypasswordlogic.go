@@ -5,11 +5,11 @@ package logic
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 
@@ -41,10 +41,9 @@ func (l *ChangeMyPasswordLogic) ChangeMyPassword(req *types.ChangeMyPasswordReq)
 		return nil, common.NewBizError(common.ErrUserIDFormat)
 	}
 
-	// 校验新密码
-	if !utils.ValidatePassword(req.NewPassword) {
-		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams,
-			"新密码长度不能少于 "+strconv.Itoa(utils.MinPasswordLength)+" 位")
+	// 校验新密码复杂度
+	if ok, msg := utils.ValidatePasswordComplexity(req.NewPassword); !ok {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams, msg)
 	}
 
 	// 查询当前用户
@@ -74,6 +73,11 @@ func (l *ChangeMyPasswordLogic) ChangeMyPassword(req *types.ChangeMyPasswordReq)
 	if err != nil {
 		l.Logger.Errorf("更新密码失败: %v", err)
 		return nil, common.NewBizError(common.ErrPasswordUpdateFailed)
+	}
+
+	// 改密后吊销该用户所有其它会话（全局踢人）
+	if _, berr := tokenversion.Bump(l.ctx, l.svcCtx.Redis, userID); berr != nil {
+		l.Logger.Errorf("吊销旧会话失败（token version bump）: user_id=%d err=%v", userID, berr)
 	}
 
 	return &types.CommonResp{Message: "密码修改成功"}, nil

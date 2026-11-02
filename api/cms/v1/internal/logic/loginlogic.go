@@ -10,6 +10,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -95,6 +96,9 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 	// 登录成功
 	l.recordLoginLogSuccess(user.ID, user.Username)
 
+	// 读取当前 token 版本号，写入新令牌；用于全局踢人 / 改密后旧令牌失效
+	tv, _ := tokenversion.Get(l.ctx, l.svcCtx.Redis, user.ID)
+
 	// 签发访问令牌（短期有效）
 	accessToken, err := utils.GenerateToken(l.svcCtx.Config.Auth.AccessSecret, l.svcCtx.Config.Auth.AccessExpire, map[string]interface{}{
 		"user_id":    user.ID,
@@ -105,6 +109,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 		"is_super":   user.IsSuper,
 		"is_active":  user.IsActive,
 		"login_time": time.Now().Unix(),
+		"tv":         tv,
 	})
 	if err != nil {
 		return nil, common.NewBizError(common.ErrInternalServer)
@@ -115,6 +120,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
 		"user_id":    user.ID,
 		"username":   user.Username,
 		"token_type": "refresh",
+		"tv":         tv,
 	})
 	if err != nil {
 		return nil, common.NewBizError(common.ErrInternalServer)

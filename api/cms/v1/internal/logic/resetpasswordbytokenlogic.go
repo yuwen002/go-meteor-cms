@@ -5,7 +5,6 @@ package logic
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
@@ -13,6 +12,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -42,9 +42,8 @@ func (l *ResetPasswordByTokenLogic) ResetPasswordByToken(req *types.ResetPasswor
 	if req.Token == "" {
 		return nil, common.NewBizError(common.ErrResetTokenInvalid)
 	}
-	if !utils.ValidatePassword(req.NewPassword) {
-		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams,
-			"新密码长度不能少于 "+strconv.Itoa(utils.MinPasswordLength)+" 位")
+	if ok, msg := utils.ValidatePasswordComplexity(req.NewPassword); !ok {
+		return nil, common.NewBizErrorWithMsg(common.ErrInvalidParams, msg)
 	}
 
 	// 2. 按令牌查找管理员
@@ -85,6 +84,11 @@ func (l *ResetPasswordByTokenLogic) ResetPasswordByToken(req *types.ResetPasswor
 	if err != nil {
 		l.Logger.Errorf("重置密码失败: %v", err)
 		return nil, common.NewBizError(common.ErrPasswordUpdateFailed)
+	}
+
+	// 重置密码后吊销该用户所有其它会话（全局踢人）
+	if _, berr := tokenversion.Bump(l.ctx, l.svcCtx.Redis, u.ID); berr != nil {
+		l.Logger.Errorf("吊销旧会话失败: user_id=%d err=%v", u.ID, berr)
 	}
 
 	return &types.RegisterResp{Message: "密码重置成功，请使用新密码登录"}, nil

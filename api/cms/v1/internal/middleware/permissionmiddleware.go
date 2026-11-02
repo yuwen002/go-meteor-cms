@@ -3,7 +3,9 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/config"
 	"github.com/yuwen002/go-meteor-cms/ent"
@@ -12,6 +14,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
+	"github.com/zeromicro/go-zero/core/collection"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -28,8 +31,9 @@ var permissionBypassRoutes = map[string]struct{}{
 }
 
 type PermissionMiddleware struct {
-	config *config.Config
-	db     *ent.Client
+	config    *config.Config
+	db        *ent.Client
+	permCache *collection.Cache
 }
 
 type matchedPermission struct {
@@ -38,9 +42,14 @@ type matchedPermission struct {
 }
 
 func NewPermissionMiddleware(c *config.Config, db *ent.Client) rest.Middleware {
+	cache, err := collection.NewCache(60 * time.Second)
+	if err != nil {
+		panic(err)
+	}
 	m := &PermissionMiddleware{
-		config: c,
-		db:     db,
+		config:    c,
+		db:        db,
+		permCache: cache,
 	}
 	return m.Handle
 }
@@ -107,25 +116,64 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func (m *PermissionMiddleware) checkUserPermission(ctx context.Context, userID int64, permission string) (bool, error) {
-	count, err := m.db.AdminUser.
-		Query().
-		Where(adminuser.IDEQ(userID)).
-		QueryRoles().
-		Where(adminrole.IsActive(true)).
-		QueryPermissions().
-		Where(
-			adminpermission.IsActive(true),
-			adminpermission.PermissionEQ(permission),
-		).
-		Count(ctx)
+	perms, err := m.loadUserPermissions(ctx, userID)
 	if err != nil {
 		return false, err
 	}
+	for _, p := range perms {
+		if p == permission {
+			return true, nil
+		}
+	}
+	return false, nil
+}
 
-	return count > 0, nil
+// loadUserPermissions 加载用户拥有的全部权限标识，结果按 userID 缓存（短 TTL），
+// 避免每次请求都走「用户→角色→权限」多表查询。注意：用户记录（is_super / is_active）
+// 仍每请求查库，以保证权限变更实时生效（见任务1），此处只缓存「角色→权限」映射。
+func (m *PermissionMiddleware) loadUserPermissions(ctx context.Context, userID int64) ([]string, error) {
+	key := "perm:" + strconv.FormatInt(userID, 10)
+	v, err := m.permCache.Take(key, func() (interface{}, error) {
+		var perms []string
+		err := m.db.AdminUser.
+			Query().
+			Where(adminuser.IDEQ(userID)).
+			QueryRoles().
+			Where(adminrole.IsActive(true)).
+			QueryPermissions().
+			Where(adminpermission.IsActive(true)).
+			Select(adminpermission.FieldPermission).
+			Scan(ctx, &perms)
+		if err != nil {
+			return nil, err
+		}
+		return perms, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return v.([]string), nil
 }
 
 func (m *PermissionMiddleware) findPermissionForRequest(ctx context.Context, method, requestPath string) (*ent.AdminPermission, error) {
+	key := "apiperm:" + strings.ToUpper(method) + ":" + normalizePath(requestPath)
+	v, err := m.permCache.Take(key, func() (interface{}, error) {
+		return m.findPermissionForRequestUncached(ctx, method, requestPath)
+	})
+	if err != nil {
+		return nil, err
+	}
+	if v == nil {
+		return nil, nil
+	}
+	p, ok := v.(*ent.AdminPermission)
+	if !ok || p == nil {
+		return nil, nil
+	}
+	return p, nil
+}
+
+func (m *PermissionMiddleware) findPermissionForRequestUncached(ctx context.Context, method, requestPath string) (*ent.AdminPermission, error) {
 	permissions, err := m.db.AdminPermission.
 		Query().
 		Where(

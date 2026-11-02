@@ -11,6 +11,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
+	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -59,6 +60,11 @@ func (l *AdminDeleteLogic) AdminDelete(req *types.DeleteAdminReq) (resp *types.C
 	if err != nil {
 		l.Logger.Errorf("删除管理员失败: %v", err)
 		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+
+	// 删除后吊销该用户所有会话（全局踢人）
+	if _, berr := tokenversion.Bump(l.ctx, l.svcCtx.Redis, req.Id); berr != nil {
+		l.Logger.Errorf("吊销用户旧会话失败: user_id=%d err=%v", req.Id, berr)
 	}
 
 	return &types.CommonResp{

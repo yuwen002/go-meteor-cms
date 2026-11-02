@@ -63,7 +63,8 @@ func main() {
 	// 将登出请求携带的 X-Refresh-Token 透传进 context，供登出接口一并吊销
 	server.Use(middleware.NewRefreshTokenHeaderMiddleware())
 
-	// 登录限流：配置了 Redis 则走分布式限流，否则（含 Redis 不可用）自动降级为内存限流
+	// 登录限流 / token 版本（全局踢人）：配置了 Redis 则启用分布式能力，
+	// 否则（含 Redis 不可用）自动降级为内存限流 / 不校验版本，防护不失效。
 	var rds *redis.Redis
 	if c.Redis.Host != "" {
 		if r, err := redis.NewRedis(c.Redis); err != nil {
@@ -80,7 +81,7 @@ func main() {
 		c.Login.RateLimit.BlockSeconds,
 	))
 
-	ctx := svc.NewServiceContext(c)
+	ctx := svc.NewServiceContext(c, rds)
 	handler.RegisterHandlers(server, ctx)
 
 	// 启动后台维护任务，随服务停止而退出
