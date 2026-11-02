@@ -27,6 +27,13 @@
 - 🔒 数据权限（按部门范围收敛可见数据）
 - ✉️ 忘记密码闭环（邮件令牌 + 一次性重置）
 - 📄 统一分页参数（每页上限 100）
+- 🧭 动态菜单：侧边栏由后端按角色下发的菜单树渲染，含图标 / 排序 / 多级层级
+- 📚 数据字典：字典类型 + 字典项两级管理（字典项按 `dict_code` 归属）
+- ⚙️ 系统配置：键值对配置项管理
+- 🖼️ 文件管理：上传 / 列表 / 重命名 / 删除
+- 📈 仪表盘统计：管理员 / 部门 / 角色 / 权限总量与今日登录、本周操作数
+- 🗂️ 操作日志与登录日志：分页查询，便于审计
+- 🖥️ 配套 Vue3 + Element Plus 前端管理后台（见「前端 Web 管理后台」一节）
 
 ## 技术栈
 
@@ -39,6 +46,11 @@
 - **API 规范**: RESTful API
 - **依赖管理**: Go Modules (Go 1.26.0)
 - **代码生成**: goctl 1.10.2 (项目级自定义模板位于 `.goctl/`)
+- **前端管理后台**:
+  - **框架**: [Vue 3](https://vuejs.org/) + [Vue Router 4](https://router.vuejs.org/) + [Pinia](https://pinia.vuejs.dev/)
+  - **UI 组件库**: [Element Plus](https://element-plus.org/) + [@element-plus/icons-vue](https://element-plus.org/)
+  - **构建工具**: [Vite](https://vitejs.dev/) 5 + [TypeScript](https://www.typescriptlang.org/) 5
+  - **类型检查**: vue-tsc
 
 ## 快速开始
 
@@ -99,14 +111,53 @@ Mail:
 go run cmd/migrate/main.go
 ```
 
-迁移完成后会输出权限统计，形如 `菜单 5 / 按钮 31 / API 31`，其中 API 权限直接决定非超级管理员能否访问各接口。
+迁移完成后会输出权限统计，形如 `📊 权限统计：菜单 11 / 按钮 52 / API 52`（合计 115 条），其中 API 权限直接决定非超级管理员能否访问各接口。
 
 5. 启动服务
 
 ```bash
-# 启动 API 服务
-go run api/cms/v1/cms.go
+# 启动 API 服务（需用 -f 指定配置文件）
+go run ./api/cms/v1 -f api/cms/v1/etc/cms-api.yaml
 ```
+
+## 前端 Web 管理后台
+
+仓库内 `web/` 为配套的前端管理后台，技术栈见上方「技术栈 · 前端管理后台」。
+
+### 环境要求
+
+- Node.js 18+（建议 LTS）
+- 包管理器 npm
+
+### 本地开发
+
+```bash
+cd web
+npm install
+npm run dev          # 启动开发服务器，默认 http://localhost:5173
+```
+
+开发服务器通过 Vite 代理将 `/admin`、`/api`、`/uploads` 转发到后端 `http://localhost:8888`，
+因此本地联调时需要先在 8888 端口启动后端服务。
+
+### 构建与预览
+
+```bash
+npm run build        # 类型检查（vue-tsc）+ 生产构建，产物在 web/dist
+npm run preview      # 本地预览构建产物
+```
+
+### 动态菜单说明
+
+侧边栏**不写死在代码里**，而是登录后由 `GET /admin/profile/permissions` 返回的菜单树驱动：
+
+- 后端按角色聚合出 `menus`（字段含 `id / name / path / component / icon / children`），
+  前端 `Sidebar.vue` 递归渲染 `MenuItem.vue`（`el-sub-menu` + `el-menu-item`）。
+- 图标为语义键（如 `dashboard`、`dict`、`setting`），前端 `MenuItem.vue` 的 `iconMap` 映射到 Element Plus 图标组件；未命中时回落为 `Menu` 图标。
+- 菜单按 `sort` 升序，后端在 `buildMenuTree` 中按 `parent_id` 组装多级层级；当父菜单对当前用户无权限时，其子菜单会自动降级为顶级菜单，不会丢失。
+
+> 新增自定义页面时，请同步在种子 `internal/seed/permissions.go` 中维护对应「菜单 / 按钮 / API」三类权限，
+> 并在 `MenuItem.vue` 的 `iconMap` 中补充图标键，否则侧边栏图标会回落为默认图标。
 
 ## 项目结构
 
@@ -124,6 +175,7 @@ go run api/cms/v1/cms.go
 │   ├── pkg/               # 可复用子包（mail 邮件、datascope 数据权限、cleanup 维护任务）
 │   ├── seed/              # 初始化数据（含权限清单）
 │   └── utils/             # 工具函数（jwt、password、captcha、page）
+├── web/                   # 前端管理后台（Vue3 + Element Plus，侧边栏由后端菜单树驱动）
 ├── rpc/                   # RPC 服务定义
 ├── Makefile               # 常用开发命令
 ├── Dockerfile             # 多阶段构建镜像
@@ -386,6 +438,23 @@ Authorization: Bearer <token>
      }
      ```
 
+### 业务模块一览
+
+除上方「公共接口」与「需要认证的接口」示例外，其余业务接口按模块归纳如下（均需 `Authorization: Bearer <token>`，完整字段定义见 `docs/api.md`）：
+
+| 模块 | 主要接口 | 说明 |
+| --- | --- | --- |
+| 仪表盘 | `GET /admin/dashboard/stats` | 管理员 / 部门 / 角色 / 权限总量，今日登录与本周操作数 |
+| 管理员 | `GET/POST /admin/admin-users`、`GET/PUT/DELETE /admin/admin-users/:id`、禁用/启用、重置密码、绑定部门、角色分配 | 分页 + 数据权限收敛 |
+| 部门 | `GET /admin/departments/tree`、`POST /admin/departments`、`GET/PUT/DELETE /admin/departments/:id` | 树形结构 |
+| 角色 | 角色 CRUD、`GET/PUT /admin/roles/:id/permissions`、`GET/PUT /admin/roles/:id/departments` | 权限与数据范围分配 |
+| 权限 | `GET /admin/permissions`、`GET /admin/permissions/tree`、CRUD | 菜单 / 按钮 / API 三级定义 |
+| 数据字典 | `GET/POST /admin/dicts` + CRUD、`GET/POST /admin/dicts/items` + 字典项 CRUD | 字典类型 + 字典项 |
+| 系统配置 | `GET/POST /admin/configs` + CRUD | 键值对配置 |
+| 文件 | `GET /admin/files`、`PUT /admin/files/rename`、`POST /admin/files/delete`、`POST /admin/upload` | 上传 / 列表 / 重命名 / 删除 |
+| 日志 | `GET /admin/logs/operations`、`GET /admin/logs/logins` | 操作 / 登录审计 |
+| 个人中心 | `GET/PUT /admin/profile`、`PUT /admin/admin-users/me/change-password`、`GET /admin/profile/permissions` | 自身资料与菜单权限 |
+
 ## 默认管理员账户
 
 系统初始化时会自动创建默认管理员账户：
@@ -518,8 +587,6 @@ go build -o bin/migrate ./cmd/migrate
 ### 后台维护任务
 
 服务启动时会自动清理已过期的 token 黑名单记录，之后按 `Maintenance.TokenBlacklistCleanInterval`（默认 3600 秒）周期性执行，避免 `token_blacklists` 表随每次登出无限增长。
-
-## 贡献指南
 
 ## 贡献指南
 
