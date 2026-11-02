@@ -1,0 +1,32 @@
+internal/pkg/datascope/scope_test.go
+  s_bbf609960902b0::t_ceaf365a38e78f 1-40
+internal/utils/password_test.go
+  s_bbf609960902b0::t_860c17ce12a5c9 1-17,19-27
+  s_bbf609960902b0::t_c7614416eef455 18
+docker-compose.yml
+  h_a3f313f3d96276 1-9,11-13,15-16
+docs/runbook.md
+  s_bbf609960902b0::t_5f40411effd9b0 179-194
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "19600353bf15e4721d756b8011030026a4c8022d",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 84
+    }
+  }
+}
