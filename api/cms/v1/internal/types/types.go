@@ -162,6 +162,10 @@ type DisableAdminReq struct {
 	ID int64 `path:"id"`
 }
 
+type ForceAdminLogoutReq struct {
+	ID int64 `path:"id"`
+}
+
 type EnableAdminReq struct {
 	ID int64 `path:"id"`
 }

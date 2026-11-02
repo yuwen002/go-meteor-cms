@@ -88,6 +88,8 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "启用管理员", Permission: "system:admin_user:enable", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "PUT", APIPath: "/admin/admin-users/:id/enable", Sort: 17},
 	{Name: "重置管理员密码", Permission: "system:admin_user:reset_pwd", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 18},
 	{Name: "重置管理员密码", Permission: "system:admin_user:reset_pwd", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "PUT", APIPath: "/admin/admin-users/reset-password", Sort: 18},
+	{Name: "强制下线", Permission: "system:admin_user:force_logout", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 20},
+	{Name: "强制下线", Permission: "system:admin_user:force_logout", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "PUT", APIPath: "/admin/admin-users/:id/force-logout", Sort: 20},
 	{Name: "绑定部门", Permission: "system:admin_user:bind_dept", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 19},
 	{Name: "绑定部门", Permission: "system:admin_user:bind_dept", Type: PermissionTypeAPI, ParentName: "管理员管理", Method: "PUT", APIPath: "/admin/admin-users/:id/bind-department", Sort: 19},
 	{Name: "查看管理员角色", Permission: "system:admin_user:role_list", Type: PermissionTypeButton, ParentName: "管理员管理", Sort: 21},

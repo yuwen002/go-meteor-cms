@@ -169,6 +169,7 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 11. **全局踢人 / 会话批量吊销**：token 携带 `tv`（版本号），Redis `auth:tv:<userID>` 自增即吊销该用户全部旧令牌；触发点：禁用/删除账号、改密（含他人重置、找回密码）。未配置 Redis 时降级为不校验（与限流一致）。
 12. **鉴权查库缓存**：权限中间件将「用户→角色→权限」集合与「API 路径→权限」解析按 60s TTL 内存缓存（`go-zero collection.Cache`）；`is_super`/`is_active` 仍每请求实时查库，保证权限变更即时生效。
 13. **Redis 依赖**：登录限流、token 版本（全局踢人）依赖 `cms-api.yaml` 的 `Redis`；`Host` 为空则相应能力降级（限流→内存、踢人→不校验），多实例部署务必配置以保证防护一致生效。
+14. **强制下线接口**：`PUT /admin/admin-users/:id/force-logout`（权限标识 `system:admin_user:force_logout`，超管专用）通过 `tokenversion.Bump` 抬高目标用户版本号，使其所有旧令牌在下次请求即被 JWT 中间件判为 `2012 登录状态已失效`。与「禁用/删除账号、改密/重置密码」触发的踢人同源；未配置 Redis 时该接口仍可达但会话不被实际吊销（与 P2-4 降级一致）。
 
 ---
 

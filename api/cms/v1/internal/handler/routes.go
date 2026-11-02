@@ -120,6 +120,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: resetAdminPasswordHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodPut,
+					Path:    "/admin/admin-users/:id/force-logout",
+					Handler: forceAdminLogoutHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPost,
 					Path:    "/admin/departments",
 					Handler: departmentCreateHandler(serverCtx),
