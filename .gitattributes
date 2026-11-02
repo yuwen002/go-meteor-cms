@@ -1,0 +1,15 @@
+# 统一以 LF 进行仓库存储与检出，避免 Windows(autocrlf) 下 CRLF 文件被 gofmt/git 误判，
+# 保证 CI(gofmt -l) 在 Linux 与本地行为一致。
+* text=auto eol=lf
+
+*.go text eol=lf
+*.go diff=golang
+
+# 二进制资源保持原样
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
