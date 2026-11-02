@@ -164,6 +164,7 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 6. **数据权限**：`data_scope` 1~5（全部/本部门/本部门及子部门/仅自己/自定义部门）；多角色取并集；任一角色为"全部"则不过滤。当前仅在管理员列表接口生效，其他列表暂不过滤。
 7. **超管**：`admin_users.is_super=true` 跳过全部鉴权与数据过滤，便于调试但不应作为常规账户。
 8. **动态菜单**：侧边栏由 `GET /admin/profile/permissions` 返回的菜单树驱动（图标语义键 + `sort` 排序 + `parent_id` 层级），不写死在前端。
+9. **`is_super` 以数据库为准**：业务层判断超管一律查 DB 的 `admin_users.is_super`，**不信任 token claim**（claim 在权限变更后、旧 token 过期前仍携带旧值）。涉及 `adminupdatelogic` / `resetadminpasswordlogic` / `operationloglistlogic` / `loginloglistlogic`，统一经 `logic.currentUserIsSuper` 取数；权限中间件同理（见 `PermissionMiddleware`）。
 
 ---
 

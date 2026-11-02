@@ -46,8 +46,13 @@ func (l *AdminUpdateLogic) AdminUpdate(req *types.UpdateAdminReq) (resp *types.C
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
 
-	// 2. 超级管理员资料只能由超级管理员修改
-	if target.IsSuper && !utils.IsSuperAdmin(l.ctx) {
+	// 2. 超级管理员资料只能由超级管理员修改（is_super 取 DB 真值，避免旧 token claim 滞后）
+	isSuper, err := currentUserIsSuper(l.ctx, l.svcCtx.EntClient)
+	if err != nil {
+		l.Logger.Errorf("查询当前用户是否超管失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if target.IsSuper && !isSuper {
 		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "不能修改超级管理员的资料")
 	}
 

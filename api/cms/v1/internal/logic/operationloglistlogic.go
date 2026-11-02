@@ -40,8 +40,13 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 	query := l.svcCtx.EntClient.OperationLog.Query()
 
 	conds := make([]predicate.OperationLog, 0, 8)
-	// 数据权限：非超管只能查看自己的操作日志，忽略外部传入的 user_id 参数，防止越权检索他人日志
-	if !utils.IsSuperAdmin(l.ctx) {
+	// 数据权限：非超管只能查看自己的操作日志（is_super 取 DB 真值），忽略外部传入的 user_id，防止越权检索
+	isSuper, err := currentUserIsSuper(l.ctx, l.svcCtx.EntClient)
+	if err != nil {
+		l.Logger.Errorf("查询当前用户是否超管失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if !isSuper {
 		uid, ok := utils.CurrentUserID(l.ctx)
 		if !ok || uid <= 0 {
 			return nil, common.NewBizError(common.ErrUnauthorized)

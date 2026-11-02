@@ -51,8 +51,13 @@ func (l *ResetAdminPasswordLogic) ResetAdminPassword(req *types.ResetAdminPasswo
 			"新密码长度不能少于 "+strconv.Itoa(utils.MinPasswordLength)+" 位")
 	}
 
-	// 3. 只有超级管理员可以重置他人密码
-	if !utils.IsSuperAdmin(l.ctx) {
+	// 3. 只有超级管理员可以重置他人密码（is_super 取 DB 真值）
+	isSuper, err := currentUserIsSuper(l.ctx, l.svcCtx.EntClient)
+	if err != nil {
+		l.Logger.Errorf("查询当前用户是否超管失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if !isSuper {
 		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "只有超级管理员可以重置其他管理员的密码")
 	}
 
