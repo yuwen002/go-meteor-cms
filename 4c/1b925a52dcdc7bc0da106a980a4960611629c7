@@ -1,0 +1,70 @@
+api/cms/v1/internal/logic/refreshtokenlogic.go
+  h_a3f313f3d96276 111
+  s_bbf609960902b0::t_633ba5dc92973c 13
+api/cms/v1/internal/middleware/jwtmiddleware.go
+  s_bbf609960902b0::t_9e6f7073048096 12,15,22,25,29
+  s_bbf609960902b0::t_86b37f0ecda4aa 82-101
+api/cms/v1/internal/middleware/permissionmiddleware.go
+  s_bbf609960902b0::t_6e9bb0330f3bba 50-51,119,123-129,131-155,159-176
+  s_bbf609960902b0::t_d24dc30af0b70e 45-48,52
+  h_a3f313f3d96276 6,8,17,36
+api/cms/v1/internal/logic/admincreatelogic.go
+  h_a3f313f3d96276 14,65-69
+api/cms/v1/internal/logic/admindetaillogic.go
+  h_a3f313f3d96276 43-62
+internal/pkg/tokenversion/tokenversion.go
+  s_bbf609960902b0::t_f820e965372e58 1-46
+api/cms/v1/internal/logic/disableadminlogic.go
+  h_a3f313f3d96276 14
+  s_bbf609960902b0::t_bd0ad233e274a7 64-68
+internal/pkg/datascope/scope.go
+  s_bbf609960902b0::t_791da532042483 153-176
+internal/utils/password.go
+  h_a3f313f3d96276 4-6,11-54,56
+api/cms/v1/internal/svc/servicecontext.go
+  h_a3f313f3d96276 55-56
+  s_bbf609960902b0::t_c65aeaeca1366a 13,20,28
+api/cms/v1/internal/logic/registeradminlogic.go
+  h_a3f313f3d96276 14,61-63
+api/cms/v1/internal/logic/changemypasswordlogic.go
+  h_a3f313f3d96276 44-46
+  s_bbf609960902b0::t_0f4f887f8cdcd7 12
+  s_bbf609960902b0::t_f398f57981b7f7 78-82
+internal/common/error_code.go
+  h_a3f313f3d96276 112
+api/cms/v1/cms.go
+  s_bbf609960902b0::t_93151dbb8cdc6a 66-67,84
+api/cms/v1/internal/logic/resetpasswordbytokenlogic.go
+  s_bbf609960902b0::t_6f24ae755c492c 15,89-93
+  h_a3f313f3d96276 45-46
+api/cms/v1/internal/logic/admindeletelogic.go
+  h_a3f313f3d96276 14,65-67
+docs/runbook.md
+  s_bbf609960902b0::t_e7e1ea0a11202e 168-171
+  s_bbf609960902b0::t_6a57dbeeaa34c2 164
+api/cms/v1/internal/logic/resetadminpasswordlogic.go
+  h_a3f313f3d96276 49-50
+  s_bbf609960902b0::t_f33c2e99dbe537 13,94-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "4c1b925a52dcdc7bc0da106a980a4960611629c7",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 228
+    }
+  }
+}
