@@ -63,6 +63,8 @@ npm run dev          # http://localhost:5173
 
 ### 3.1 Docker Compose（推荐）
 
+> 若需要分布式登录限流（多副本 API），compose 中需额外加入 `redis` 服务，并在 `cms-api.yaml` 的 `Redis.Host` 指向该服务。
+
 ```bash
 docker compose up -d --wait        # MySQL(健康检查) → 迁移 → API
 docker compose down
@@ -89,6 +91,32 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 
 服务启动后自动清理过期 token 黑名单，按 `Maintenance.TokenBlacklistCleanInterval`（默认 3600s）周期执行。
 
+### 3.5 Redis 与 CORS 配置（鉴权增强）
+
+登录限流默认开启（`Login.RateLimit.Enabled=true`），采用**分布式固定窗口限流**：
+
+- **Redis（多实例/容器部署必需）**：在 `cms-api.yaml` 配置 `Redis` 块：
+  ```yaml
+  Redis:
+    Host: "127.0.0.1:6379"
+    Type: "node"
+    Pass: ""
+    DB: 0
+  ```
+  - `Host` 为空时，登录限流自动降级为**单实例内存模式**（重启即清空、多实例不共享，仅适合单机开发）。
+  - Redis 连接失败/抖动时同样降级为内存模式并打 error 日志，**防护不失效**（不会因 Redis 故障导致全员无法登录）。
+  - 生产建议独立 Redis 实例或 Sentinel/Cluster（`Type` 可设 `cluster`），并配置 `Pass` 与网络隔离。
+- **CORS（前端独立域名部署时必需）**：`cms-api.yaml` 的 `Cors` 列表配置允许的前端源：
+  ```yaml
+  Cors:
+    - "http://localhost:5173"      # 本地 Vite 联调
+    - "https://admin.example.com"
+  ```
+  - 通过 go-zero 内置 `rest.WithCors` 启用，预检 `OPTIONS` 由框架统一返回 204 并带 CORS 头。
+  - 列表含 `"*"` 表示允许任意源（仅适合无 cookie 凭据、纯 token 鉴权场景）。
+  - **未配置的源不会收到 `Access-Control-Allow-Origin`，浏览器将拒绝跨域请求**。
+  - 同源部署（本服务用 `StaticDir` 直接托管 SPA、或反向代理同源）可不配 `Cors`。
+
 ---
 
 ## 4. 健康检查
@@ -98,6 +126,7 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 | 后端进程 | `netstat`/`ss` 看 `:8888` 监听；或 `docker ps` | 端口已监听 / 容器 Up |
 | 接口探活 | 带 token `GET /admin/profile/permissions` | `code=0`，返回 `menus` 与 `permissions` |
 | 数据库 | 迁移日志 `✅ 数据库迁移完成`、`✅ 数据初始化完成` | 无报错 |
+| Redis | 多实例部署时执行 `redis-cli -h <host> ping` 应返回 `PONG`；限流 key 形如 `login_rl:<ip>` | `PONG`；限流生效 |
 | 前端 | 浏览器打开页面，能登录并看到菜单 | 菜单正常渲染，无控制台报错 |
 
 > `GET /admin/test-token` 不参与 API 权限校验，但需要有效 token 才能解析 claims，用于验证令牌本身是否有效。
@@ -118,6 +147,10 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 | 数据库迁移失败 | DSN 错误、MySQL 用户权限不足、表锁 | 检查 `MYSQL_DSN` / `cms-api.yaml` 的 `Database.Source`；确认 MySQL 用户有建库建表权限 |
 | 文件上传失败 | `uploads` 目录无写权限、超出大小/类型限制 | 检查服务运行目录的 `uploads/` 写权限与文件配置项 |
 | 非超管列表数据为空 | 数据权限 fail-closed（当前仅在管理员列表生效）：角色未分配 / 分配部门缺失 / 范围解析失败 → 不返回数据 | 检查用户角色 `data_scope` 与 `dept_id`，以及角色自定义部门（`admin_role_depts`） |
+| 登录接口频繁返回 `code=2029`（请求过于频繁） | 同一 IP 在窗口内尝试次数超过 `Login.RateLimit.Max`（默认 10/60s）被限流；或 Redis 未配置导致各实例独立计数 | 等待 `BlockSeconds`(默认 300s) 后重试；多实例务必配置 `Redis` 使计数集中；确认 `Login.RateLimit.Enabled` |
+| 多实例部署下登录限流形同虚设 | 未配置 `Redis`，各副本内存独立计数 | 在 `cms-api.yaml` 配置 `Redis.Host` 指向共享 Redis |
+| 前端跨域报错（CORS / 预检失败） | 未配置 `Cors`，或前端源不在白名单 | 在 `cms-api.yaml` 的 `Cors` 加入前端实际源（含协议与端口） |
+| 带 token 的跨域请求被拦（无 `Access-Control-Allow-Origin`） | 预检/实际请求的 `Origin` 不在 `Cors` 白名单 | 将前端源加入 `Cors`；确认前端实际使用的 `http://x:port` 与配置一致 |
 
 ---
 

@@ -4,15 +4,31 @@ import (
 	"encoding/json"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 )
 
 // loginRateLimitCode 与统一响应约定一致的业务码（请求过于频繁）
 const loginRateLimitCode = 2029
+
+// loginWindowLua 固定窗口限流：对 key 自增，首次设置窗口过期；超过阈值返回 blocked=1 与剩余 TTL。
+// 采用 Lua 保证「自增 + 设置过期」的原子性，避免并发窗口边界出现计数漂移。
+var loginWindowLua = `
+local current = redis.call("incr", KEYS[1])
+if tonumber(current) == 1 then
+  redis.call("expire", KEYS[1], tonumber(ARGV[1]))
+end
+if tonumber(current) > tonumber(ARGV[2]) then
+  return {1, redis.call("ttl", KEYS[1])}
+end
+return {0, redis.call("ttl", KEYS[1])}
+`
 
 type ipCounter struct {
 	mu           sync.Mutex
@@ -21,56 +37,90 @@ type ipCounter struct {
 	blockedUntil int64
 }
 
-// NewLoginRateLimitMiddleware 按客户端 IP 对登录接口做固定窗口限流，用于缓解爆破。
-// 仅对 POST /admin/login 生效；未启用（enabled=false）时直接透传，零额外开销。
-func NewLoginRateLimitMiddleware(enabled bool, max, window, blockSeconds int) rest.Middleware {
+type loginRateLimiter struct {
+	rds          *redis.Redis
+	max          int
+	window       int
+	blockSeconds int
+	mem          *sync.Map // rds==nil 或 Redis 异常时的兜底
+}
+
+// allow 返回是否限流拦截，以及建议客户端重试等待秒数（Redis 路径返回 key 剩余 TTL）。
+func (l *loginRateLimiter) allow(ip string) (bool, int) {
+	if l.rds != nil {
+		res, err := l.rds.Eval(loginWindowLua, []string{"login_rl:" + ip}, l.window, l.max)
+		if err == nil {
+			if arr, ok := res.([]interface{}); ok && len(arr) == 2 {
+				if toInt(arr[0]) == 1 {
+					return true, toInt(arr[1])
+				}
+				return false, toInt(arr[1])
+			}
+		}
+		// Redis 不可用：降级到内存限流，保证防护不失效
+		logx.Errorf("Redis 登录限流失败，降级为内存模式: %v", err)
+	}
+	return l.memAllow(ip)
+}
+
+// memAllow 单实例内存限流，作为 Redis 不可用时的兜底。
+func (l *loginRateLimiter) memAllow(ip string) (bool, int) {
+	now := time.Now().Unix()
+	val, _ := l.mem.LoadOrStore(ip, &ipCounter{})
+	c := val.(*ipCounter)
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.blockedUntil > now {
+		return true, int(c.blockedUntil - now)
+	}
+	if now-c.windowStart > int64(l.window) {
+		c.count = 0
+		c.windowStart = now
+	}
+	c.count++
+	if c.count > l.max {
+		c.blockedUntil = now + int64(l.blockSeconds)
+		return true, l.blockSeconds
+	}
+	return false, 0
+}
+
+// NewLoginRateLimitMiddleware 按客户端 IP 对登录接口做分布式固定窗口限流（防爆破）。
+// rds 为 nil 或 Redis 不可用时自动降级为单实例内存限流；未启用（enabled=false）时直接透传，零额外开销。
+func NewLoginRateLimitMiddleware(rds *redis.Redis, enabled bool, max, window, blockSeconds int) rest.Middleware {
 	if !enabled {
 		return func(next http.HandlerFunc) http.HandlerFunc {
 			return next
 		}
 	}
-	rl := struct {
-		Max          int
-		Window       int
-		BlockSeconds int
-	}{max, window, blockSeconds}
-	store := &sync.Map{}
-
+	limiter := &loginRateLimiter{
+		rds:          rds,
+		max:          max,
+		window:       window,
+		blockSeconds: blockSeconds,
+		mem:          &sync.Map{},
+	}
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != "/admin/login" || r.Method != http.MethodPost {
 				next(w, r)
 				return
 			}
-			ip := clientIP(r)
-			now := time.Now().Unix()
-			val, _ := store.LoadOrStore(ip, &ipCounter{})
-			c := val.(*ipCounter)
-			c.mu.Lock()
-			if c.blockedUntil > now {
-				c.mu.Unlock()
-				writeRateLimited(w)
+			blocked, retryAfter := limiter.allow(clientIP(r))
+			if blocked {
+				writeRateLimited(w, retryAfter)
 				return
 			}
-			if now-c.windowStart > int64(rl.Window) {
-				c.count = 0
-				c.windowStart = now
-			}
-			c.count++
-			if c.count > rl.Max {
-				c.blockedUntil = now + int64(rl.BlockSeconds)
-				c.mu.Unlock()
-				writeRateLimited(w)
-				return
-			}
-			c.mu.Unlock()
 			next(w, r)
 		}
 	}
 }
 
-func writeRateLimited(w http.ResponseWriter) {
+func writeRateLimited(w http.ResponseWriter, retryAfter int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	if retryAfter > 0 {
+		w.Header().Set("Retry-After", strconv.Itoa(retryAfter))
+	}
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"code": loginRateLimitCode,
@@ -92,4 +142,20 @@ func clientIP(r *http.Request) string {
 		return r.RemoteAddr
 	}
 	return host
+}
+
+func toInt(v interface{}) int {
+	switch n := v.(type) {
+	case int64:
+		return int(n)
+	case int:
+		return n
+	case float64:
+		return int(n)
+	case string:
+		i, _ := strconv.Atoi(n)
+		return i
+	default:
+		return 0
+	}
 }

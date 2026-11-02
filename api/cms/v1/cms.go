@@ -18,6 +18,8 @@ import (
 	"github.com/yuwen002/go-meteor-cms/internal/pkg/cleanup"
 
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -45,16 +47,33 @@ func main() {
 	// WithFileServer 是 RunOption，必须在创建 server 时传入；它仅拦截 GET 且
 	// 路径以 /uploads/ 前缀开头且文件存在的请求，其余请求仍走 API 路由。
 	uploadDir := c.Upload.Defaults().Dir
-	server := rest.MustNewServer(c.RestConf,
-		rest.WithFileServer(uploadURLPrefix, http.Dir(uploadDir)))
+	// 跨域：通过 go-zero 内置 WithCors 启用（内部以 NotAllowedHandler 接管 OPTIONS 预检并返回 204）。
+	// 仅在显式配置 Cors 源时开启；未配置则保持同源部署（不暴露 CORS 头）。
+	opts := []rest.RunOption{
+		rest.WithFileServer(uploadURLPrefix, http.Dir(uploadDir)),
+	}
+	if len(c.Cors) > 0 {
+		opts = append(opts, rest.WithCors(c.Cors...))
+	}
+	server := rest.MustNewServer(c.RestConf, opts...)
 	defer server.Stop()
 
 	// 若配置了前端产物目录，则直接托管 SPA（含 history 路由回退）
 	server.Use(middleware.NewSPAMiddleware(c.StaticDir))
 	// 将登出请求携带的 X-Refresh-Token 透传进 context，供登出接口一并吊销
 	server.Use(middleware.NewRefreshTokenHeaderMiddleware())
-	// 登录接口按 IP 限流（防爆破），配置见 Login.RateLimit
+
+	// 登录限流：配置了 Redis 则走分布式限流，否则（含 Redis 不可用）自动降级为内存限流
+	var rds *redis.Redis
+	if c.Redis.Host != "" {
+		if r, err := redis.NewRedis(c.Redis); err != nil {
+			logx.Errorf("Redis 初始化失败，登录限流将使用内存模式: %v", err)
+		} else {
+			rds = r
+		}
+	}
 	server.Use(middleware.NewLoginRateLimitMiddleware(
+		rds,
 		c.Login.RateLimit.Enabled,
 		c.Login.RateLimit.Max,
 		c.Login.RateLimit.Window,

@@ -5,12 +5,17 @@ package config
 
 import (
 	baseconfig "github.com/yuwen002/go-meteor-cms/internal/config"
-
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 )
 
 type Config struct {
 	rest.RestConf
+	// Cors 允许跨域访问的前端源列表（前端独立域名部署时配置），如 ["https://admin.example.com"]；
+	// 含 "*" 表示允许任意源（仅适合无 cookie 凭据、纯 token 鉴权的场景）
+	Cors []string `json:",optional"`
+	// Redis 登录限流的分布式存储；Host 为空时登录限流自动降级为单实例内存模式
+	Redis redis.RedisConf `json:",optional"`
 	Database struct {
 		Driver string
 		Source string
