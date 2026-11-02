@@ -10,6 +10,7 @@ import (
 )
 
 var ErrInvalidToken = errors.New("无效或过期的 token")
+var ErrExpiredToken = errors.New("token 已过期")
 
 // GenerateToken 生成 JWT Token
 // 参数:
@@ -51,8 +52,14 @@ func ParseToken(secret, tokenStr string) (map[string]interface{}, error) {
 		return []byte(secret), nil
 	})
 
-	// 检查 Token 是否有效
-	if err != nil || !token.Valid {
+	// 解析失败：区分「过期」与「签名/格式非法」，便于上层对过期令牌触发刷新
+	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, ErrExpiredToken
+		}
+		return nil, ErrInvalidToken
+	}
+	if !token.Valid {
 		return nil, ErrInvalidToken
 	}
 

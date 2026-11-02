@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -65,6 +66,11 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		// 解析 token（使用你自己的 utils.ParseToken）
 		claims, err := utils.ParseToken(m.config.Auth.AccessSecret, tokenStr)
 		if err != nil {
+			// 过期令牌返回 2001，前端据此发起无感刷新；其它非法令牌仍返回 2009
+			if errors.Is(err, utils.ErrExpiredToken) {
+				common.Fail(w, common.ErrUnauthorized, common.GetErrorMessage(common.ErrUnauthorized))
+				return
+			}
 			common.Fail(w, common.ErrInvalidToken, common.GetErrorMessage(common.ErrInvalidToken))
 			return
 		}
