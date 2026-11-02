@@ -1,0 +1,43 @@
+api/cms/v1/internal/handler/forceadminlogoutallhandler.go
+  h_a3f313f3d96276 1-30
+api/cms/v1/internal/logic/forceadminlogoutbydeptlogic.go
+  s_bbf609960902b0::t_c889b227751470 1-68
+docs/runbook.md
+  s_bbf609960902b0::t_ed3a10fdda4bcf 173-175
+api/cms/v1/internal/middleware/permissionmiddleware.go
+  s_bbf609960902b0::t_894dc0187267a9 24
+api/cms/v1/internal/handler/forceadminlogoutbydepthandler.go
+  h_a3f313f3d96276 1-39
+api/cms/v1/internal/handler/logoutallhandler.go
+  s_bbf609960902b0::t_a368ed8149bf2f 1-30
+api/cms/v1/internal/logic/forceadminlogoutalllogic.go
+  h_a3f313f3d96276 1-76
+api/cms/v1/internal/logic/logoutalllogic.go
+  h_a3f313f3d96276 1-55
+api/cms/v1/internal/types/types.go
+  h_a3f313f3d96276 169-172
+internal/seed/permissions.go
+  s_bbf609960902b0::t_3a51b9caf66ccb 93-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "a10610e44874b4d41768f8c6909329f544bd4c59",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 203
+    }
+  }
+}
