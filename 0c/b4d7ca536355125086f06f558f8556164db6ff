@@ -1,0 +1,33 @@
+api/cms/v1/internal/handler/forceadminlogouthandler.go
+  s_bbf609960902b0::t_13076f9b69966b 1-38
+api/cms/v1/internal/types/types.go
+  s_bbf609960902b0::t_6642266d8b2859 165-168
+api/cms/v1/internal/handler/routes.go
+  s_bbf609960902b0::t_330eafeab435a8 122-126
+docs/runbook.md
+  s_bbf609960902b0::t_256082268e2de2 172
+api/cms/v1/internal/logic/forceadminlogoutlogic.go
+  h_a3f313f3d96276 62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "0cb4d7ca536355125086f06f558f8556164db6ff",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 139
+    }
+  }
+}
