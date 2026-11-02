@@ -166,6 +166,10 @@ type ForceAdminLogoutReq struct {
 	ID int64 `path:"id"`
 }
 
+type ForceLogoutByDeptReq struct {
+	DeptID int64 `json:"dept_id"`
+}
+
 type EnableAdminReq struct {
 	ID int64 `path:"id"`
 }

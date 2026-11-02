@@ -126,6 +126,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/admin/logout-all",
+					Handler: logoutAllHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/admin-users/force-logout-by-dept",
+					Handler: forceAdminLogoutByDeptHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/admin-users/force-logout-all",
+					Handler: forceAdminLogoutAllHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/admin/departments",
 					Handler: departmentCreateHandler(serverCtx),
 				},

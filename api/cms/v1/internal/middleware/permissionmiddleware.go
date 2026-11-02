@@ -21,6 +21,7 @@ import (
 
 var permissionBypassRoutes = map[string]struct{}{
 	http.MethodPost + " /admin/logout":                        {},
+	http.MethodPost + " /admin/logout-all":                    {}, // 任意登录用户可注销自己的全部会话
 	http.MethodGet + " /admin/test-token":                     {},
 	http.MethodPut + " /admin/admin-users/me/change-password": {},
 	// 个人中心相关接口必须放行：普通管理员在拿到任何权限之前需要取回菜单，

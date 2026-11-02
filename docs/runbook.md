@@ -170,6 +170,9 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 12. **鉴权查库缓存**：权限中间件将「用户→角色→权限」集合与「API 路径→权限」解析按 60s TTL 内存缓存（`go-zero collection.Cache`）；`is_super`/`is_active` 仍每请求实时查库，保证权限变更即时生效。
 13. **Redis 依赖**：登录限流、token 版本（全局踢人）依赖 `cms-api.yaml` 的 `Redis`；`Host` 为空则相应能力降级（限流→内存、踢人→不校验），多实例部署务必配置以保证防护一致生效。
 14. **强制下线接口**：`PUT /admin/admin-users/:id/force-logout`（权限标识 `system:admin_user:force_logout`，超管专用）通过 `tokenversion.Bump` 抬高目标用户版本号，使其所有旧令牌在下次请求即被 JWT 中间件判为 `2012 登录状态已失效`。与「禁用/删除账号、改密/重置密码」触发的踢人同源；未配置 Redis 时该接口仍可达但会话不被实际吊销（与 P2-4 降级一致）。
+15. **自我全设备下线**：`POST /admin/logout-all`（权限中间件已 bypass，任意登录用户可调用）抬高自身 token 版本号，注销自己全部会话（含当前令牌）。无需超管权限，与单点登出不同的是它一次清除所有设备会话。
+16. **按部门强制下线**：`POST /admin/admin-users/force-logout-by-dept`（超管，`system:admin_user:force_logout_dept`）按 `dept_id` 批量抬高该部门全部管理员的 token 版本号；未配置 Redis 时降级为 no-op（仅直接隶属该 `dept_id` 的用户，不含子部门）。
+17. **强制下线全部（除自己）**：`POST /admin/admin-users/force-logout-all`（超管，`system:admin_user:force_logout_all`）批量抬高除当前操作者外全部管理员的 token 版本号，避免把自己也踢下线；未配置 Redis 时降级为 no-op。
 
 ---
 
