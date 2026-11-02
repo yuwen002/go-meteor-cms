@@ -1,50 +1,17 @@
+# 本地开发依赖编排。
+# 说明：
+#   - 应用本身依赖 MySQL（见 api/cms/v1/etc/cms-api.yaml 的 Database.Source，
+#     默认 127.0.0.1:3306）。本 compose 不内置 MySQL，请保证本机/可访问的 MySQL 已就绪。
+#   - Redis 用于：P1 登录限流（分布式）、P2-4 全局踢人/token 版本号。
+#     不配置 Redis 时这两项会自动降级（限流→单实例内存、踢人→不校验），防护不失效。
+#
+# 启动： docker compose up -d redis
+# 验证踢人（P2-4）见 docs/runbook.md 对应章节。
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: go-meteor-cms-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: "123456"
-      MYSQL_DATABASE: go_meteor_cms
-      TZ: Asia/Shanghai
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  redis:
+    image: redis:7-alpine
+    container_name: go-meteor-cms-redis
     ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p123456"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-
-  migrate:
-    build: .
-    container_name: go-meteor-cms-migrate
-    restart: "no"
-    command: ["/app/migrate"]
-    environment:
-      MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
-    depends_on:
-      mysql:
-        condition: service_healthy
-
-  api:
-    build: .
-    container_name: go-meteor-cms-api
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "no"]
     restart: unless-stopped
-    command: ["/app/cms", "-f", "etc/cms-api.yaml"]
-    environment:
-      TZ: Asia/Shanghai
-      WEB_DIST: "/app/web/dist"
-      MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
-    ports:
-      - "8888:8888"
-    depends_on:
-      mysql:
-        condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
-
-volumes:
-  mysql-data:

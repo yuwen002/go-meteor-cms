@@ -176,3 +176,19 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 
 - 提交历史：`e4998ad`（动态菜单多级层级 + 子菜单丢失修复）、`d8643a8`（统一响应信封修复）。
 - 接口一致性审计方法见 `docs/smoke-test.md` 第 6 节，建议改动 `routes.go` 或种子权限后复跑。
+
+## 8. 附录：P2-4 全局踢人验证（需 Redis）
+
+环境起 Redis 后，token 版本校验与「禁用/删除/改密/重置」触发点才会真正生效；否则自动降级为不校验（见第 13 条）。
+
+验证步骤（无需真实登录，用调试 token 即可）：
+
+1. 起 Redis：`docker compose up -d redis`（见仓库 `docker-compose.yml`）。
+2. 启动服务（yaml 中 `Redis.Host` 默认 `127.0.0.1:6379`）。
+3. 用任意合法的用户级 token（claim 含 `user_id` 与 `tv`）访问受保护接口（如 `/admin/profile/permissions`），应正常返回。
+4. 手动抬高该用户版本号（模拟「踢人」）：
+   `docker exec go-meteor-cms-redis redis-cli SET auth:tv:<userID> 5`
+5. 用同一枚 `tv` 仍为旧值（如 0）的 token 再访问 → 应返回 `2012 登录状态已失效`。
+6. 用一枚 `tv=5`（与当前版本一致）的新 token 访问 → 应正常返回，证明「旧令牌失效、新令牌有效」。
+
+说明：生产中踢人由 disable/delete/change-password/reset 自动 `INCR auth:tv:<userID>` 触发，无需手动操作；上述步骤仅用于回归验证。
