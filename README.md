@@ -561,6 +561,9 @@ docker compose down -v
 应用通过环境变量连接依赖，无需改动 `cms-api.yaml`：`MYSQL_DSN` 指向 `mysql:3306`、`REDIS_HOST` 指向 `redis:6379`、
 `WEB_DIST=/app/web/dist`。部署到别的机器时只需改 docker-compose.yml 里的这几个环境变量。
 
+配置项集中在 `.env`（参考 `.env.example`，含开发默认值）：可覆盖 root 密码、库名、各服务端口等；
+不提供 `.env` 时 compose 的 `${VAR:-默认值}` 自动生效，开箱即用。注意改密码 / 库名时要同步改 `MYSQL_DSN` 中的对应部分。
+
 > 说明：mysql / redis 默认仅容器内部网络互通（未映射宿主机端口），以免与本地已运行的 MySQL(3306) 冲突；
 > 如需从宿主机直连排查，取消 docker-compose.yml 中对应 `ports` 注释即可（注意 3306 端口冲突可改用 `3307:3306`）。
 

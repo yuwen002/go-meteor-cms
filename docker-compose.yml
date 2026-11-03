@@ -2,19 +2,17 @@
 #
 # 启动： docker compose up -d
 #   依赖顺序由 depends_on 保证：
-#     mysql 就绪(健康检查通过) → migrate 执行表结构+种子(幂等) → api 启动并托管前端 SPA(8888)
+#     mysql 就绪(健康检查通过) → migrate 执行表结构+种子(幂等) → api 启动并托管前端 SPA(:${API_PORT})
 # 停止（保留数据）： docker compose down
 # 停止（清空数据）： docker compose down -v
 #
-# 仅要依赖、应用仍在宿主机跑： docker compose up -d mysql redis
-#   （此时若宿主机已占用 3306，请把下方 mysql.ports 改映射到其它宿主机端口，并同步改 cms-api.yaml）
+# 配置集中在 .env（开发默认值见 .env.example）：
+#   - 改密码/库名：改 MYSQL_ROOT_PASSWORD / MYSQL_DATABASE，并同步改 MYSQL_DSN 中对应部分
+#   - 容器内服务间连接（MYSQL_DSN 的 mysql:3306、REDIS_HOST 的 redis:6379）使用 compose 服务名，一般无需改
+#   - 各服务端口（API_PORT / REDIS_PORT）可改；MYSQL 默认不映射宿主机端口以免与本地 MySQL(3306) 冲突，
+#     如需从宿主机直连，取消下方 mysql.ports 注释并设 MYSQL_PORT 对应值（如 3307）
 #
-# 容器内通过环境变量注入连接信息，无需改动 cms-api.yaml：
-#   MYSQL_DSN   指向 mysql:3306 ； REDIS_HOST 指向 redis:6379 ； WEB_DIST=/app/web/dist
-# 改 root 密码 / 库名时，同步修改 mysql.environment 与下方 MYSQL_DSN 两处即可。
-#
-# 说明：mysql / redis 未映射宿主机端口（纯内部网络），以免与本地已运行的 MySQL(3306) 冲突；
-#       如需从宿主机用 GUI/redis-cli 直连，取消对应 ports 注释即可（注意 3306 端口冲突）。
+# 未提供 .env 时，下方 ${VAR:-默认值} 自动生效，开箱即用。
 
 services:
   mysql:
@@ -24,14 +22,14 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_ROOT_PASSWORD: "123456"
-      MYSQL_DATABASE: "go_meteor_cms"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-go_meteor_cms}
     # ports:
-    #   - "3306:3306"   # 取消注释可从宿主机访问；若本地 MySQL 已占 3306 请改用 "3307:3306"
+    #   - "${MYSQL_PORT:-3306}:3306"   # 取消注释可从宿主机访问；若本地已占 3306 请改用 3307
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p123456"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-123456}"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -42,7 +40,7 @@ services:
     container_name: go-meteor-cms-redis
     command: ["redis-server", "--appendonly", "no"]
     ports:
-      - "6379:6379"   # 当前宿主机无 Redis，映射无冲突；如需独占可删掉此行
+      - "${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -59,7 +57,7 @@ services:
     container_name: go-meteor-cms-migrate
     command: ["/app/migrate"]
     environment:
-      MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
+      MYSQL_DSN: ${MYSQL_DSN:-root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local}
     depends_on:
       mysql:
         condition: service_healthy
@@ -73,11 +71,11 @@ services:
       dockerfile: Dockerfile
     container_name: go-meteor-cms-api
     ports:
-      - "8888:8888"
+      - "${API_PORT:-8888}:8888"
     environment:
-      MYSQL_DSN: "root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local"
-      REDIS_HOST: "redis:6379"
-      WEB_DIST: "/app/web/dist"
+      MYSQL_DSN: ${MYSQL_DSN:-root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local}
+      REDIS_HOST: ${REDIS_HOST:-redis:6379}
+      WEB_DIST: ${WEB_DIST:-/app/web/dist}
     depends_on:
       mysql:
         condition: service_healthy
