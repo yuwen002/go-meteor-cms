@@ -1,0 +1,33 @@
+.env.example
+  s_bbf609960902b0::t_7acfee2d651b07 22-25
+docker-compose.yml
+  s_bbf609960902b0::t_3399e7c321e766 57-59,75-77
+Dockerfile
+  s_bbf609960902b0::t_38b92c4d5e2c2e 2-4,7,13,16-18
+api/cms/v1/cms.go
+  s_bbf609960902b0::t_2f86158510b359 58-61
+api/cms/v1/internal/middleware/spa.go
+  s_bbf609960902b0::t_3a4b7deaca01de 10,15-32,34-41,44,46-50,52-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "6d10128f72bcf262db0f525052cd75ad8441597b",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 155
+    }
+  }
+}
