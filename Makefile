@@ -62,7 +62,7 @@ gen-doc: ## 由 cms.api 生成 OpenAPI 文档（输出 openapi.json）
 docker-build: ## 构建镜像
 	docker build -t go-meteor-cms .
 
-docker-up: ## 启动 MySQL + 迁移 + API（迁移成功后再起服务）
+docker-up: ## 启动依赖：MySQL + Redis（应用仍需本地 make migrate + make run）
 	docker compose up -d --wait
 
 docker-down: ## 停止并清理容器

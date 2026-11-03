@@ -179,7 +179,7 @@ npm run preview      # 本地预览构建产物
 ├── rpc/                   # RPC 服务定义
 ├── Makefile               # 常用开发命令
 ├── Dockerfile             # 多阶段构建镜像
-└── docker-compose.yml     # MySQL + 迁移 + API 一键编排
+└── docker-compose.yml     # 本地依赖编排（MySQL + Redis）
 ```
 
 ## API 接口
@@ -540,17 +540,32 @@ go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 
 ## 部署
 
-### Docker（推荐）
+### Docker（依赖编排）
 
-项目已内置 `Dockerfile`（多阶段构建，最终镜像基于 alpine，以非 root 用户运行）与 `docker-compose.yml`。
+`docker-compose.yml` 负责把 MySQL 与 Redis 两个依赖一键拉起；应用仍在宿主机用 `make run` 启动，
+连接 compose 暴露到 `127.0.0.1` 的 `3306` / `6379` 端口（与 `api/cms/v1/etc/cms-api.yaml` 一致）。
+完整多容器（含 API / 迁移）编排可在此基础上扩展。
 
 ```bash
-# 一键启动：MySQL（健康检查通过）→ 迁移（执行成功）→ API 服务
+# 启动依赖（MySQL + Redis，带健康检查，等待就绪）
 docker compose up -d --wait
 
-# 停止
+# 迁移数据库（幂等，可重复执行）
+make migrate
+
+# 启动 API 服务
+make run
+# 或： go run ./api/cms/v1 -f api/cms/v1/etc/cms-api.yaml
+```
+
+停止依赖：
+
+```bash
 docker compose down
 ```
+
+> 注意：若宿主机已运行本地 MySQL 占用 3306，`docker compose up` 会因端口冲突失败；
+> 请先停掉本地 MySQL，或把 docker-compose.yml 的 `ports` 改映射到其它宿主机端口并同步修改 `cms-api.yaml`。
 
 或单独构建运行：
 
