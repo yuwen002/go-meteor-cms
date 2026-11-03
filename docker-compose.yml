@@ -54,6 +54,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org/}
+        GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
     container_name: go-meteor-cms-migrate
     command: ["/app/migrate"]
     environment:
@@ -69,6 +72,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org/}
+        GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
     container_name: go-meteor-cms-api
     ports:
       - "${API_PORT:-8888}:8888"

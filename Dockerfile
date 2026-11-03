@@ -1,14 +1,20 @@
 # ---------- 前端构建阶段 ----------
-FROM node:20-alpine AS web
+# NPM_REGISTRY 可覆盖为镜像源（如 https://registry.npmmirror.com/）以适配受限网络环境
+FROM node:22-alpine AS web
+ARG NPM_REGISTRY=https://registry.npmjs.org/
 WORKDIR /web
 COPY web/package.json ./
-RUN npm install
+RUN npm install --registry=$NPM_REGISTRY --no-audit --no-fund
 COPY web/ ./
 # 产物位于 /web/dist（vite 默认 base 为 /，由 Go 服务统一托管 SPA）
 RUN npm run build
 
 # ---------- 后端构建阶段 ----------
+# GOPROXY 可覆盖为镜像源（如 https://goproxy.cn,direct）以适配受限网络环境
 FROM golang:1.26-alpine AS builder
+
+ARG GOPROXY=https://proxy.golang.org,direct
+ENV GOPROXY=$GOPROXY
 
 WORKDIR /src
 

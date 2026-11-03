@@ -55,6 +55,10 @@ func main() {
 	// 仅在显式配置 Cors 源时开启；未配置则保持同源部署（不暴露 CORS 头）。
 	opts := []rest.RunOption{
 		rest.WithFileServer(uploadURLPrefix, http.Dir(uploadDir)),
+		// 若配置了前端产物目录，则通过自定义 NotFoundHandler 直接托管 SPA（含 history 路由回退）。
+		// 不能用 server.Use 注册：go-zero 的全局中间件不会作用于 404（未匹配）路由，
+		// 而 notFoundHandler 在 MustNewServer 时即绑定中间件链，早于 server.Use 调用。
+		rest.WithNotFoundHandler(middleware.SPAHandler(c.StaticDir)),
 	}
 	if len(c.Cors) > 0 {
 		opts = append(opts, rest.WithCors(c.Cors...))
@@ -62,8 +66,6 @@ func main() {
 	server := rest.MustNewServer(c.RestConf, opts...)
 	defer server.Stop()
 
-	// 若配置了前端产物目录，则直接托管 SPA（含 history 路由回退）
-	server.Use(middleware.NewSPAMiddleware(c.StaticDir))
 	// 将登出请求携带的 X-Refresh-Token 透传进 context，供登出接口一并吊销
 	server.Use(middleware.NewRefreshTokenHeaderMiddleware())
 
