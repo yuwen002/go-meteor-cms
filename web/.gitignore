@@ -5,3 +5,8 @@ dist
 .idea
 .vscode
 *.log
+
+# 构建产物（本地生成，禁止提交，避免 Windows 路径的 tsbuildinfo 在 CI 增量构建时出错）
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
