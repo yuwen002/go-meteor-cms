@@ -42,6 +42,10 @@ func main() {
 	if dir := os.Getenv("WEB_DIST"); dir != "" {
 		c.StaticDir = dir
 	}
+	// Redis 地址：容器化部署时通过 REDIS_HOST 注入（如 "redis:6379"），本地开发留空（默认 127.0.0.1:6379）
+	if rh := os.Getenv("REDIS_HOST"); rh != "" {
+		c.Redis.Host = rh
+	}
 
 	// 静态资源：让 public/uploads 下的文件可通过 /uploads/xxx 访问。
 	// WithFileServer 是 RunOption，必须在创建 server 时传入；它仅拦截 GET 且

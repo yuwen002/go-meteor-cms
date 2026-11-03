@@ -179,7 +179,7 @@ npm run preview      # 本地预览构建产物
 ├── rpc/                   # RPC 服务定义
 ├── Makefile               # 常用开发命令
 ├── Dockerfile             # 多阶段构建镜像
-└── docker-compose.yml     # 本地依赖编排（MySQL + Redis）
+└── docker-compose.yml     # 全栈一键编排（MySQL + Redis + 迁移 + API，前端打包进镜像）
 ```
 
 ## API 接口
@@ -540,32 +540,36 @@ go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 
 ## 部署
 
-### Docker（依赖编排）
+### Docker（全栈一键）
 
-`docker-compose.yml` 负责把 MySQL 与 Redis 两个依赖一键拉起；应用仍在宿主机用 `make run` 启动，
-连接 compose 暴露到 `127.0.0.1` 的 `3306` / `6379` 端口（与 `api/cms/v1/etc/cms-api.yaml` 一致）。
-完整多容器（含 API / 迁移）编排可在此基础上扩展。
-
-```bash
-# 启动依赖（MySQL + Redis，带健康检查，等待就绪）
-docker compose up -d --wait
-
-# 迁移数据库（幂等，可重复执行）
-make migrate
-
-# 启动 API 服务
-make run
-# 或： go run ./api/cms/v1 -f api/cms/v1/etc/cms-api.yaml
-```
-
-停止依赖：
+`docker-compose.yml` 编排完整栈：MySQL（数据） + Redis（限流 / 全局踢人） + 迁移（表结构 + 种子） + API（含前端 SPA）。
+镜像由仓库根目录 `Dockerfile` 多阶段构建：前端 `web/` 的构建产物被打进同一镜像，由 Go 服务在 8888 端口统一托管。
 
 ```bash
+# 一键启动：mysql 就绪 → migrate 迁移+种子 → api 启动并托管前端
+docker compose up -d
+
+# 跟踪日志（看迁移进度 / API 启动）
+docker compose logs -f api
+
+# 停止并保留数据
 docker compose down
+# 停止并清空数据（含库）
+docker compose down -v
 ```
 
-> 注意：若宿主机已运行本地 MySQL 占用 3306，`docker compose up` 会因端口冲突失败；
-> 请先停掉本地 MySQL，或把 docker-compose.yml 的 `ports` 改映射到其它宿主机端口并同步修改 `cms-api.yaml`。
+应用通过环境变量连接依赖，无需改动 `cms-api.yaml`：`MYSQL_DSN` 指向 `mysql:3306`、`REDIS_HOST` 指向 `redis:6379`、
+`WEB_DIST=/app/web/dist`。部署到别的机器时只需改 docker-compose.yml 里的这几个环境变量。
+
+> 说明：mysql / redis 默认仅容器内部网络互通（未映射宿主机端口），以免与本地已运行的 MySQL(3306) 冲突；
+> 如需从宿主机直连排查，取消 docker-compose.yml 中对应 `ports` 注释即可（注意 3306 端口冲突可改用 `3307:3306`）。
+
+仅想用容器里的 MySQL / Redis、应用仍在宿主机跑：
+
+```bash
+docker compose up -d mysql redis          # 依赖暴露到 127.0.0.1:3306 / 6379（若本地已占 3306 见上方说明）
+make migrate && make run                  # 或 go run ./api/cms/v1 -f api/cms/v1/etc/cms-api.yaml
+```
 
 或单独构建运行：
 
@@ -573,6 +577,8 @@ docker compose down
 docker build -t go-meteor-cms .
 docker run -d -p 8888:8888 \
   -e MYSQL_DSN="root:123456@tcp(host.docker.internal:3306)/go_meteor_cms?parseTime=True&loc=Local" \
+  -e REDIS_HOST="host.docker.internal:6379" \
+  -e WEB_DIST="/app/web/dist" \
   go-meteor-cms
 ```
 
