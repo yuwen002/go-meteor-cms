@@ -1,0 +1,29 @@
+docker-compose.yml
+  h_a3f313f3d96276 1-5,8-10,12,15-16,18-37,41,44-48,50-52
+README.md
+  s_bbf609960902b0::t_5f05d1f4639c59 182,543,545-547,550,553-563,567-569
+Makefile
+  s_bbf609960902b0::t_4dd99539cfd5dc 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "f0edaa5e584f0a01b4eba097815a63b85b8e5109",
+  "prompts": {},
+  "humans": {
+    "h_a3f313f3d96276": {
+      "author": "liuxingyu <yuwen002@163.com>"
+    }
+  },
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 160
+    }
+  }
+}
