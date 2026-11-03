@@ -1,0 +1,24 @@
+README.md
+  s_bbf609960902b0::t_80626738f38748 564-566
+.env.example
+  s_bbf609960902b0::t_08c87e5aeda0eb 1-21
+docker-compose.yml
+  s_bbf609960902b0::t_9ac181acb132f5 5,9-13,15,25-26,28,32,43,60,74,76-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "b475b133919596214b8722e9fccdb414009cba45",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy3"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 59
+    }
+  }
+}
