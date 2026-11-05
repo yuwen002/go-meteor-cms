@@ -487,3 +487,103 @@ Authorization: Bearer <token>
 }
 ```
 
+---
+
+## 文章发布
+
+> 本模块路由注册在 `api/cms/v1/internal/handler/contentroutes.go`，请求/响应类型在
+> `api/cms/v1/internal/types/article_types.go`。与字典 / 配置 / 文件管理一样，它们没有写进
+> `cms.api`；`openapi.json` 由 `cmd/apidoc` 从 `cms.api` 生成，因此**不包含**这些路径，
+> 手工注册模块的接口清单以本文档与 `contentroutes.go` 为准。
+>
+> 独立注册而非追加到 `routes.go` 的原因：`routes.go` / `types.go` 是 goctl 生成文件且被项目
+> 手工追加过内容，重跑 `make gen-api` 会冲掉这些追加段。
+
+### 数据模型与状态机
+
+| 表 | 说明 |
+| --- | --- |
+| `articles` | 文章主表：标题、slug、摘要、封面、Markdown 正文、状态、发布时间、浏览量、置顶、SEO 字段 |
+| `categories` | 分类：支持父子层级，slug 唯一 |
+| `tags` | 标签：名称与 slug 唯一 |
+| `article_tags` | 文章与标签关联表；刻意不继承软删除，避免复合唯一索引被软删行占用 |
+
+四张表由 `cmd/migrate` 的 `client.Schema.Create` 自动创建。文章 / 分类 / 标签继承
+`BaseMixin + SoftDeleteMixin`，查询自动过滤软删除行。
+
+**状态机**：`0 草稿 → 1 已发布 → 2 已下线`，下线后可再次发布。新建文章一律落草稿，
+状态只能经发布 / 撤回接口变更，编辑接口不会绕过状态机。发布状态是流程状态，
+刻意不放进数据字典（避免运营改字典破坏状态机）。
+
+**公开可见条件**：`status = 1 AND published_at <= NOW()`。发布时传入未来的
+`published_at` 即为定时发布，到点后公开接口自动放行，无需后台定时任务。
+
+**slug**：全局唯一，仅允许小写字母 / 数字 / 连字符。留空时从标题派生，纯中文标题
+退化为 `post-<纳秒时间戳>`。软删除前先把 slug 改为一次性值，避免唯一索引被已删行长期占用。
+
+### 后台接口（需登录 + 权限码）
+
+| 方法 | 路径 | 权限码 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/admin/articles` | `cms:article:list` | 分页列表：`keyword` / `status` / `category_id` / `tag_id` |
+| GET | `/admin/articles/:id` | `cms:article:detail` | 详情，含 Markdown 正文与 SEO 字段 |
+| POST | `/admin/articles` | `cms:article:add` | 新建，落草稿；返回 `data.id` |
+| PUT | `/admin/articles/:id` | `cms:article:edit` | 整单更新（不改状态与发布时间） |
+| DELETE | `/admin/articles/:id` | `cms:article:delete` | 软删除 |
+| POST | `/admin/articles/:id/publish` | `cms:article:publish` | 发布 / 定时发布 |
+| POST | `/admin/articles/:id/withdraw` | `cms:article:withdraw` | 撤回下线 |
+| POST | `/admin/articles/:id/toggle-top` | `cms:article:toggle_top` | 切换置顶 |
+| GET | `/admin/categories` | `cms:category:list` | 分类列表（平铺 + `article_count`） |
+| POST | `/admin/categories` | `cms:category:add` | 新增分类 |
+| PUT | `/admin/categories/:id` | `cms:category:edit` | 修改分类（含父级成环检测） |
+| DELETE | `/admin/categories/:id` | `cms:category:delete` | 删除空分类（有子分类 / 文章时拒绝） |
+| GET | `/admin/tags` | `cms:tag:list` | 标签列表（含 `article_count`） |
+| POST | `/admin/tags` | `cms:tag:add` | 新增标签 |
+| PUT | `/admin/tags/:id` | `cms:tag:edit` | 修改标签 |
+| DELETE | `/admin/tags/:id` | `cms:tag:delete` | 删除标签并清理关联 |
+
+**列表请求参数（query）**：`page`（默认 1）、`page_size`（默认 20，上限 100）、
+`keyword`（标题 / 摘要模糊）、`status`（0/1/2）、`category_id`、`tag_id`。
+响应 data：`list[]`、`total`、`page`、`page_size`。
+
+**新建 / 更新文章请求体**：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| title | string | 必填 |
+| slug | string | 可选，留空自动生成 |
+| summary / cover / content | string | 摘要、封面 URL（来自 `/admin/upload`）、Markdown 正文 |
+| category_id | int64 | 可选，0 表示未分类；必须指向启用中的分类 |
+| tag_ids | int64[] | 可选，服务端去重并校验标签存在且启用 |
+| is_top | bool | 是否置顶 |
+| seo_title / seo_description / seo_keywords | string | SEO 字段，留空时前台取标题 / 摘要 |
+
+**发布请求体**：`{ "published_at": "2026-11-06 09:30:00" }`。留空表示立即发布；
+支持 RFC3339、`YYYY-MM-DD HH:mm:ss`、`YYYY-MM-DDTHH:mm`。正文为空时拒绝发布。
+
+**错误码**：`5801` 文章不存在、`5802` slug 被占用、`5803~5806` 文章增改删查失败、
+`5807` slug 格式不合法、`5808` 发布失败、`5809` 撤回失败、`5810` 分类无效、
+`5811` 标签无效、`5812` 时间格式不合法、`5813` 置顶失败；
+`5901~5910` 分类错误、`5921~5926` 标签错误。
+
+### 公开接口（无需登录）
+
+只挂 `ClientInfoMiddleware`，不经过 JWT / 权限 / 操作日志中间件。`/api` 前缀同时被
+`SPAHandler` 排除，因此前台页面刷新不会误回退到 API 404。
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/articles` | 已发布文章列表：`page` / `page_size`（默认 10）/ `keyword` / `category`（slug）/ `tag`（slug） |
+| GET | `/api/articles/:slug` | 按 slug 取详情，返回 Markdown 正文并累加浏览量 |
+| GET | `/api/taxonomy` | 前台分类 / 标签导航，只返回至少有一篇公开文章的条目 |
+
+公开接口不返回草稿 / 下线 / 未到点文章，列表也不返回正文。对应前台页面为
+`/articles`（列表）与 `/articles/:slug`（详情），二者是顶层路由、不套后台 Layout、无需登录。
+
+**正文安全**：`content` 是 Markdown 源码而非 HTML。前端 `web/src/utils/markdown.ts`
+先做 HTML 转义再套用有限语法，链接 / 图片地址白名单为 `http(s)`、站内绝对路径与 `#`，
+阻断 `javascript:` 等协议，然后才用于 `v-html`。
+
+**操作日志归类**：`/admin/articles`、`/admin/categories`、`/admin/tags` 已加入
+`operationlogmiddleware.go` 的 `moduleByPrefix`，分别记为「文章管理 / 分类管理 / 标签管理」。
+

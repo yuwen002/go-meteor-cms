@@ -204,6 +204,54 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "编辑配置", Permission: "system:config:edit", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "PUT", APIPath: "/admin/configs/:id", Sort: 83},
 	{Name: "删除配置", Permission: "system:config:delete", Type: PermissionTypeButton, ParentName: "系统配置", Sort: 84},
 	{Name: "删除配置", Permission: "system:config:delete", Type: PermissionTypeAPI, ParentName: "系统配置", Method: "DELETE", APIPath: "/admin/configs/:id", Sort: 84},
+
+	// ---------- 内容管理（分组与菜单，父级必须写在子级之前） ----------
+	{Name: "内容管理", Permission: "cms:group:content", Type: PermissionTypeMenu,
+		Path: "", Component: "", Icon: "content", Sort: 100},
+	{Name: "文章管理", Permission: "cms:article:list", Type: PermissionTypeMenu,
+		Path: "/content/articles", Component: "views/content/article/index.vue", Icon: "article", Sort: 101, ParentName: "内容管理"},
+	{Name: "分类管理", Permission: "cms:category:list", Type: PermissionTypeMenu,
+		Path: "/content/categories", Component: "views/content/category/index.vue", Icon: "category", Sort: 102, ParentName: "内容管理"},
+	{Name: "标签管理", Permission: "cms:tag:list", Type: PermissionTypeMenu,
+		Path: "/content/tags", Component: "views/content/tag/index.vue", Icon: "tag", Sort: 103, ParentName: "内容管理"},
+
+	// ---------- 文章管理（按钮 / API） ----------
+	{Name: "查看文章", Permission: "cms:article:list", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 110},
+	{Name: "查看文章", Permission: "cms:article:list", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "GET", APIPath: "/admin/articles", Sort: 110},
+	{Name: "文章详情", Permission: "cms:article:detail", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 111},
+	{Name: "文章详情", Permission: "cms:article:detail", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "GET", APIPath: "/admin/articles/:id", Sort: 111},
+	{Name: "新增文章", Permission: "cms:article:add", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 112},
+	{Name: "新增文章", Permission: "cms:article:add", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles", Sort: 112},
+	{Name: "编辑文章", Permission: "cms:article:edit", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 113},
+	{Name: "编辑文章", Permission: "cms:article:edit", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "PUT", APIPath: "/admin/articles/:id", Sort: 113},
+	{Name: "删除文章", Permission: "cms:article:delete", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 114},
+	{Name: "删除文章", Permission: "cms:article:delete", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "DELETE", APIPath: "/admin/articles/:id", Sort: 114},
+	{Name: "发布文章", Permission: "cms:article:publish", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 115},
+	{Name: "发布文章", Permission: "cms:article:publish", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/publish", Sort: 115},
+	{Name: "撤回文章", Permission: "cms:article:withdraw", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 116},
+	{Name: "撤回文章", Permission: "cms:article:withdraw", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/withdraw", Sort: 116},
+	{Name: "置顶文章", Permission: "cms:article:toggle_top", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 117},
+	{Name: "置顶文章", Permission: "cms:article:toggle_top", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/toggle-top", Sort: 117},
+
+	// ---------- 分类管理（按钮 / API） ----------
+	{Name: "查看分类", Permission: "cms:category:list", Type: PermissionTypeButton, ParentName: "分类管理", Sort: 120},
+	{Name: "查看分类", Permission: "cms:category:list", Type: PermissionTypeAPI, ParentName: "分类管理", Method: "GET", APIPath: "/admin/categories", Sort: 120},
+	{Name: "新增分类", Permission: "cms:category:add", Type: PermissionTypeButton, ParentName: "分类管理", Sort: 121},
+	{Name: "新增分类", Permission: "cms:category:add", Type: PermissionTypeAPI, ParentName: "分类管理", Method: "POST", APIPath: "/admin/categories", Sort: 121},
+	{Name: "编辑分类", Permission: "cms:category:edit", Type: PermissionTypeButton, ParentName: "分类管理", Sort: 122},
+	{Name: "编辑分类", Permission: "cms:category:edit", Type: PermissionTypeAPI, ParentName: "分类管理", Method: "PUT", APIPath: "/admin/categories/:id", Sort: 122},
+	{Name: "删除分类", Permission: "cms:category:delete", Type: PermissionTypeButton, ParentName: "分类管理", Sort: 123},
+	{Name: "删除分类", Permission: "cms:category:delete", Type: PermissionTypeAPI, ParentName: "分类管理", Method: "DELETE", APIPath: "/admin/categories/:id", Sort: 123},
+
+	// ---------- 标签管理（按钮 / API） ----------
+	{Name: "查看标签", Permission: "cms:tag:list", Type: PermissionTypeButton, ParentName: "标签管理", Sort: 130},
+	{Name: "查看标签", Permission: "cms:tag:list", Type: PermissionTypeAPI, ParentName: "标签管理", Method: "GET", APIPath: "/admin/tags", Sort: 130},
+	{Name: "新增标签", Permission: "cms:tag:add", Type: PermissionTypeButton, ParentName: "标签管理", Sort: 131},
+	{Name: "新增标签", Permission: "cms:tag:add", Type: PermissionTypeAPI, ParentName: "标签管理", Method: "POST", APIPath: "/admin/tags", Sort: 131},
+	{Name: "编辑标签", Permission: "cms:tag:edit", Type: PermissionTypeButton, ParentName: "标签管理", Sort: 132},
+	{Name: "编辑标签", Permission: "cms:tag:edit", Type: PermissionTypeAPI, ParentName: "标签管理", Method: "PUT", APIPath: "/admin/tags/:id", Sort: 132},
+	{Name: "删除标签", Permission: "cms:tag:delete", Type: PermissionTypeButton, ParentName: "标签管理", Sort: 133},
+	{Name: "删除标签", Permission: "cms:tag:delete", Type: PermissionTypeAPI, ParentName: "标签管理", Method: "DELETE", APIPath: "/admin/tags/:id", Sort: 133},
 }
 
 // legacyPermissions 历史版本的权限标识，已被 DefaultPermissions 中的新标识取代。

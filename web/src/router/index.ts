@@ -11,6 +11,19 @@ const routes = [
     component: () => import('@/views/login/index.vue'),
     meta: { title: '登录', hidden: true },
   },
+  // 公开阅读页是顶层路由，不套后台 Layout，也不进侧边栏菜单
+  {
+    path: '/articles',
+    name: 'PortalArticles',
+    component: () => import('@/views/portal/ArticleList.vue'),
+    meta: { title: '文章' },
+  },
+  {
+    path: '/articles/:slug',
+    name: 'PortalArticleDetail',
+    component: () => import('@/views/portal/ArticleDetail.vue'),
+    meta: { title: '文章详情' },
+  },
   {
     path: '/',
     component: Layout,
@@ -77,6 +90,36 @@ const routes = [
         meta: { title: '登录日志', permission: 'system:log:login_list' },
       },
       {
+        path: 'content/articles',
+        name: 'ContentArticles',
+        component: () => import('@/views/content/article/index.vue'),
+        meta: { title: '文章管理', permission: 'cms:article:list' },
+      },
+      {
+        path: 'content/articles/new',
+        name: 'ContentArticleCreate',
+        component: () => import('@/views/content/article/edit.vue'),
+        meta: { title: '写文章', permission: 'cms:article:add' },
+      },
+      {
+        path: 'content/articles/:id/edit',
+        name: 'ContentArticleEdit',
+        component: () => import('@/views/content/article/edit.vue'),
+        meta: { title: '编辑文章', permission: 'cms:article:edit' },
+      },
+      {
+        path: 'content/categories',
+        name: 'ContentCategories',
+        component: () => import('@/views/content/category/index.vue'),
+        meta: { title: '分类管理', permission: 'cms:category:list' },
+      },
+      {
+        path: 'content/tags',
+        name: 'ContentTags',
+        component: () => import('@/views/content/tag/index.vue'),
+        meta: { title: '标签管理', permission: 'cms:tag:list' },
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/profile/index.vue'),
@@ -91,20 +134,27 @@ const router = createRouter({
   routes,
 })
 
-const whiteList = ['/login']
+// 公开页面无需登录即可访问，且不触发后台菜单/权限加载。
+// 前台列表与详情共用 /articles 前缀；SPAHandler 会为这些路径回退 index.html。
+const isPublicRoute = (path: string): boolean =>
+  path === '/login' || path === '/articles' || path.startsWith('/articles/')
 
 router.beforeEach(async (to, from, next) => {
   const token = getToken()
-  if (!token) {
-    if (whiteList.includes(to.path)) {
-      next()
+  if (to.path === '/login') {
+    if (token) {
+      next('/')
     } else {
-      next('/login')
+      next()
     }
     return
   }
-  if (to.path === '/login') {
-    next('/')
+  if (isPublicRoute(to.path)) {
+    next()
+    return
+  }
+  if (!token) {
+    next('/login')
     return
   }
 

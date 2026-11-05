@@ -37,6 +37,9 @@ var moduleByPrefix = map[string]string{
 	"/admin/permissions": "权限管理",
 	"/admin/profile":     "个人中心",
 	"/admin/logs":        "日志管理",
+	"/admin/articles":    "文章管理",
+	"/admin/categories":  "分类管理",
+	"/admin/tags":        "标签管理",
 }
 
 // OperationLogMiddleware 操作日志中间件

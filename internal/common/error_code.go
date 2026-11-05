@@ -97,6 +97,39 @@ const (
 	ErrConfigCreateFail   = 5703 // 创建配置失败
 	ErrConfigUpdateFail   = 5704 // 更新配置失败
 	ErrConfigDeleteSystem = 5705 // 系统内置配置禁止删除
+
+	// Article errors (5800-5899)
+	ErrArticleNotFound        = 5801 // 文章不存在
+	ErrArticleSlugExists      = 5802 // 文章别名已被占用
+	ErrArticleCreateFail      = 5803 // 创建文章失败
+	ErrArticleUpdateFail      = 5804 // 更新文章失败
+	ErrArticleDeleteFail      = 5805 // 删除文章失败
+	ErrArticleListFail        = 5806 // 获取文章列表失败
+	ErrArticleInvalidSlug     = 5807 // 文章别名格式不合法
+	ErrArticlePublishFail     = 5808 // 发布文章失败
+	ErrArticleWithdrawFail    = 5809 // 撤回文章失败
+	ErrArticleCategoryInvalid = 5810 // 所属分类不存在或已禁用
+	ErrArticleTagInvalid      = 5811 // 标签不存在或已禁用
+	ErrArticleInvalidTime     = 5812 // 定时发布时间格式不合法
+	ErrArticleSetTopFail      = 5813 // 设置置顶失败
+
+	// Category & Tag errors (5900-5999)
+	ErrCategoryNotFound     = 5901 // 分类不存在
+	ErrCategoryNameExists   = 5902 // 分类名称已存在
+	ErrCategorySlugExists   = 5903 // 分类别名已被占用
+	ErrCategoryHasChildren  = 5904 // 该分类下存在子分类
+	ErrCategoryHasArticles  = 5905 // 该分类下存在文章
+	ErrCategoryCreateFail   = 5906 // 创建分类失败
+	ErrCategoryUpdateFail   = 5907 // 更新分类失败
+	ErrCategoryDeleteFail   = 5908 // 删除分类失败
+	ErrCategoryParentSelf   = 5909 // 不能将自己设为父级分类
+	ErrCategoryParentNested = 5910 // 不能将子分类设为父级分类
+	ErrTagNotFound          = 5921 // 标签不存在
+	ErrTagNameExists        = 5922 // 标签名称已存在
+	ErrTagSlugExists        = 5923 // 标签别名已被占用
+	ErrTagCreateFail        = 5924 // 创建标签失败
+	ErrTagUpdateFail        = 5925 // 更新标签失败
+	ErrTagDeleteFail        = 5926 // 删除标签失败
 )
 
 var errorMessages = map[int]string{
@@ -182,6 +215,37 @@ var errorMessages = map[int]string{
 	ErrConfigCreateFail:   "创建配置失败",
 	ErrConfigUpdateFail:   "更新配置失败",
 	ErrConfigDeleteSystem: "系统内置配置禁止删除",
+	// Article error messages
+	ErrArticleNotFound:        "文章不存在",
+	ErrArticleSlugExists:      "文章别名已被占用，请换一个",
+	ErrArticleCreateFail:      "创建文章失败",
+	ErrArticleUpdateFail:      "更新文章失败",
+	ErrArticleDeleteFail:      "删除文章失败",
+	ErrArticleListFail:        "获取文章列表失败",
+	ErrArticleInvalidSlug:     "文章别名只能包含小写字母、数字和连字符",
+	ErrArticlePublishFail:     "发布文章失败",
+	ErrArticleWithdrawFail:    "撤回文章失败",
+	ErrArticleCategoryInvalid: "所属分类不存在或已禁用",
+	ErrArticleTagInvalid:      "所选标签不存在或已禁用",
+	ErrArticleInvalidTime:     "定时发布时间格式不合法",
+	ErrArticleSetTopFail:      "设置置顶失败",
+	// Category & Tag error messages
+	ErrCategoryNotFound:     "分类不存在",
+	ErrCategoryNameExists:   "分类名称已存在",
+	ErrCategorySlugExists:   "分类别名已被占用",
+	ErrCategoryHasChildren:  "该分类下存在子分类，禁止删除",
+	ErrCategoryHasArticles:  "该分类下存在文章，禁止删除",
+	ErrCategoryCreateFail:   "创建分类失败",
+	ErrCategoryUpdateFail:   "更新分类失败",
+	ErrCategoryDeleteFail:   "删除分类失败",
+	ErrCategoryParentSelf:   "不能将自己设为父级分类",
+	ErrCategoryParentNested: "不能将子分类设为父级分类",
+	ErrTagNotFound:          "标签不存在",
+	ErrTagNameExists:        "标签名称已存在",
+	ErrTagSlugExists:        "标签别名已被占用",
+	ErrTagCreateFail:        "创建标签失败",
+	ErrTagUpdateFail:        "更新标签失败",
+	ErrTagDeleteFail:        "删除标签失败",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

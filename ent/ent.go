@@ -18,12 +18,16 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articletag"
+	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
+	"github.com/yuwen002/go-meteor-cms/ent/tag"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -91,12 +95,16 @@ func checkColumn(t, c string) error {
 			adminrolepermission.Table: adminrolepermission.ValidColumn,
 			adminuser.Table:           adminuser.ValidColumn,
 			adminuserrole.Table:       adminuserrole.ValidColumn,
+			article.Table:             article.ValidColumn,
+			articletag.Table:          articletag.ValidColumn,
+			category.Table:            category.ValidColumn,
 			department.Table:          department.ValidColumn,
 			loginlog.Table:            loginlog.ValidColumn,
 			operationlog.Table:        operationlog.ValidColumn,
 			sysconfig.Table:           sysconfig.ValidColumn,
 			sysdict.Table:             sysdict.ValidColumn,
 			sysdictitem.Table:         sysdictitem.ValidColumn,
+			tag.Table:                 tag.ValidColumn,
 			tokenblacklist.Table:      tokenblacklist.ValidColumn,
 		})
 	})

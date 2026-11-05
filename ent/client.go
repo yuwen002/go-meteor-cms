@@ -21,12 +21,16 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articletag"
+	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
+	"github.com/yuwen002/go-meteor-cms/ent/tag"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -47,6 +51,12 @@ type Client struct {
 	AdminUser *AdminUserClient
 	// AdminUserRole is the client for interacting with the AdminUserRole builders.
 	AdminUserRole *AdminUserRoleClient
+	// Article is the client for interacting with the Article builders.
+	Article *ArticleClient
+	// ArticleTag is the client for interacting with the ArticleTag builders.
+	ArticleTag *ArticleTagClient
+	// Category is the client for interacting with the Category builders.
+	Category *CategoryClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
 	// LoginLog is the client for interacting with the LoginLog builders.
@@ -59,6 +69,8 @@ type Client struct {
 	SysDict *SysDictClient
 	// SysDictItem is the client for interacting with the SysDictItem builders.
 	SysDictItem *SysDictItemClient
+	// Tag is the client for interacting with the Tag builders.
+	Tag *TagClient
 	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
 	TokenBlacklist *TokenBlacklistClient
 }
@@ -78,12 +90,16 @@ func (c *Client) init() {
 	c.AdminRolePermission = NewAdminRolePermissionClient(c.config)
 	c.AdminUser = NewAdminUserClient(c.config)
 	c.AdminUserRole = NewAdminUserRoleClient(c.config)
+	c.Article = NewArticleClient(c.config)
+	c.ArticleTag = NewArticleTagClient(c.config)
+	c.Category = NewCategoryClient(c.config)
 	c.Department = NewDepartmentClient(c.config)
 	c.LoginLog = NewLoginLogClient(c.config)
 	c.OperationLog = NewOperationLogClient(c.config)
 	c.SysConfig = NewSysConfigClient(c.config)
 	c.SysDict = NewSysDictClient(c.config)
 	c.SysDictItem = NewSysDictItemClient(c.config)
+	c.Tag = NewTagClient(c.config)
 	c.TokenBlacklist = NewTokenBlacklistClient(c.config)
 }
 
@@ -183,12 +199,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AdminRolePermission: NewAdminRolePermissionClient(cfg),
 		AdminUser:           NewAdminUserClient(cfg),
 		AdminUserRole:       NewAdminUserRoleClient(cfg),
+		Article:             NewArticleClient(cfg),
+		ArticleTag:          NewArticleTagClient(cfg),
+		Category:            NewCategoryClient(cfg),
 		Department:          NewDepartmentClient(cfg),
 		LoginLog:            NewLoginLogClient(cfg),
 		OperationLog:        NewOperationLogClient(cfg),
 		SysConfig:           NewSysConfigClient(cfg),
 		SysDict:             NewSysDictClient(cfg),
 		SysDictItem:         NewSysDictItemClient(cfg),
+		Tag:                 NewTagClient(cfg),
 		TokenBlacklist:      NewTokenBlacklistClient(cfg),
 	}, nil
 }
@@ -215,12 +235,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AdminRolePermission: NewAdminRolePermissionClient(cfg),
 		AdminUser:           NewAdminUserClient(cfg),
 		AdminUserRole:       NewAdminUserRoleClient(cfg),
+		Article:             NewArticleClient(cfg),
+		ArticleTag:          NewArticleTagClient(cfg),
+		Category:            NewCategoryClient(cfg),
 		Department:          NewDepartmentClient(cfg),
 		LoginLog:            NewLoginLogClient(cfg),
 		OperationLog:        NewOperationLogClient(cfg),
 		SysConfig:           NewSysConfigClient(cfg),
 		SysDict:             NewSysDictClient(cfg),
 		SysDictItem:         NewSysDictItemClient(cfg),
+		Tag:                 NewTagClient(cfg),
 		TokenBlacklist:      NewTokenBlacklistClient(cfg),
 	}, nil
 }
@@ -252,8 +276,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AdminPermission, c.AdminRole, c.AdminRoleDept, c.AdminRolePermission,
-		c.AdminUser, c.AdminUserRole, c.Department, c.LoginLog, c.OperationLog,
-		c.SysConfig, c.SysDict, c.SysDictItem, c.TokenBlacklist,
+		c.AdminUser, c.AdminUserRole, c.Article, c.ArticleTag, c.Category,
+		c.Department, c.LoginLog, c.OperationLog, c.SysConfig, c.SysDict,
+		c.SysDictItem, c.Tag, c.TokenBlacklist,
 	} {
 		n.Use(hooks...)
 	}
@@ -264,8 +289,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AdminPermission, c.AdminRole, c.AdminRoleDept, c.AdminRolePermission,
-		c.AdminUser, c.AdminUserRole, c.Department, c.LoginLog, c.OperationLog,
-		c.SysConfig, c.SysDict, c.SysDictItem, c.TokenBlacklist,
+		c.AdminUser, c.AdminUserRole, c.Article, c.ArticleTag, c.Category,
+		c.Department, c.LoginLog, c.OperationLog, c.SysConfig, c.SysDict,
+		c.SysDictItem, c.Tag, c.TokenBlacklist,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -286,6 +312,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AdminUser.mutate(ctx, m)
 	case *AdminUserRoleMutation:
 		return c.AdminUserRole.mutate(ctx, m)
+	case *ArticleMutation:
+		return c.Article.mutate(ctx, m)
+	case *ArticleTagMutation:
+		return c.ArticleTag.mutate(ctx, m)
+	case *CategoryMutation:
+		return c.Category.mutate(ctx, m)
 	case *DepartmentMutation:
 		return c.Department.mutate(ctx, m)
 	case *LoginLogMutation:
@@ -298,6 +330,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.SysDict.mutate(ctx, m)
 	case *SysDictItemMutation:
 		return c.SysDictItem.mutate(ctx, m)
+	case *TagMutation:
+		return c.Tag.mutate(ctx, m)
 	case *TokenBlacklistMutation:
 		return c.TokenBlacklist.mutate(ctx, m)
 	default:
@@ -1319,6 +1353,537 @@ func (c *AdminUserRoleClient) mutate(ctx context.Context, m *AdminUserRoleMutati
 	}
 }
 
+// ArticleClient is a client for the Article schema.
+type ArticleClient struct {
+	config
+}
+
+// NewArticleClient returns a client for the Article from the given config.
+func NewArticleClient(c config) *ArticleClient {
+	return &ArticleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `article.Hooks(f(g(h())))`.
+func (c *ArticleClient) Use(hooks ...Hook) {
+	c.hooks.Article = append(c.hooks.Article, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `article.Intercept(f(g(h())))`.
+func (c *ArticleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Article = append(c.inters.Article, interceptors...)
+}
+
+// Create returns a builder for creating a Article entity.
+func (c *ArticleClient) Create() *ArticleCreate {
+	mutation := newArticleMutation(c.config, OpCreate)
+	return &ArticleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Article entities.
+func (c *ArticleClient) CreateBulk(builders ...*ArticleCreate) *ArticleCreateBulk {
+	return &ArticleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ArticleClient) MapCreateBulk(slice any, setFunc func(*ArticleCreate, int)) *ArticleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ArticleCreateBulk{err: fmt.Errorf("calling to ArticleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ArticleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ArticleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Article.
+func (c *ArticleClient) Update() *ArticleUpdate {
+	mutation := newArticleMutation(c.config, OpUpdate)
+	return &ArticleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ArticleClient) UpdateOne(_m *Article) *ArticleUpdateOne {
+	mutation := newArticleMutation(c.config, OpUpdateOne, withArticle(_m))
+	return &ArticleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ArticleClient) UpdateOneID(id int64) *ArticleUpdateOne {
+	mutation := newArticleMutation(c.config, OpUpdateOne, withArticleID(id))
+	return &ArticleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Article.
+func (c *ArticleClient) Delete() *ArticleDelete {
+	mutation := newArticleMutation(c.config, OpDelete)
+	return &ArticleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ArticleClient) DeleteOne(_m *Article) *ArticleDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ArticleClient) DeleteOneID(id int64) *ArticleDeleteOne {
+	builder := c.Delete().Where(article.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ArticleDeleteOne{builder}
+}
+
+// Query returns a query builder for Article.
+func (c *ArticleClient) Query() *ArticleQuery {
+	return &ArticleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeArticle},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Article entity by its id.
+func (c *ArticleClient) Get(ctx context.Context, id int64) (*Article, error) {
+	return c.Query().Where(article.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ArticleClient) GetX(ctx context.Context, id int64) *Article {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCategory queries the category edge of a Article.
+func (c *ArticleClient) QueryCategory(_m *Article) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(article.Table, article.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, article.CategoryTable, article.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTags queries the tags edge of a Article.
+func (c *ArticleClient) QueryTags(_m *Article) *TagQuery {
+	query := (&TagClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(article.Table, article.FieldID, id),
+			sqlgraph.To(tag.Table, tag.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, article.TagsTable, article.TagsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryArticleTags queries the article_tags edge of a Article.
+func (c *ArticleClient) QueryArticleTags(_m *Article) *ArticleTagQuery {
+	query := (&ArticleTagClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(article.Table, article.FieldID, id),
+			sqlgraph.To(articletag.Table, articletag.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, article.ArticleTagsTable, article.ArticleTagsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ArticleClient) Hooks() []Hook {
+	hooks := c.hooks.Article
+	return append(hooks[:len(hooks):len(hooks)], article.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ArticleClient) Interceptors() []Interceptor {
+	inters := c.inters.Article
+	return append(inters[:len(inters):len(inters)], article.Interceptors[:]...)
+}
+
+func (c *ArticleClient) mutate(ctx context.Context, m *ArticleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ArticleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ArticleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ArticleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ArticleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Article mutation op: %q", m.Op())
+	}
+}
+
+// ArticleTagClient is a client for the ArticleTag schema.
+type ArticleTagClient struct {
+	config
+}
+
+// NewArticleTagClient returns a client for the ArticleTag from the given config.
+func NewArticleTagClient(c config) *ArticleTagClient {
+	return &ArticleTagClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `articletag.Hooks(f(g(h())))`.
+func (c *ArticleTagClient) Use(hooks ...Hook) {
+	c.hooks.ArticleTag = append(c.hooks.ArticleTag, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `articletag.Intercept(f(g(h())))`.
+func (c *ArticleTagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ArticleTag = append(c.inters.ArticleTag, interceptors...)
+}
+
+// Create returns a builder for creating a ArticleTag entity.
+func (c *ArticleTagClient) Create() *ArticleTagCreate {
+	mutation := newArticleTagMutation(c.config, OpCreate)
+	return &ArticleTagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ArticleTag entities.
+func (c *ArticleTagClient) CreateBulk(builders ...*ArticleTagCreate) *ArticleTagCreateBulk {
+	return &ArticleTagCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ArticleTagClient) MapCreateBulk(slice any, setFunc func(*ArticleTagCreate, int)) *ArticleTagCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ArticleTagCreateBulk{err: fmt.Errorf("calling to ArticleTagClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ArticleTagCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ArticleTagCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ArticleTag.
+func (c *ArticleTagClient) Update() *ArticleTagUpdate {
+	mutation := newArticleTagMutation(c.config, OpUpdate)
+	return &ArticleTagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ArticleTagClient) UpdateOne(_m *ArticleTag) *ArticleTagUpdateOne {
+	mutation := newArticleTagMutation(c.config, OpUpdateOne, withArticleTag(_m))
+	return &ArticleTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ArticleTagClient) UpdateOneID(id int64) *ArticleTagUpdateOne {
+	mutation := newArticleTagMutation(c.config, OpUpdateOne, withArticleTagID(id))
+	return &ArticleTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ArticleTag.
+func (c *ArticleTagClient) Delete() *ArticleTagDelete {
+	mutation := newArticleTagMutation(c.config, OpDelete)
+	return &ArticleTagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ArticleTagClient) DeleteOne(_m *ArticleTag) *ArticleTagDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ArticleTagClient) DeleteOneID(id int64) *ArticleTagDeleteOne {
+	builder := c.Delete().Where(articletag.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ArticleTagDeleteOne{builder}
+}
+
+// Query returns a query builder for ArticleTag.
+func (c *ArticleTagClient) Query() *ArticleTagQuery {
+	return &ArticleTagQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeArticleTag},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ArticleTag entity by its id.
+func (c *ArticleTagClient) Get(ctx context.Context, id int64) (*ArticleTag, error) {
+	return c.Query().Where(articletag.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ArticleTagClient) GetX(ctx context.Context, id int64) *ArticleTag {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryArticle queries the article edge of a ArticleTag.
+func (c *ArticleTagClient) QueryArticle(_m *ArticleTag) *ArticleQuery {
+	query := (&ArticleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(articletag.Table, articletag.FieldID, id),
+			sqlgraph.To(article.Table, article.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, articletag.ArticleTable, articletag.ArticleColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTag queries the tag edge of a ArticleTag.
+func (c *ArticleTagClient) QueryTag(_m *ArticleTag) *TagQuery {
+	query := (&TagClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(articletag.Table, articletag.FieldID, id),
+			sqlgraph.To(tag.Table, tag.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, articletag.TagTable, articletag.TagColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ArticleTagClient) Hooks() []Hook {
+	return c.hooks.ArticleTag
+}
+
+// Interceptors returns the client interceptors.
+func (c *ArticleTagClient) Interceptors() []Interceptor {
+	return c.inters.ArticleTag
+}
+
+func (c *ArticleTagClient) mutate(ctx context.Context, m *ArticleTagMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ArticleTagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ArticleTagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ArticleTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ArticleTagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ArticleTag mutation op: %q", m.Op())
+	}
+}
+
+// CategoryClient is a client for the Category schema.
+type CategoryClient struct {
+	config
+}
+
+// NewCategoryClient returns a client for the Category from the given config.
+func NewCategoryClient(c config) *CategoryClient {
+	return &CategoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `category.Hooks(f(g(h())))`.
+func (c *CategoryClient) Use(hooks ...Hook) {
+	c.hooks.Category = append(c.hooks.Category, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `category.Intercept(f(g(h())))`.
+func (c *CategoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Category = append(c.inters.Category, interceptors...)
+}
+
+// Create returns a builder for creating a Category entity.
+func (c *CategoryClient) Create() *CategoryCreate {
+	mutation := newCategoryMutation(c.config, OpCreate)
+	return &CategoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Category entities.
+func (c *CategoryClient) CreateBulk(builders ...*CategoryCreate) *CategoryCreateBulk {
+	return &CategoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CategoryClient) MapCreateBulk(slice any, setFunc func(*CategoryCreate, int)) *CategoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CategoryCreateBulk{err: fmt.Errorf("calling to CategoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CategoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CategoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Category.
+func (c *CategoryClient) Update() *CategoryUpdate {
+	mutation := newCategoryMutation(c.config, OpUpdate)
+	return &CategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CategoryClient) UpdateOne(_m *Category) *CategoryUpdateOne {
+	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategory(_m))
+	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CategoryClient) UpdateOneID(id int64) *CategoryUpdateOne {
+	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategoryID(id))
+	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Category.
+func (c *CategoryClient) Delete() *CategoryDelete {
+	mutation := newCategoryMutation(c.config, OpDelete)
+	return &CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CategoryClient) DeleteOne(_m *Category) *CategoryDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CategoryClient) DeleteOneID(id int64) *CategoryDeleteOne {
+	builder := c.Delete().Where(category.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CategoryDeleteOne{builder}
+}
+
+// Query returns a query builder for Category.
+func (c *CategoryClient) Query() *CategoryQuery {
+	return &CategoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCategory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Category entity by its id.
+func (c *CategoryClient) Get(ctx context.Context, id int64) (*Category, error) {
+	return c.Query().Where(category.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CategoryClient) GetX(ctx context.Context, id int64) *Category {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryParent queries the parent edge of a Category.
+func (c *CategoryClient) QueryParent(_m *Category) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, category.ParentTable, category.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryChildren queries the children edge of a Category.
+func (c *CategoryClient) QueryChildren(_m *Category) *CategoryQuery {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, category.ChildrenTable, category.ChildrenColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryArticles queries the articles edge of a Category.
+func (c *CategoryClient) QueryArticles(_m *Category) *ArticleQuery {
+	query := (&ArticleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(article.Table, article.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, category.ArticlesTable, category.ArticlesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CategoryClient) Hooks() []Hook {
+	hooks := c.hooks.Category
+	return append(hooks[:len(hooks):len(hooks)], category.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *CategoryClient) Interceptors() []Interceptor {
+	inters := c.inters.Category
+	return append(inters[:len(inters):len(inters)], category.Interceptors[:]...)
+}
+
+func (c *CategoryClient) mutate(ctx context.Context, m *CategoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CategoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Category mutation op: %q", m.Op())
+	}
+}
+
 // DepartmentClient is a client for the Department schema.
 type DepartmentClient struct {
 	config
@@ -2167,6 +2732,157 @@ func (c *SysDictItemClient) mutate(ctx context.Context, m *SysDictItemMutation) 
 	}
 }
 
+// TagClient is a client for the Tag schema.
+type TagClient struct {
+	config
+}
+
+// NewTagClient returns a client for the Tag from the given config.
+func NewTagClient(c config) *TagClient {
+	return &TagClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tag.Hooks(f(g(h())))`.
+func (c *TagClient) Use(hooks ...Hook) {
+	c.hooks.Tag = append(c.hooks.Tag, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tag.Intercept(f(g(h())))`.
+func (c *TagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tag = append(c.inters.Tag, interceptors...)
+}
+
+// Create returns a builder for creating a Tag entity.
+func (c *TagClient) Create() *TagCreate {
+	mutation := newTagMutation(c.config, OpCreate)
+	return &TagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tag entities.
+func (c *TagClient) CreateBulk(builders ...*TagCreate) *TagCreateBulk {
+	return &TagCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TagClient) MapCreateBulk(slice any, setFunc func(*TagCreate, int)) *TagCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TagCreateBulk{err: fmt.Errorf("calling to TagClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TagCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TagCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tag.
+func (c *TagClient) Update() *TagUpdate {
+	mutation := newTagMutation(c.config, OpUpdate)
+	return &TagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TagClient) UpdateOne(_m *Tag) *TagUpdateOne {
+	mutation := newTagMutation(c.config, OpUpdateOne, withTag(_m))
+	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TagClient) UpdateOneID(id int64) *TagUpdateOne {
+	mutation := newTagMutation(c.config, OpUpdateOne, withTagID(id))
+	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tag.
+func (c *TagClient) Delete() *TagDelete {
+	mutation := newTagMutation(c.config, OpDelete)
+	return &TagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TagClient) DeleteOne(_m *Tag) *TagDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TagClient) DeleteOneID(id int64) *TagDeleteOne {
+	builder := c.Delete().Where(tag.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TagDeleteOne{builder}
+}
+
+// Query returns a query builder for Tag.
+func (c *TagClient) Query() *TagQuery {
+	return &TagQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTag},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Tag entity by its id.
+func (c *TagClient) Get(ctx context.Context, id int64) (*Tag, error) {
+	return c.Query().Where(tag.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TagClient) GetX(ctx context.Context, id int64) *Tag {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryArticles queries the articles edge of a Tag.
+func (c *TagClient) QueryArticles(_m *Tag) *ArticleQuery {
+	query := (&ArticleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tag.Table, tag.FieldID, id),
+			sqlgraph.To(article.Table, article.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, tag.ArticlesTable, tag.ArticlesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TagClient) Hooks() []Hook {
+	hooks := c.hooks.Tag
+	return append(hooks[:len(hooks):len(hooks)], tag.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *TagClient) Interceptors() []Interceptor {
+	inters := c.inters.Tag
+	return append(inters[:len(inters):len(inters)], tag.Interceptors[:]...)
+}
+
+func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tag mutation op: %q", m.Op())
+	}
+}
+
 // TokenBlacklistClient is a client for the TokenBlacklist schema.
 type TokenBlacklistClient struct {
 	config
@@ -2304,12 +3020,13 @@ func (c *TokenBlacklistClient) mutate(ctx context.Context, m *TokenBlacklistMuta
 type (
 	hooks struct {
 		AdminPermission, AdminRole, AdminRoleDept, AdminRolePermission, AdminUser,
-		AdminUserRole, Department, LoginLog, OperationLog, SysConfig, SysDict,
-		SysDictItem, TokenBlacklist []ent.Hook
+		AdminUserRole, Article, ArticleTag, Category, Department, LoginLog,
+		OperationLog, SysConfig, SysDict, SysDictItem, Tag, TokenBlacklist []ent.Hook
 	}
 	inters struct {
 		AdminPermission, AdminRole, AdminRoleDept, AdminRolePermission, AdminUser,
-		AdminUserRole, Department, LoginLog, OperationLog, SysConfig, SysDict,
-		SysDictItem, TokenBlacklist []ent.Interceptor
+		AdminUserRole, Article, ArticleTag, Category, Department, LoginLog,
+		OperationLog, SysConfig, SysDict, SysDictItem, Tag,
+		TokenBlacklist []ent.Interceptor
 	}
 )

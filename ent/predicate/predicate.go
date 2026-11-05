@@ -24,6 +24,15 @@ type AdminUser func(*sql.Selector)
 // AdminUserRole is the predicate function for adminuserrole builders.
 type AdminUserRole func(*sql.Selector)
 
+// Article is the predicate function for article builders.
+type Article func(*sql.Selector)
+
+// ArticleTag is the predicate function for articletag builders.
+type ArticleTag func(*sql.Selector)
+
+// Category is the predicate function for category builders.
+type Category func(*sql.Selector)
+
 // Department is the predicate function for department builders.
 type Department func(*sql.Selector)
 
@@ -41,6 +50,9 @@ type SysDict func(*sql.Selector)
 
 // SysDictItem is the predicate function for sysdictitem builders.
 type SysDictItem func(*sql.Selector)
+
+// Tag is the predicate function for tag builders.
+type Tag func(*sql.Selector)
 
 // TokenBlacklist is the predicate function for tokenblacklist builders.
 type TokenBlacklist func(*sql.Selector)

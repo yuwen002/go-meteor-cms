@@ -250,6 +250,160 @@ var (
 			},
 		},
 	}
+	// ArticlesColumns holds the columns for the "articles" table.
+	ArticlesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "title", Type: field.TypeString, Size: 255, Comment: "文章标题"},
+		{Name: "slug", Type: field.TypeString, Unique: true, Size: 191, Comment: "URL 友好标识，全局唯一，用于前台文章地址"},
+		{Name: "summary", Type: field.TypeString, Size: 512, Comment: "摘要，为空时前台取正文开头", Default: ""},
+		{Name: "cover", Type: field.TypeString, Size: 512, Comment: "封面图 URL，来自 /admin/upload", Default: ""},
+		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "正文 Markdown 源码"},
+		{Name: "status", Type: field.TypeInt, Comment: "状态：0 草稿 1 已发布 2 已下线", Default: 0},
+		{Name: "author_id", Type: field.TypeInt64, Nullable: true, Comment: "创建人管理员 ID"},
+		{Name: "published_at", Type: field.TypeTime, Nullable: true, Comment: "发布/定时发布时间；公开可见需满足 status=1 且该时间不晚于当前时间"},
+		{Name: "view_count", Type: field.TypeInt64, Comment: "浏览量", Default: 0},
+		{Name: "is_top", Type: field.TypeBool, Comment: "是否置顶", Default: false},
+		{Name: "seo_title", Type: field.TypeString, Size: 255, Comment: "SEO 标题，为空时取文章标题", Default: ""},
+		{Name: "seo_description", Type: field.TypeString, Size: 512, Comment: "SEO 描述，为空时取摘要", Default: ""},
+		{Name: "seo_keywords", Type: field.TypeString, Size: 255, Comment: "SEO 关键词，逗号分隔", Default: ""},
+		{Name: "category_id", Type: field.TypeInt64, Nullable: true, Comment: "所属分类 ID"},
+	}
+	// ArticlesTable holds the schema information for the "articles" table.
+	ArticlesTable = &schema.Table{
+		Name:       "articles",
+		Comment:    "文章表，正文为 Markdown 源码",
+		Columns:    ArticlesColumns,
+		PrimaryKey: []*schema.Column{ArticlesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "articles_categories_articles",
+				Columns:    []*schema.Column{ArticlesColumns[17]},
+				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "article_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[1]},
+			},
+			{
+				Name:    "article_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[3]},
+			},
+			{
+				Name:    "article_status_published_at",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[9], ArticlesColumns[11]},
+			},
+			{
+				Name:    "article_category_id",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[17]},
+			},
+			{
+				Name:    "article_is_top",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[13]},
+			},
+		},
+	}
+	// ArticleTagsColumns holds the columns for the "article_tags" table.
+	ArticleTagsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "article_id", Type: field.TypeInt64, Comment: "文章 ID，关联 articles.id"},
+		{Name: "tag_id", Type: field.TypeInt64, Comment: "标签 ID，关联 tags.id"},
+	}
+	// ArticleTagsTable holds the schema information for the "article_tags" table.
+	ArticleTagsTable = &schema.Table{
+		Name:       "article_tags",
+		Comment:    "文章标签关联表",
+		Columns:    ArticleTagsColumns,
+		PrimaryKey: []*schema.Column{ArticleTagsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "article_tags_articles_article",
+				Columns:    []*schema.Column{ArticleTagsColumns[3]},
+				RefColumns: []*schema.Column{ArticlesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "article_tags_tags_tag",
+				Columns:    []*schema.Column{ArticleTagsColumns[4]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "articletag_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ArticleTagsColumns[1]},
+			},
+			{
+				Name:    "articletag_article_id_tag_id",
+				Unique:  true,
+				Columns: []*schema.Column{ArticleTagsColumns[3], ArticleTagsColumns[4]},
+			},
+		},
+	}
+	// CategoriesColumns holds the columns for the "categories" table.
+	CategoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "name", Type: field.TypeString, Size: 128, Comment: "分类名称"},
+		{Name: "slug", Type: field.TypeString, Unique: true, Size: 191, Comment: "URL 友好标识，全局唯一"},
+		{Name: "description", Type: field.TypeString, Size: 512, Comment: "分类描述", Default: ""},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序，从小到大", Default: 0},
+		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
+		{Name: "parent_id", Type: field.TypeInt64, Nullable: true, Comment: "父级分类 ID，为空表示顶级分类"},
+	}
+	// CategoriesTable holds the schema information for the "categories" table.
+	CategoriesTable = &schema.Table{
+		Name:       "categories",
+		Comment:    "文章分类表，支持父子层级",
+		Columns:    CategoriesColumns,
+		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "categories_categories_children",
+				Columns:    []*schema.Column{CategoriesColumns[9]},
+				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "category_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{CategoriesColumns[1]},
+			},
+			{
+				Name:    "category_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{CategoriesColumns[3]},
+			},
+			{
+				Name:    "category_parent_id",
+				Unique:  false,
+				Columns: []*schema.Column{CategoriesColumns[9]},
+			},
+			{
+				Name:    "category_sort",
+				Unique:  false,
+				Columns: []*schema.Column{CategoriesColumns[7]},
+			},
+		},
+	}
 	// DepartmentsColumns holds the columns for the "departments" table.
 	DepartmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "部门ID"},
@@ -474,6 +628,42 @@ var (
 			},
 		},
 	}
+	// TagsColumns holds the columns for the "tags" table.
+	TagsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间，用于软删除"},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 64, Comment: "标签名称，全局唯一"},
+		{Name: "slug", Type: field.TypeString, Unique: true, Size: 191, Comment: "URL 友好标识，全局唯一"},
+		{Name: "description", Type: field.TypeString, Size: 512, Comment: "标签描述", Default: ""},
+		{Name: "sort", Type: field.TypeInt, Comment: "排序，从小到大", Default: 0},
+		{Name: "is_active", Type: field.TypeBool, Comment: "是否启用", Default: true},
+	}
+	// TagsTable holds the schema information for the "tags" table.
+	TagsTable = &schema.Table{
+		Name:       "tags",
+		Comment:    "文章标签表",
+		Columns:    TagsColumns,
+		PrimaryKey: []*schema.Column{TagsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tag_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TagsColumns[1]},
+			},
+			{
+				Name:    "tag_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{TagsColumns[3]},
+			},
+			{
+				Name:    "tag_sort",
+				Unique:  false,
+				Columns: []*schema.Column{TagsColumns[7]},
+			},
+		},
+	}
 	// TokenBlacklistsColumns holds the columns for the "token_blacklists" table.
 	TokenBlacklistsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "自增主键 ID"},
@@ -515,12 +705,16 @@ var (
 		AdminRolePermissionsTable,
 		AdminUsersTable,
 		AdminUserRolesTable,
+		ArticlesTable,
+		ArticleTagsTable,
+		CategoriesTable,
 		DepartmentsTable,
 		LoginLogsTable,
 		OperationLogsTable,
 		SysConfigsTable,
 		SysDictsTable,
 		SysDictItemsTable,
+		TagsTable,
 		TokenBlacklistsTable,
 	}
 )
@@ -552,8 +746,24 @@ func init() {
 	AdminUserRolesTable.Annotation = &entsql.Annotation{
 		Table: "admin_user_roles",
 	}
+	ArticlesTable.ForeignKeys[0].RefTable = CategoriesTable
+	ArticlesTable.Annotation = &entsql.Annotation{
+		Table: "articles",
+	}
+	ArticleTagsTable.ForeignKeys[0].RefTable = ArticlesTable
+	ArticleTagsTable.ForeignKeys[1].RefTable = TagsTable
+	ArticleTagsTable.Annotation = &entsql.Annotation{
+		Table: "article_tags",
+	}
+	CategoriesTable.ForeignKeys[0].RefTable = CategoriesTable
+	CategoriesTable.Annotation = &entsql.Annotation{
+		Table: "categories",
+	}
 	DepartmentsTable.ForeignKeys[0].RefTable = DepartmentsTable
 	DepartmentsTable.Annotation = &entsql.Annotation{
 		Table: "departments",
+	}
+	TagsTable.Annotation = &entsql.Annotation{
+		Table: "tags",
 	}
 }

@@ -24,6 +24,12 @@ type Tx struct {
 	AdminUser *AdminUserClient
 	// AdminUserRole is the client for interacting with the AdminUserRole builders.
 	AdminUserRole *AdminUserRoleClient
+	// Article is the client for interacting with the Article builders.
+	Article *ArticleClient
+	// ArticleTag is the client for interacting with the ArticleTag builders.
+	ArticleTag *ArticleTagClient
+	// Category is the client for interacting with the Category builders.
+	Category *CategoryClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
 	// LoginLog is the client for interacting with the LoginLog builders.
@@ -36,6 +42,8 @@ type Tx struct {
 	SysDict *SysDictClient
 	// SysDictItem is the client for interacting with the SysDictItem builders.
 	SysDictItem *SysDictItemClient
+	// Tag is the client for interacting with the Tag builders.
+	Tag *TagClient
 	// TokenBlacklist is the client for interacting with the TokenBlacklist builders.
 	TokenBlacklist *TokenBlacklistClient
 
@@ -175,12 +183,16 @@ func (tx *Tx) init() {
 	tx.AdminRolePermission = NewAdminRolePermissionClient(tx.config)
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.AdminUserRole = NewAdminUserRoleClient(tx.config)
+	tx.Article = NewArticleClient(tx.config)
+	tx.ArticleTag = NewArticleTagClient(tx.config)
+	tx.Category = NewCategoryClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.LoginLog = NewLoginLogClient(tx.config)
 	tx.OperationLog = NewOperationLogClient(tx.config)
 	tx.SysConfig = NewSysConfigClient(tx.config)
 	tx.SysDict = NewSysDictClient(tx.config)
 	tx.SysDictItem = NewSysDictItemClient(tx.config)
+	tx.Tag = NewTagClient(tx.config)
 	tx.TokenBlacklist = NewTokenBlacklistClient(tx.config)
 }
 

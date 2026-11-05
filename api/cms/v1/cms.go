@@ -89,6 +89,9 @@ func main() {
 
 	ctx := svc.NewServiceContext(c, rds)
 	handler.RegisterHandlers(server, ctx)
+	// 文章发布模块独立注册：routes.go 是 goctl 生成文件且被手工追加过，
+	// 单独注册可避免重跑 make gen-api 时丢失路由。
+	handler.RegisterContentRoutes(server, ctx)
 
 	// 启动后台维护任务，随服务停止而退出
 	taskCtx, cancelTasks := context.WithCancel(context.Background())

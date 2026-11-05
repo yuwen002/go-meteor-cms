@@ -105,8 +105,10 @@ service.interceptors.response.use(
       }
       return refreshAndRetry(response.config as InternalAxiosRequestConfig)
     }
-    ElMessage.error(res.message || '请求失败')
-    return Promise.reject(new Error(res.message || 'Error'))
+    // 后端统一响应字段是 msg（见 internal/common/response.go），兼容 message 便于对接旧数据
+    const bizMessage = res.msg || res.message || '请求失败'
+    ElMessage.error(bizMessage)
+    return Promise.reject(new Error(bizMessage))
   },
   (error) => {
     ElMessage.error(error.message || '网络错误')

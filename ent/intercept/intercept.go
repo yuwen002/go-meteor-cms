@@ -14,6 +14,9 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articletag"
+	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
@@ -21,6 +24,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
+	"github.com/yuwen002/go-meteor-cms/ent/tag"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -242,6 +246,87 @@ func (f TraverseAdminUserRole) Traverse(ctx context.Context, q ent.Query) error 
 	return fmt.Errorf("unexpected query type %T. expect *ent.AdminUserRoleQuery", q)
 }
 
+// The ArticleFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ArticleFunc func(context.Context, *ent.ArticleQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ArticleFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ArticleQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ArticleQuery", q)
+}
+
+// The TraverseArticle type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseArticle func(context.Context, *ent.ArticleQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseArticle) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseArticle) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ArticleQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ArticleQuery", q)
+}
+
+// The ArticleTagFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ArticleTagFunc func(context.Context, *ent.ArticleTagQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ArticleTagFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ArticleTagQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ArticleTagQuery", q)
+}
+
+// The TraverseArticleTag type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseArticleTag func(context.Context, *ent.ArticleTagQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseArticleTag) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseArticleTag) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ArticleTagQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ArticleTagQuery", q)
+}
+
+// The CategoryFunc type is an adapter to allow the use of ordinary function as a Querier.
+type CategoryFunc func(context.Context, *ent.CategoryQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f CategoryFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.CategoryQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.CategoryQuery", q)
+}
+
+// The TraverseCategory type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseCategory func(context.Context, *ent.CategoryQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseCategory) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseCategory) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.CategoryQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.CategoryQuery", q)
+}
+
 // The DepartmentFunc type is an adapter to allow the use of ordinary function as a Querier.
 type DepartmentFunc func(context.Context, *ent.DepartmentQuery) (ent.Value, error)
 
@@ -404,6 +489,33 @@ func (f TraverseSysDictItem) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.SysDictItemQuery", q)
 }
 
+// The TagFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TagFunc func(context.Context, *ent.TagQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f TagFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TagQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TagQuery", q)
+}
+
+// The TraverseTag type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTag func(context.Context, *ent.TagQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseTag) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseTag) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TagQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.TagQuery", q)
+}
+
 // The TokenBlacklistFunc type is an adapter to allow the use of ordinary function as a Querier.
 type TokenBlacklistFunc func(context.Context, *ent.TokenBlacklistQuery) (ent.Value, error)
 
@@ -446,6 +558,12 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AdminUserQuery, predicate.AdminUser, adminuser.OrderOption]{typ: ent.TypeAdminUser, tq: q}, nil
 	case *ent.AdminUserRoleQuery:
 		return &query[*ent.AdminUserRoleQuery, predicate.AdminUserRole, adminuserrole.OrderOption]{typ: ent.TypeAdminUserRole, tq: q}, nil
+	case *ent.ArticleQuery:
+		return &query[*ent.ArticleQuery, predicate.Article, article.OrderOption]{typ: ent.TypeArticle, tq: q}, nil
+	case *ent.ArticleTagQuery:
+		return &query[*ent.ArticleTagQuery, predicate.ArticleTag, articletag.OrderOption]{typ: ent.TypeArticleTag, tq: q}, nil
+	case *ent.CategoryQuery:
+		return &query[*ent.CategoryQuery, predicate.Category, category.OrderOption]{typ: ent.TypeCategory, tq: q}, nil
 	case *ent.DepartmentQuery:
 		return &query[*ent.DepartmentQuery, predicate.Department, department.OrderOption]{typ: ent.TypeDepartment, tq: q}, nil
 	case *ent.LoginLogQuery:
@@ -458,6 +576,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.SysDictQuery, predicate.SysDict, sysdict.OrderOption]{typ: ent.TypeSysDict, tq: q}, nil
 	case *ent.SysDictItemQuery:
 		return &query[*ent.SysDictItemQuery, predicate.SysDictItem, sysdictitem.OrderOption]{typ: ent.TypeSysDictItem, tq: q}, nil
+	case *ent.TagQuery:
+		return &query[*ent.TagQuery, predicate.Tag, tag.OrderOption]{typ: ent.TypeTag, tq: q}, nil
 	case *ent.TokenBlacklistQuery:
 		return &query[*ent.TokenBlacklistQuery, predicate.TokenBlacklist, tokenblacklist.OrderOption]{typ: ent.TypeTokenBlacklist, tq: q}, nil
 	default:

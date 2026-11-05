@@ -11,6 +11,9 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminrolepermission"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
+	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articletag"
+	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
@@ -18,6 +21,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
+	"github.com/yuwen002/go-meteor-cms/ent/tag"
 	"github.com/yuwen002/go-meteor-cms/ent/tokenblacklist"
 )
 
@@ -269,6 +273,209 @@ func init() {
 	adminuserroleDescID := adminuserroleFields[0].Descriptor()
 	// adminuserrole.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	adminuserrole.IDValidator = adminuserroleDescID.Validators[0].(func(int64) error)
+	articleMixin := schema.Article{}.Mixin()
+	articleMixinHooks1 := articleMixin[1].Hooks()
+	article.Hooks[0] = articleMixinHooks1[0]
+	articleMixinInters1 := articleMixin[1].Interceptors()
+	article.Interceptors[0] = articleMixinInters1[0]
+	articleMixinFields0 := articleMixin[0].Fields()
+	_ = articleMixinFields0
+	articleFields := schema.Article{}.Fields()
+	_ = articleFields
+	// articleDescCreatedAt is the schema descriptor for created_at field.
+	articleDescCreatedAt := articleMixinFields0[0].Descriptor()
+	// article.DefaultCreatedAt holds the default value on creation for the created_at field.
+	article.DefaultCreatedAt = articleDescCreatedAt.Default.(func() time.Time)
+	// articleDescUpdatedAt is the schema descriptor for updated_at field.
+	articleDescUpdatedAt := articleMixinFields0[1].Descriptor()
+	// article.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	article.DefaultUpdatedAt = articleDescUpdatedAt.Default.(func() time.Time)
+	// article.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	article.UpdateDefaultUpdatedAt = articleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// articleDescTitle is the schema descriptor for title field.
+	articleDescTitle := articleFields[1].Descriptor()
+	// article.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	article.TitleValidator = func() func(string) error {
+		validators := articleDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// articleDescSlug is the schema descriptor for slug field.
+	articleDescSlug := articleFields[2].Descriptor()
+	// article.SlugValidator is a validator for the "slug" field. It is called by the builders before save.
+	article.SlugValidator = func() func(string) error {
+		validators := articleDescSlug.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(slug string) error {
+			for _, fn := range fns {
+				if err := fn(slug); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// articleDescSummary is the schema descriptor for summary field.
+	articleDescSummary := articleFields[3].Descriptor()
+	// article.DefaultSummary holds the default value on creation for the summary field.
+	article.DefaultSummary = articleDescSummary.Default.(string)
+	// article.SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
+	article.SummaryValidator = articleDescSummary.Validators[0].(func(string) error)
+	// articleDescCover is the schema descriptor for cover field.
+	articleDescCover := articleFields[4].Descriptor()
+	// article.DefaultCover holds the default value on creation for the cover field.
+	article.DefaultCover = articleDescCover.Default.(string)
+	// article.CoverValidator is a validator for the "cover" field. It is called by the builders before save.
+	article.CoverValidator = articleDescCover.Validators[0].(func(string) error)
+	// articleDescStatus is the schema descriptor for status field.
+	articleDescStatus := articleFields[6].Descriptor()
+	// article.DefaultStatus holds the default value on creation for the status field.
+	article.DefaultStatus = articleDescStatus.Default.(int)
+	// articleDescViewCount is the schema descriptor for view_count field.
+	articleDescViewCount := articleFields[10].Descriptor()
+	// article.DefaultViewCount holds the default value on creation for the view_count field.
+	article.DefaultViewCount = articleDescViewCount.Default.(int64)
+	// article.ViewCountValidator is a validator for the "view_count" field. It is called by the builders before save.
+	article.ViewCountValidator = articleDescViewCount.Validators[0].(func(int64) error)
+	// articleDescIsTop is the schema descriptor for is_top field.
+	articleDescIsTop := articleFields[11].Descriptor()
+	// article.DefaultIsTop holds the default value on creation for the is_top field.
+	article.DefaultIsTop = articleDescIsTop.Default.(bool)
+	// articleDescSeoTitle is the schema descriptor for seo_title field.
+	articleDescSeoTitle := articleFields[12].Descriptor()
+	// article.DefaultSeoTitle holds the default value on creation for the seo_title field.
+	article.DefaultSeoTitle = articleDescSeoTitle.Default.(string)
+	// article.SeoTitleValidator is a validator for the "seo_title" field. It is called by the builders before save.
+	article.SeoTitleValidator = articleDescSeoTitle.Validators[0].(func(string) error)
+	// articleDescSeoDescription is the schema descriptor for seo_description field.
+	articleDescSeoDescription := articleFields[13].Descriptor()
+	// article.DefaultSeoDescription holds the default value on creation for the seo_description field.
+	article.DefaultSeoDescription = articleDescSeoDescription.Default.(string)
+	// article.SeoDescriptionValidator is a validator for the "seo_description" field. It is called by the builders before save.
+	article.SeoDescriptionValidator = articleDescSeoDescription.Validators[0].(func(string) error)
+	// articleDescSeoKeywords is the schema descriptor for seo_keywords field.
+	articleDescSeoKeywords := articleFields[14].Descriptor()
+	// article.DefaultSeoKeywords holds the default value on creation for the seo_keywords field.
+	article.DefaultSeoKeywords = articleDescSeoKeywords.Default.(string)
+	// article.SeoKeywordsValidator is a validator for the "seo_keywords" field. It is called by the builders before save.
+	article.SeoKeywordsValidator = articleDescSeoKeywords.Validators[0].(func(string) error)
+	// articleDescID is the schema descriptor for id field.
+	articleDescID := articleFields[0].Descriptor()
+	// article.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	article.IDValidator = articleDescID.Validators[0].(func(int64) error)
+	articletagMixin := schema.ArticleTag{}.Mixin()
+	articletagMixinFields0 := articletagMixin[0].Fields()
+	_ = articletagMixinFields0
+	articletagFields := schema.ArticleTag{}.Fields()
+	_ = articletagFields
+	// articletagDescCreatedAt is the schema descriptor for created_at field.
+	articletagDescCreatedAt := articletagMixinFields0[0].Descriptor()
+	// articletag.DefaultCreatedAt holds the default value on creation for the created_at field.
+	articletag.DefaultCreatedAt = articletagDescCreatedAt.Default.(func() time.Time)
+	// articletagDescUpdatedAt is the schema descriptor for updated_at field.
+	articletagDescUpdatedAt := articletagMixinFields0[1].Descriptor()
+	// articletag.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	articletag.DefaultUpdatedAt = articletagDescUpdatedAt.Default.(func() time.Time)
+	// articletag.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	articletag.UpdateDefaultUpdatedAt = articletagDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// articletagDescArticleID is the schema descriptor for article_id field.
+	articletagDescArticleID := articletagFields[1].Descriptor()
+	// articletag.ArticleIDValidator is a validator for the "article_id" field. It is called by the builders before save.
+	articletag.ArticleIDValidator = articletagDescArticleID.Validators[0].(func(int64) error)
+	// articletagDescTagID is the schema descriptor for tag_id field.
+	articletagDescTagID := articletagFields[2].Descriptor()
+	// articletag.TagIDValidator is a validator for the "tag_id" field. It is called by the builders before save.
+	articletag.TagIDValidator = articletagDescTagID.Validators[0].(func(int64) error)
+	// articletagDescID is the schema descriptor for id field.
+	articletagDescID := articletagFields[0].Descriptor()
+	// articletag.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	articletag.IDValidator = articletagDescID.Validators[0].(func(int64) error)
+	categoryMixin := schema.Category{}.Mixin()
+	categoryMixinHooks1 := categoryMixin[1].Hooks()
+	category.Hooks[0] = categoryMixinHooks1[0]
+	categoryMixinInters1 := categoryMixin[1].Interceptors()
+	category.Interceptors[0] = categoryMixinInters1[0]
+	categoryMixinFields0 := categoryMixin[0].Fields()
+	_ = categoryMixinFields0
+	categoryFields := schema.Category{}.Fields()
+	_ = categoryFields
+	// categoryDescCreatedAt is the schema descriptor for created_at field.
+	categoryDescCreatedAt := categoryMixinFields0[0].Descriptor()
+	// category.DefaultCreatedAt holds the default value on creation for the created_at field.
+	category.DefaultCreatedAt = categoryDescCreatedAt.Default.(func() time.Time)
+	// categoryDescUpdatedAt is the schema descriptor for updated_at field.
+	categoryDescUpdatedAt := categoryMixinFields0[1].Descriptor()
+	// category.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	category.DefaultUpdatedAt = categoryDescUpdatedAt.Default.(func() time.Time)
+	// category.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	category.UpdateDefaultUpdatedAt = categoryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// categoryDescName is the schema descriptor for name field.
+	categoryDescName := categoryFields[1].Descriptor()
+	// category.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	category.NameValidator = func() func(string) error {
+		validators := categoryDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// categoryDescSlug is the schema descriptor for slug field.
+	categoryDescSlug := categoryFields[2].Descriptor()
+	// category.SlugValidator is a validator for the "slug" field. It is called by the builders before save.
+	category.SlugValidator = func() func(string) error {
+		validators := categoryDescSlug.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(slug string) error {
+			for _, fn := range fns {
+				if err := fn(slug); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// categoryDescDescription is the schema descriptor for description field.
+	categoryDescDescription := categoryFields[4].Descriptor()
+	// category.DefaultDescription holds the default value on creation for the description field.
+	category.DefaultDescription = categoryDescDescription.Default.(string)
+	// category.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	category.DescriptionValidator = categoryDescDescription.Validators[0].(func(string) error)
+	// categoryDescSort is the schema descriptor for sort field.
+	categoryDescSort := categoryFields[5].Descriptor()
+	// category.DefaultSort holds the default value on creation for the sort field.
+	category.DefaultSort = categoryDescSort.Default.(int)
+	// categoryDescIsActive is the schema descriptor for is_active field.
+	categoryDescIsActive := categoryFields[6].Descriptor()
+	// category.DefaultIsActive holds the default value on creation for the is_active field.
+	category.DefaultIsActive = categoryDescIsActive.Default.(bool)
+	// categoryDescID is the schema descriptor for id field.
+	categoryDescID := categoryFields[0].Descriptor()
+	// category.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	category.IDValidator = categoryDescID.Validators[0].(func(int64) error)
 	departmentMixin := schema.Department{}.Mixin()
 	departmentMixinHooks1 := departmentMixin[1].Hooks()
 	department.Hooks[0] = departmentMixinHooks1[0]
@@ -625,6 +832,79 @@ func init() {
 	sysdictitemDescID := sysdictitemFields[0].Descriptor()
 	// sysdictitem.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	sysdictitem.IDValidator = sysdictitemDescID.Validators[0].(func(int64) error)
+	tagMixin := schema.Tag{}.Mixin()
+	tagMixinHooks1 := tagMixin[1].Hooks()
+	tag.Hooks[0] = tagMixinHooks1[0]
+	tagMixinInters1 := tagMixin[1].Interceptors()
+	tag.Interceptors[0] = tagMixinInters1[0]
+	tagMixinFields0 := tagMixin[0].Fields()
+	_ = tagMixinFields0
+	tagFields := schema.Tag{}.Fields()
+	_ = tagFields
+	// tagDescCreatedAt is the schema descriptor for created_at field.
+	tagDescCreatedAt := tagMixinFields0[0].Descriptor()
+	// tag.DefaultCreatedAt holds the default value on creation for the created_at field.
+	tag.DefaultCreatedAt = tagDescCreatedAt.Default.(func() time.Time)
+	// tagDescUpdatedAt is the schema descriptor for updated_at field.
+	tagDescUpdatedAt := tagMixinFields0[1].Descriptor()
+	// tag.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	tag.DefaultUpdatedAt = tagDescUpdatedAt.Default.(func() time.Time)
+	// tag.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	tag.UpdateDefaultUpdatedAt = tagDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tagDescName is the schema descriptor for name field.
+	tagDescName := tagFields[1].Descriptor()
+	// tag.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	tag.NameValidator = func() func(string) error {
+		validators := tagDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// tagDescSlug is the schema descriptor for slug field.
+	tagDescSlug := tagFields[2].Descriptor()
+	// tag.SlugValidator is a validator for the "slug" field. It is called by the builders before save.
+	tag.SlugValidator = func() func(string) error {
+		validators := tagDescSlug.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(slug string) error {
+			for _, fn := range fns {
+				if err := fn(slug); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// tagDescDescription is the schema descriptor for description field.
+	tagDescDescription := tagFields[3].Descriptor()
+	// tag.DefaultDescription holds the default value on creation for the description field.
+	tag.DefaultDescription = tagDescDescription.Default.(string)
+	// tag.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	tag.DescriptionValidator = tagDescDescription.Validators[0].(func(string) error)
+	// tagDescSort is the schema descriptor for sort field.
+	tagDescSort := tagFields[4].Descriptor()
+	// tag.DefaultSort holds the default value on creation for the sort field.
+	tag.DefaultSort = tagDescSort.Default.(int)
+	// tagDescIsActive is the schema descriptor for is_active field.
+	tagDescIsActive := tagFields[5].Descriptor()
+	// tag.DefaultIsActive holds the default value on creation for the is_active field.
+	tag.DefaultIsActive = tagDescIsActive.Default.(bool)
+	// tagDescID is the schema descriptor for id field.
+	tagDescID := tagFields[0].Descriptor()
+	// tag.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	tag.IDValidator = tagDescID.Validators[0].(func(int64) error)
 	tokenblacklistMixin := schema.TokenBlacklist{}.Mixin()
 	tokenblacklistMixinFields0 := tokenblacklistMixin[0].Fields()
 	_ = tokenblacklistMixinFields0

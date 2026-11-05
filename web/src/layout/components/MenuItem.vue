@@ -32,6 +32,10 @@ const iconMap: Record<string, string> = {
   file: 'Folder',
   dict: 'Collection',
   setting: 'Setting',
+  content: 'Files',
+  article: 'EditPen',
+  category: 'FolderOpened',
+  tag: 'PriceTag',
 }
 
 // 未在映射表中的 icon 键只在控制台提示一次，便于定位后端下发了哪些未配置的图标
