@@ -1,0 +1,28 @@
+README.md
+  s_bbf609960902b0::t_15cf5caa0ac25d 643,649,652-681
+docs/runbook.md
+  s_bbf609960902b0::t_e72aee01b0b5c1 187
+.env.example
+  s_bbf609960902b0::t_117ee630ce1e3e 25-29
+.github/workflows/release.yml
+  s_bbf609960902b0::t_18c21274fa3d51 1-100
+docker-compose.yml
+  s_bbf609960902b0::t_7653fa86047d11 53,71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "941fbf9177aef71ddb3ede18c97e8653167fc1fe",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4free"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 178
+    }
+  }
+}
