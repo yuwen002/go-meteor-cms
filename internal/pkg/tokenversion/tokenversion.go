@@ -28,6 +28,12 @@ func Get(ctx context.Context, rdb *redis.Redis, userID int64) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	// go-zero 的 Redis.Get 在 key 不存在时返回 ("", nil)（内部已把 redis.Nil 转成空串），
+	// 必须显式视为初始版本 0；否则 ParseInt("") 会误报错误，被 JWT 中间件当成
+	// 「Redis 异常」走降级放行并刷错误日志，跳过版本比对。
+	if val == "" {
+		return 0, nil
+	}
 	v, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		return 0, err

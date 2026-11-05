@@ -531,12 +531,15 @@ go test ./internal/... ./api/cms/v1/internal/middleware/...
 go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 ```
 
-当前已覆盖的纯逻辑单测：
+当前已覆盖的纯逻辑单测（均不依赖外部 MySQL / Redis / Docker，可直接进 CI）：
 
 - `internal/utils`：分页参数规范化（默认值、负值纠正、上限截断）
 - `internal/pkg/datascope`：部门树子孙收集，含脏数据成环时不死循环
 - `internal/pkg/mail`：邮件报文构造（UTF-8 主题与正文编码）、SMTP 参数校验
-- `api/cms/v1/internal/middleware`：路由匹配规则、静态路由优先于动态路由、免鉴权路由判定
+- `internal/pkg/tokenversion`：token 版本号读取 / 自增、按用户隔离、未配置 Redis 时降级（进程内 miniredis）
+- `api/cms/v1/internal/middleware`：路由匹配规则、静态路由优先于动态路由、免鉴权路由判定；
+  SPA 托管的 history 回退与目录穿越防护；JWT 中间件的 token 版本比对与全局踢人
+- JWT 中间件测试用进程内 Redis + 空结果集 ent driver 替代数据库，无需 MySQL / Docker
 
 ## 部署
 
@@ -545,7 +548,16 @@ go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 `docker-compose.yml` 编排完整栈：MySQL（数据） + Redis（限流 / 全局踢人） + 迁移（表结构 + 种子） + API（含前端 SPA）。
 镜像由仓库根目录 `Dockerfile` 多阶段构建：前端 `web/` 的构建产物被打进同一镜像，由 Go 服务在 8888 端口统一托管。
 
+前端由 Go 服务通过 `rest.WithNotFoundHandler` 托管（见 `api/cms/v1/internal/middleware/spa.go`）：
+`/`、`/login`、`/dashboard`、`/system/*` 等未匹配路由回退到 `index.html`（保证 `createWebHistory` 刷新不 404），
+`/assets/*` 等真实文件直接返回；`/admin`、`/api`、`/uploads` 前缀保留给 API 与上传资源，不参与回退。
+注意不要用 `server.Use` 注册 SPA 兜底：go-zero 的全局中间件不作用于 404（未匹配）路由。
+
+> Windows / macOS 需先启动 Docker Desktop 并等引擎就绪（`docker info` 能返回 ServerVersion），
+> 否则 `docker compose` 会报 `dockerDesktopLinuxEngine` 管道不存在。
+
 ```bash
+cp .env.example .env          # 可选：按需修改端口、口令、构建镜像源
 # 一键启动：mysql 就绪 → migrate 迁移+种子 → api 启动并托管前端
 docker compose up -d
 
@@ -559,18 +571,30 @@ docker compose down -v
 ```
 
 应用通过环境变量连接依赖，无需改动 `cms-api.yaml`：`MYSQL_DSN` 指向 `mysql:3306`、`REDIS_HOST` 指向 `redis:6379`、
-`WEB_DIST=/app/web/dist`。部署到别的机器时只需改 docker-compose.yml 里的这几个环境变量。
+`WEB_DIST=/app/web/dist`。这些值由 compose 从 `.env` 注入容器，**部署到别的机器时改 `.env` 即可，不要改 `docker-compose.yml`**。
 
-配置项集中在 `.env`（参考 `.env.example`，含开发默认值）：可覆盖 root 密码、库名、各服务端口等；
+配置项集中在 `.env`（复制 `.env.example` 得到，含开发默认值）：可覆盖 root 密码、库名、各服务端口等；
 不提供 `.env` 时 compose 的 `${VAR:-默认值}` 自动生效，开箱即用。注意改密码 / 库名时要同步改 `MYSQL_DSN` 中的对应部分。
 
-> 说明：mysql / redis 默认仅容器内部网络互通（未映射宿主机端口），以免与本地已运行的 MySQL(3306) 冲突；
-> 如需从宿主机直连排查，取消 docker-compose.yml 中对应 `ports` 注释即可（注意 3306 端口冲突可改用 `3307:3306`）。
-
-仅想用容器里的 MySQL / Redis、应用仍在宿主机跑：
+受限网络下容器构建可能拉不到默认官方源，可在 `.env` 里启用镜像源（它们是 **build args**，只影响构建、不进入运行容器）：
 
 ```bash
-docker compose up -d mysql redis          # 依赖暴露到 127.0.0.1:3306 / 6379（若本地已占 3306 见上方说明）
+NPM_REGISTRY=https://registry.npmmirror.com/
+GOPROXY=https://goproxy.cn,direct
+```
+
+修改后需重新构建：`docker compose build && docker compose up -d`。
+
+> 端口说明：mysql 默认**不映射**宿主机端口（避免与本地 MySQL 的 3306 冲突），
+> 如需从宿主机直连排查，取消 `docker-compose.yml` 中 mysql 的 `ports` 注释并设 `MYSQL_PORT`（如 `3307`）。
+> redis 默认映射 `${REDIS_PORT:-6379}:6379` 供本机调试；若 6379 已被本地 Redis 占用，
+> 在 `.env` 里改 `REDIS_PORT`（如 `6380`）即可——容器内服务间仍走 `redis:6379`，不受影响。
+
+仅想用容器里的 MySQL / Redis、应用仍在宿主机跑（需先按上方说明打开 mysql 的 `ports` 映射；
+redis 默认已映射 `${REDIS_PORT:-6379}:6379`）：
+
+```bash
+docker compose up -d mysql redis
 make migrate && make run                  # 或 go run ./api/cms/v1 -f api/cms/v1/etc/cms-api.yaml
 ```
 
@@ -604,9 +628,25 @@ go build -o bin/migrate ./cmd/migrate
 
 ### 环境变量
 
+应用进程读取的环境变量（本地直跑 / 单独 `docker run` 时同样适用）：
+
 | 变量 | 说明 |
 | --- | --- |
-| `MYSQL_DSN` | 数据库连接串，设置后覆盖配置文件中的 `Database.Source`（容器化部署推荐） |
+| `MYSQL_DSN` | 数据库连接串，设置后覆盖配置文件中的 `Database.Source`（容器化部署推荐；未设置时默认 `127.0.0.1:3306`） |
+| `REDIS_HOST` | Redis 地址，容器内置为 `redis:6379`；未设置时按配置文件默认 `127.0.0.1:6379` |
+| `WEB_DIST` | 前端构建产物目录；容器内置为 `/app/web/dist`，本地开发留空则仅暴露 API |
+
+compose 专用配置（写在 `.env`，由 `${VAR:-默认值}` 插值；不提供 `.env` 时用默认值）：
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `MYSQL_ROOT_PASSWORD` | `123456` | MySQL root 口令，需与 `MYSQL_DSN` 保持一致 |
+| `MYSQL_DATABASE` | `go_meteor_cms` | 库名，需与 `MYSQL_DSN` 保持一致 |
+| `API_PORT` | `8888` | API / 前端对外端口 |
+| `REDIS_PORT` | `6379` | Redis 映射到宿主机的端口；被占用时可改（如 `6380`） |
+| `MYSQL_PORT` | `3306` | 仅在取消 compose 中 mysql `ports` 注释后生效 |
+| `NPM_REGISTRY` | `https://registry.npmjs.org/` | 构建参数：前端 `npm install` 源，受限网络可换 npmmirror |
+| `GOPROXY` | `https://proxy.golang.org,direct` | 构建参数：Go 模块代理，受限网络可换 goproxy.cn |
 
 ### 后台维护任务
 
