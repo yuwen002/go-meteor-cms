@@ -1,0 +1,35 @@
+.env.example
+  s_bbf609960902b0::t_d759f8cf4b1246 13-14
+api/cms/v1/internal/middleware/spa_test.go
+  s_bbf609960902b0::t_1db48da714cc34 1-144
+internal/pkg/tokenversion/tokenversion.go
+  s_bbf609960902b0::t_3fb52a32cfef9f 31-36
+internal/pkg/tokenversion/tokenversion_test.go
+  s_bbf609960902b0::t_2eb1bb9b50c243 1-104
+README.md
+  s_bbf609960902b0::t_82ca522c3cc0f9 534,539-542,592
+  s_bbf609960902b0::t_2431c57f009470 551-558,560,574,576,579-586,588-591
+  s_bbf609960902b0::t_f73d2e5d444499 593-594,597
+  s_bbf609960902b0::t_61249cb666d95d 631-632,635-649
+go.mod
+  s_bbf609960902b0::t_a05646ae093eaf 19,50
+api/cms/v1/internal/middleware/jwtmiddleware_test.go
+  s_bbf609960902b0::t_4c327245eb3f3d 1-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "c52d82cb5c95af30ad28eb0b92e0923b0a356711",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4free"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 498
+    }
+  }
+}
