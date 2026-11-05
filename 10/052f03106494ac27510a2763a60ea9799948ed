@@ -1,0 +1,29 @@
+.github/workflows/ci.yml
+  s_bbf609960902b0::t_744bffaa36cf64 44-45
+  s_bbf609960902b0::t_c43471496e3cec 21,40-41,47-58
+Dockerfile
+  s_bbf609960902b0::t_6d4e2dd59f919d 6-7
+  s_bbf609960902b0::t_c623dbd5b8830d 8-10
+.dockerignore
+  s_bbf609960902b0::t_85b76d5fa1e058 17-23
+docs/runbook.md
+  s_bbf609960902b0::t_dd624aefec7cc0 194-197
+  s_bbf609960902b0::t_50a7ca81172115 66-67,70,91-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "26.9.9",
+  "base_commit_sha": "10052f03106494ac27510a2763a60ea9799948ed",
+  "prompts": {},
+  "sessions": {
+    "s_bbf609960902b0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "e1b6045518d048e4bd07e87813a33b92",
+        "model": "hy4free"
+      },
+      "human_author": "liuxingyu <yuwen002@163.com>",
+      "generated_lines": 71
+    }
+  }
+}
