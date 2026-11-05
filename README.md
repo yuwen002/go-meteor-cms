@@ -640,13 +640,44 @@ compose 专用配置（写在 `.env`，由 `${VAR:-默认值}` 插值；不提�
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
+| `CMS_IMAGE` | `go-meteor-cms:local` | migrate / api 使用的镜像；生产固定为已发布版本，改回旧版本即可回滚 |
 | `MYSQL_ROOT_PASSWORD` | `123456` | MySQL root 口令，需与 `MYSQL_DSN` 保持一致 |
 | `MYSQL_DATABASE` | `go_meteor_cms` | 库名，需与 `MYSQL_DSN` 保持一致 |
 | `API_PORT` | `8888` | API / 前端对外端口 |
 | `REDIS_PORT` | `6379` | Redis 映射到宿主机的端口；被占用时可改（如 `6380`） |
 | `MYSQL_PORT` | `3306` | 仅在取消 compose 中 mysql `ports` 注释后生效 |
-| `NPM_REGISTRY` | `https://registry.npmjs.org/` | 构建参数：前端 `npm install` 源，受限网络可换 npmmirror |
+| `NPM_REGISTRY` | `https://registry.npmjs.org/` | 构建参数：前端 `npm ci` 源，受限网络可换 npmmirror |
 | `GOPROXY` | `https://proxy.golang.org,direct` | 构建参数：Go 模块代理，受限网络可换 goproxy.cn |
+
+### 版本发布与回滚
+
+发布由 `.github/workflows/release.yml` 完成：推送 `vX.Y.Z` 标签即自动验证、构建并推送镜像到 GHCR，同时创建 GitHub Release。
+使用仓库内置 `GITHUB_TOKEN`（`packages: write`），**无需配置额外密钥**；首次使用需在 GitHub 把该 Package 设为 Public，或在目标机器先执行 `docker login ghcr.io`。
+
+```bash
+# 在已验证的 commit 上打标签触发发版
+git tag -a v1.2.3 -m "release v1.2.3"
+git push origin v1.2.3
+# 产出：ghcr.io/yuwen002/go-meteor-cms:1.2.3 / :1.2 / :latest
+```
+
+生产部署在 `.env` 中固定版本（不要用 `latest`）：
+
+```bash
+CMS_IMAGE=ghcr.io/yuwen002/go-meteor-cms:1.2.3
+docker compose pull && docker compose up -d
+```
+
+> compose 同时保留了 `build:`，因此**必须先 `pull` 且不要加 `--build`**，否则会在本机重新构建并覆盖已发布镜像。
+
+回滚只需把 `CMS_IMAGE` 改回上一个版本号并重复上述命令：
+
+```bash
+CMS_IMAGE=ghcr.io/yuwen002/go-meteor-cms:1.2.2
+docker compose pull && docker compose up -d
+```
+
+> `migrate` 服务在每次 `up -d` 时幂等执行迁移（只增不减）。回滚镜像前请确认旧版本与当前表结构兼容；若发版包含破坏性 schema 变更，需另行评估数据回滚方案。
 
 ### 后台维护任务
 

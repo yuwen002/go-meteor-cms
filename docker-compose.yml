@@ -50,7 +50,7 @@ services:
 
   # 迁移：基于同一镜像，仅替换启动命令为 /app/migrate；依赖 mysql 健康后执行（幂等）
   migrate:
-    image: go-meteor-cms:local
+    image: ${CMS_IMAGE:-go-meteor-cms:local}
     build:
       context: .
       dockerfile: Dockerfile
@@ -68,7 +68,7 @@ services:
 
   # API：同一镜像默认 CMD 为 /app/cms -f etc/cms-api.yaml；前端由 WEB_DIST 托管
   api:
-    image: go-meteor-cms:local
+    image: ${CMS_IMAGE:-go-meteor-cms:local}
     build:
       context: .
       dockerfile: Dockerfile

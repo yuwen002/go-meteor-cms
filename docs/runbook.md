@@ -184,6 +184,7 @@ compose 专用配置（`API_PORT` / `REDIS_PORT` / 镜像源构建参数等）�
 
 ## 7. 回滚与定位
 
+- **版本回滚**：在 `.env` 把 `CMS_IMAGE` 改回上一个已发布版本，执行 `docker compose pull && docker compose up -d`（发布与回滚流程详见 `README.md`「版本发布与回滚」）。`migrate` 每次启动幂等执行且迁移只增不减，回滚前须确认旧版本与当前表结构兼容。
 - 提交历史：`e4998ad`（动态菜单多级层级 + 子菜单丢失修复）、`d8643a8`（统一响应信封修复）。
 - 接口一致性审计方法见 `docs/smoke-test.md` 第 6 节，建议改动 `routes.go` 或种子权限后复跑。
 
