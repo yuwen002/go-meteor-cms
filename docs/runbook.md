@@ -63,9 +63,11 @@ npm run dev          # http://localhost:5173
 
 ### 3.1 Docker Compose（推荐）
 
-> 若需要分布式登录限流（多副本 API），compose 中需额外加入 `redis` 服务，并在 `cms-api.yaml` 的 `Redis.Host` 指向该服务。
+compose 已内置 `redis` 服务（登录限流 / 全局踢人共用），无需额外添加；容器内连接由 `.env` 的
+`MYSQL_DSN`、`REDIS_HOST` 注入，配置项说明见 `README.md` 部署章节与 `.env.example`。
 
 ```bash
+cp .env.example .env              # 可选：按需修改端口、口令、构建镜像源
 docker compose up -d --wait        # MySQL(健康检查) → 迁移 → API
 docker compose down
 ```
@@ -86,6 +88,10 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 | 变量 | 说明 |
 | --- | --- |
 | `MYSQL_DSN` | 数据库连接串，覆盖配置文件 `Database.Source`，容器化部署推荐 |
+| `REDIS_HOST` | Redis 地址，容器内置为 `redis:6379`；未设置时按配置文件默认 `127.0.0.1:6379` |
+| `WEB_DIST` | 前端产物目录，容器内置为 `/app/web/dist`；本地留空则仅暴露 API |
+
+compose 专用配置（`API_PORT` / `REDIS_PORT` / 镜像源构建参数等）完整清单见 `README.md` 的「环境变量」表。
 
 ### 3.4 后台维护
 
@@ -184,6 +190,10 @@ export MYSQL_DSN="root:123456@tcp(127.0.0.1:3306)/go_meteor_cms?parseTime=True&l
 ## 8. 附录：P2-4 全局踢人验证（需 Redis）
 
 环境起 Redis 后，token 版本校验与「禁用/删除/改密/重置」触发点才会真正生效；否则自动降级为不校验（见第 13 条）。
+
+> 该链路已有自动化测试覆盖：`go test ./internal/pkg/tokenversion` 与
+> `go test ./api/cms/v1/internal/middleware -run TestJwtMiddleware_RealKick`
+> （进程内 miniredis，无需真实 Redis / Docker）。以下步骤仅用于手工排查。
 
 验证步骤（无需真实登录，用调试 token 即可）：
 

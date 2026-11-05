@@ -3,8 +3,11 @@
 FROM node:22-alpine AS web
 ARG NPM_REGISTRY=https://registry.npmjs.org/
 WORKDIR /web
-COPY web/package.json ./
-RUN npm install --registry=$NPM_REGISTRY --no-audit --no-fund
+# 连同 lock 一起复制并使用 npm ci，保证镜像构建与 CI / 本地使用同一份依赖树（发布可复现）
+COPY web/package.json web/package-lock.json ./
+# replace-registry-host=always：lock 中 resolved 固化了生成时的源（当前为 npmmirror），
+# 该参数让 --registry / NPM_REGISTRY 真正生效，避免不同环境被迫走同一个源。
+RUN npm ci --replace-registry-host=always --registry=$NPM_REGISTRY --no-audit --no-fund
 COPY web/ ./
 # 产物位于 /web/dist（vite 默认 base 为 /，由 Go 服务统一托管 SPA）
 RUN npm run build

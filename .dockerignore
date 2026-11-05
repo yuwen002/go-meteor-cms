@@ -14,3 +14,10 @@ README.md
 # 前端依赖与构建产物不应进入后端构建上下文
 web/node_modules
 web/dist
+
+# 环境文件含明文口令（MYSQL_ROOT_PASSWORD、MYSQL_DSN 等），不得进入构建上下文：
+# Dockerfile 后端阶段使用 COPY . .，若不排除会被复制进中间镜像层（--target builder、
+# 导出/推送构建缓存时存在外泄面）。.env.example 是无敏感信息的模板，保留。
+.env
+.env.local
+.env.*.local

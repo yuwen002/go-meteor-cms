@@ -18,7 +18,7 @@ jobs:
           cache: true
       - name: gofmt
         run: |
-          fmt_out=$(gofmt -l api internal cmd 2>/dev/null)
+          fmt_out=$(gofmt -l api internal cmd ent/schema 2>/dev/null)
           if [ -n "$fmt_out" ]; then echo "以下文件未格式化:"; echo "$fmt_out"; exit 1; fi
       - name: go vet
         run: go vet ./...
@@ -37,8 +37,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # 与 Dockerfile 的 node:22-alpine 保持一致，CI 结论才代表生产镜像
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: web/package-lock.json
-      - run: npm install
+      # lock 的 resolved 固化为 npmmirror，替换 host 后 CI 使用默认官方源
+      - run: npm ci --replace-registry-host=always
       - run: npm run build
+
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 校验 compose 文件可解析（无 .env 时用 ${VAR:-默认值}）
+      - name: Validate compose config
+        run: docker compose config > /dev/null
+      # 冒烟构建镜像：覆盖 Dockerfile 的前端/后端多阶段构建，不推送
+      - name: Build image
+        run: docker build -t go-meteor-cms:ci .
