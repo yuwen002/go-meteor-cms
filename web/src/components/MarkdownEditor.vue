@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { renderMarkdown } from '@/utils/markdown'
 import { uploadFile } from '@/api/upload'
 

@@ -9,7 +9,8 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" type="password" show-password placeholder="请输入密码" />
         </el-form-item>
-        <el-form-item label="验证码" prop="captcha">
+        <!-- 后端可通过 LOGIN_CAPTCHA_ENABLED 关闭验证码，前端按接口返回的 enabled 自适应 -->
+        <el-form-item v-if="captchaEnabled" label="验证码" prop="captcha">
           <div class="captcha-row">
             <el-input v-model="form.captcha" placeholder="请输入验证码" />
             <img :src="captchaImg" class="captcha-img" @click="refreshCaptcha" alt="验证码" />
@@ -22,9 +23,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from '@/utils/element'
 import { login as loginApi, getCaptcha } from '@/api/auth'
 import { useUserStore } from '@/stores/user'
 import { setRefreshToken } from '@/utils/auth'
@@ -34,7 +35,7 @@ const userStore = useUserStore()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 const captchaImg = ref('')
-const captchaId = ref('')
+const captchaEnabled = ref(true)
 
 const form = reactive({
   username: '',
@@ -43,17 +44,31 @@ const form = reactive({
   captcha_id: '',
 })
 
-const rules: FormRules = {
+const rules = computed<FormRules>(() => ({
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-}
+  ...(captchaEnabled.value
+    ? { captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }] }
+    : {}),
+}))
 
 async function refreshCaptcha() {
-  const res = await getCaptcha()
-  captchaId.value = res.captcha_id
-  captchaImg.value = res.captcha_base64
-  form.captcha_id = res.captcha_id
+  try {
+    const res = await getCaptcha()
+    captchaEnabled.value = res.enabled
+    if (!res.enabled) {
+      captchaImg.value = ''
+      form.captcha = ''
+      form.captcha_id = ''
+      return
+    }
+    captchaImg.value = res.captcha_base64
+    form.captcha_id = res.captcha_id
+    form.captcha = ''
+  } catch {
+    // 拉取失败时保持验证码必填，避免用户在无验证码的情况下被后端拒绝
+    captchaEnabled.value = true
+  }
 }
 
 function handleLogin() {
@@ -67,7 +82,9 @@ function handleLogin() {
       ElMessage.success('登录成功')
       router.push('/')
     } catch {
-      refreshCaptcha()
+      if (captchaEnabled.value) {
+        refreshCaptcha()
+      }
     } finally {
       loading.value = false
     }

@@ -89,6 +89,8 @@ func (l *RolePermissionAssignLogic) RolePermissionAssign(req *types.RolePermissi
 	}
 
 	// 5. 开启事务
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
 	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
 	if err != nil {
 		l.Logger.Errorf("开启事务失败: %v", err)

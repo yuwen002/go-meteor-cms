@@ -15,12 +15,15 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articlereview"
+	"github.com/yuwen002/go-meteor-cms/ent/articlerevision"
 	"github.com/yuwen002/go-meteor-cms/ent/articletag"
 	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/predicate"
+	"github.com/yuwen002/go-meteor-cms/ent/slugredirect"
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
@@ -273,6 +276,60 @@ func (f TraverseArticle) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.ArticleQuery", q)
 }
 
+// The ArticleReviewFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ArticleReviewFunc func(context.Context, *ent.ArticleReviewQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ArticleReviewFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ArticleReviewQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ArticleReviewQuery", q)
+}
+
+// The TraverseArticleReview type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseArticleReview func(context.Context, *ent.ArticleReviewQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseArticleReview) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseArticleReview) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ArticleReviewQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ArticleReviewQuery", q)
+}
+
+// The ArticleRevisionFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ArticleRevisionFunc func(context.Context, *ent.ArticleRevisionQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ArticleRevisionFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ArticleRevisionQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ArticleRevisionQuery", q)
+}
+
+// The TraverseArticleRevision type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseArticleRevision func(context.Context, *ent.ArticleRevisionQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseArticleRevision) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseArticleRevision) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ArticleRevisionQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ArticleRevisionQuery", q)
+}
+
 // The ArticleTagFunc type is an adapter to allow the use of ordinary function as a Querier.
 type ArticleTagFunc func(context.Context, *ent.ArticleTagQuery) (ent.Value, error)
 
@@ -406,6 +463,33 @@ func (f TraverseOperationLog) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.OperationLogQuery", q)
+}
+
+// The SlugRedirectFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SlugRedirectFunc func(context.Context, *ent.SlugRedirectQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SlugRedirectFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SlugRedirectQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SlugRedirectQuery", q)
+}
+
+// The TraverseSlugRedirect type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSlugRedirect func(context.Context, *ent.SlugRedirectQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSlugRedirect) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSlugRedirect) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SlugRedirectQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SlugRedirectQuery", q)
 }
 
 // The SysConfigFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -560,6 +644,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AdminUserRoleQuery, predicate.AdminUserRole, adminuserrole.OrderOption]{typ: ent.TypeAdminUserRole, tq: q}, nil
 	case *ent.ArticleQuery:
 		return &query[*ent.ArticleQuery, predicate.Article, article.OrderOption]{typ: ent.TypeArticle, tq: q}, nil
+	case *ent.ArticleReviewQuery:
+		return &query[*ent.ArticleReviewQuery, predicate.ArticleReview, articlereview.OrderOption]{typ: ent.TypeArticleReview, tq: q}, nil
+	case *ent.ArticleRevisionQuery:
+		return &query[*ent.ArticleRevisionQuery, predicate.ArticleRevision, articlerevision.OrderOption]{typ: ent.TypeArticleRevision, tq: q}, nil
 	case *ent.ArticleTagQuery:
 		return &query[*ent.ArticleTagQuery, predicate.ArticleTag, articletag.OrderOption]{typ: ent.TypeArticleTag, tq: q}, nil
 	case *ent.CategoryQuery:
@@ -570,6 +658,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.LoginLogQuery, predicate.LoginLog, loginlog.OrderOption]{typ: ent.TypeLoginLog, tq: q}, nil
 	case *ent.OperationLogQuery:
 		return &query[*ent.OperationLogQuery, predicate.OperationLog, operationlog.OrderOption]{typ: ent.TypeOperationLog, tq: q}, nil
+	case *ent.SlugRedirectQuery:
+		return &query[*ent.SlugRedirectQuery, predicate.SlugRedirect, slugredirect.OrderOption]{typ: ent.TypeSlugRedirect, tq: q}, nil
 	case *ent.SysConfigQuery:
 		return &query[*ent.SysConfigQuery, predicate.SysConfig, sysconfig.OrderOption]{typ: ent.TypeSysConfig, tq: q}, nil
 	case *ent.SysDictQuery:

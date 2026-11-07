@@ -19,11 +19,14 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articlereview"
+	"github.com/yuwen002/go-meteor-cms/ent/articlerevision"
 	"github.com/yuwen002/go-meteor-cms/ent/articletag"
 	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
+	"github.com/yuwen002/go-meteor-cms/ent/slugredirect"
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
@@ -96,11 +99,14 @@ func checkColumn(t, c string) error {
 			adminuser.Table:           adminuser.ValidColumn,
 			adminuserrole.Table:       adminuserrole.ValidColumn,
 			article.Table:             article.ValidColumn,
+			articlereview.Table:       articlereview.ValidColumn,
+			articlerevision.Table:     articlerevision.ValidColumn,
 			articletag.Table:          articletag.ValidColumn,
 			category.Table:            category.ValidColumn,
 			department.Table:          department.ValidColumn,
 			loginlog.Table:            loginlog.ValidColumn,
 			operationlog.Table:        operationlog.ValidColumn,
+			slugredirect.Table:        slugredirect.ValidColumn,
 			sysconfig.Table:           sysconfig.ValidColumn,
 			sysdict.Table:             sysdict.ValidColumn,
 			sysdictitem.Table:         sysdictitem.ValidColumn,

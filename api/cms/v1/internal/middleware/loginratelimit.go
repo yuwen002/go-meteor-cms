@@ -17,9 +17,9 @@ import (
 // loginRateLimitCode 与统一响应约定一致的业务码（请求过于频繁）
 const loginRateLimitCode = 2029
 
-// loginWindowLua 固定窗口限流：对 key 自增，首次设置窗口过期；超过阈值返回 blocked=1 与剩余 TTL。
+// windowLimitLua 固定窗口限流：对 key 自增，首次设置窗口过期；超过阈值返回 blocked=1 与剩余 TTL。
 // 采用 Lua 保证「自增 + 设置过期」的原子性，避免并发窗口边界出现计数漂移。
-var loginWindowLua = `
+var windowLimitLua = `
 local current = redis.call("incr", KEYS[1])
 if tonumber(current) == 1 then
   redis.call("expire", KEYS[1], tonumber(ARGV[1]))
@@ -37,8 +37,10 @@ type ipCounter struct {
 	blockedUntil int64
 }
 
-type loginRateLimiter struct {
+// ipRateLimiter 登录限流与公开接口限流共用的固定窗口实现，prefix 用于隔离 Redis 计数键。
+type ipRateLimiter struct {
 	rds          *redis.Redis
+	prefix       string
 	max          int
 	window       int
 	blockSeconds int
@@ -46,9 +48,9 @@ type loginRateLimiter struct {
 }
 
 // allow 返回是否限流拦截，以及建议客户端重试等待秒数（Redis 路径返回 key 剩余 TTL）。
-func (l *loginRateLimiter) allow(ip string) (bool, int) {
+func (l *ipRateLimiter) allow(ip string) (bool, int) {
 	if l.rds != nil {
-		res, err := l.rds.Eval(loginWindowLua, []string{"login_rl:" + ip}, l.window, l.max)
+		res, err := l.rds.Eval(windowLimitLua, []string{l.prefix + ip}, l.window, l.max)
 		if err == nil {
 			if arr, ok := res.([]interface{}); ok && len(arr) == 2 {
 				if toInt(arr[0]) == 1 {
@@ -58,13 +60,13 @@ func (l *loginRateLimiter) allow(ip string) (bool, int) {
 			}
 		}
 		// Redis 不可用：降级到内存限流，保证防护不失效
-		logx.Errorf("Redis 登录限流失败，降级为内存模式: %v", err)
+		logx.Errorf("Redis 限流失败（%s），降级为内存模式: %v", l.prefix, err)
 	}
 	return l.memAllow(ip)
 }
 
 // memAllow 单实例内存限流，作为 Redis 不可用时的兜底。
-func (l *loginRateLimiter) memAllow(ip string) (bool, int) {
+func (l *ipRateLimiter) memAllow(ip string) (bool, int) {
 	now := time.Now().Unix()
 	val, _ := l.mem.LoadOrStore(ip, &ipCounter{})
 	c := val.(*ipCounter)
@@ -93,12 +95,9 @@ func NewLoginRateLimitMiddleware(rds *redis.Redis, enabled bool, max, window, bl
 			return next
 		}
 	}
-	limiter := &loginRateLimiter{
-		rds:          rds,
-		max:          max,
-		window:       window,
-		blockSeconds: blockSeconds,
-		mem:          &sync.Map{},
+	limiter := &ipRateLimiter{
+		rds: rds, prefix: "login_rl:", max: max, window: window,
+		blockSeconds: blockSeconds, mem: &sync.Map{},
 	}
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {

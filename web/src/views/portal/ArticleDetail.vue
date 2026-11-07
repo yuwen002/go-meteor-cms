@@ -5,6 +5,7 @@
         <router-link to="/articles" class="brand">Meteor<span>CMS</span></router-link>
         <nav class="nav-links">
           <router-link to="/articles">全部文章</router-link>
+          <a href="/api/rss" target="_blank" rel="noopener noreferrer">RSS</a>
           <router-link to="/login">管理后台</router-link>
         </nav>
       </div>
@@ -21,6 +22,7 @@
           <h1 class="detail-title">{{ article.title }}</h1>
           <div class="detail-meta">
             <span v-if="article.category_name" class="chip">{{ article.category_name }}</span>
+            <span v-if="article.author_name">{{ article.author_name }}</span>
             <span>{{ formatDate(article.published_at) }}</span>
             <span>{{ article.view_count }} 次阅读</span>
           </div>
@@ -30,24 +32,54 @@
           <div v-if="article.tag_names.length" class="detail-tags">
             <span v-for="t in article.tag_names" :key="t" class="tag"># {{ t }}</span>
           </div>
+
+          <nav v-if="article.prev || article.next" class="adjacent-nav">
+            <a v-if="article.prev" class="adjacent-link" @click="openArticle(article.prev)">
+              <span>← 上一篇</span>
+              <strong>{{ article.prev.title }}</strong>
+            </a>
+            <span v-else />
+            <a v-if="article.next" class="adjacent-link right" @click="openArticle(article.next)">
+              <span>下一篇 →</span>
+              <strong>{{ article.next.title }}</strong>
+            </a>
+          </nav>
         </template>
         <el-empty v-else-if="!loading" description="文章不存在或尚未发布" :image-size="90" />
       </div>
+
+      <section v-if="relatedList.length" class="related">
+        <h2 class="related-title">相关文章</h2>
+        <div class="related-grid">
+          <a v-for="r in relatedList" :key="r.id" class="related-card" @click="openArticle(r)">
+            <img v-if="r.cover" :src="r.cover" :alt="r.title" class="related-cover" />
+            <div class="related-body">
+              <strong>{{ r.title }}</strong>
+              <p>{{ r.summary || '暂无摘要' }}</p>
+              <span>{{ formatDate(r.published_at) }}</span>
+            </div>
+          </a>
+        </div>
+      </section>
 
       <div class="back-row">
         <el-button @click="goBack">← 返回文章列表</el-button>
       </div>
     </main>
 
-    <footer class="site-footer">Powered by Go Meteor CMS</footer>
+    <footer class="site-footer">
+      Powered by Go Meteor CMS ·
+      <a href="/api/rss" target="_blank" rel="noopener noreferrer">RSS</a> ·
+      <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getPublicArticle, type PublicArticleDetail } from '@/api/public'
-import { renderMarkdown } from '@/utils/markdown'
+import { getPublicArticle, type PublicArticle, type PublicArticleDetail } from '@/api/public'
+import { plainSummary, renderMarkdown } from '@/utils/markdown'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,10 +87,74 @@ const slug = computed(() => String(route.params.slug ?? ''))
 const article = ref<PublicArticleDetail | null>(null)
 const loading = ref(false)
 const rendered = computed(() => renderMarkdown(article.value?.content ?? ''))
+const relatedList = computed<PublicArticle[]>(() => article.value?.related ?? [])
 const originalTitle = document.title
+
+interface MetaSnapshot {
+  name: string
+  content: string | null
+  el: HTMLMetaElement | null
+}
+const metaSnapshots: MetaSnapshot[] = []
+let canonicalSnapshot: { content: string | null; el: HTMLLinkElement | null } | null = null
+
+// 服务端 SPAHandler 已注入首屏 SEO 标签；这里只负责 SPA 内切换文章时同步更新。
+function syncMeta(name: string, content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`)
+  if (!metaSnapshots.some((m) => m.name === name)) {
+    metaSnapshots.push({ name, content: el?.getAttribute('content') ?? null, el })
+  }
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute('name', name)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('content', content)
+}
+
+function syncCanonical(url: string) {
+  let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+  if (!canonicalSnapshot) {
+    canonicalSnapshot = { content: el?.getAttribute('href') ?? null, el }
+  }
+  if (!el) {
+    el = document.createElement('link')
+    el.setAttribute('rel', 'canonical')
+    document.head.appendChild(el)
+  }
+  el.setAttribute('href', url)
+}
+
+function syncPageMeta(a: PublicArticleDetail) {
+  document.title = a.seo_title || a.title
+  syncMeta('description', a.seo_description || a.summary || plainSummary(a.content))
+  syncMeta('keywords', a.seo_keywords || a.tag_names.join(', '))
+  syncCanonical(a.canonical_url || `${window.location.origin}/articles/${a.slug}`)
+}
+
+function restoreMeta() {
+  for (const snap of metaSnapshots) {
+    if (!snap.content) {
+      snap.el?.remove()
+    } else {
+      snap.el?.setAttribute('content', snap.content)
+    }
+  }
+  if (canonicalSnapshot) {
+    if (!canonicalSnapshot.content) {
+      canonicalSnapshot.el?.remove()
+    } else {
+      canonicalSnapshot.el?.setAttribute('href', canonicalSnapshot.content)
+    }
+  }
+}
 
 function formatDate(s: string): string {
   return s ? s.replace('T', ' ').slice(0, 16) : ''
+}
+
+function openArticle(a: PublicArticle) {
+  void router.push(`/articles/${a.slug}`)
 }
 
 async function load() {
@@ -66,7 +162,7 @@ async function load() {
   loading.value = true
   try {
     article.value = await getPublicArticle(slug.value)
-    document.title = article.value.seo_title || article.value.title
+    syncPageMeta(article.value)
     window.scrollTo({ top: 0 })
   } catch {
     article.value = null
@@ -87,6 +183,7 @@ watch(slug, () => {
 })
 onUnmounted(() => {
   document.title = originalTitle
+  restoreMeta()
 })
 </script>
 
@@ -190,6 +287,92 @@ onUnmounted(() => {
   padding: 3px 10px;
   border-radius: 12px;
 }
+.adjacent-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 28px;
+}
+.adjacent-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 46%;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #2563eb;
+  font-size: 12px;
+  text-decoration: none;
+}
+.adjacent-link:hover {
+  background: #eff6ff;
+}
+.adjacent-link.right {
+  text-align: right;
+}
+.adjacent-link strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.related {
+  margin-top: 32px;
+}
+.related-title {
+  margin: 0 0 14px;
+  font-size: 18px;
+  color: #0f172a;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.related-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.18s ease;
+}
+.related-card:hover {
+  transform: translateY(-2px);
+}
+.related-cover {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+.related-body {
+  padding: 12px 14px 14px;
+}
+.related-body strong {
+  font-size: 14px;
+  color: #0f172a;
+}
+.related-body p {
+  margin: 6px 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #64748b;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.related-body span {
+  font-size: 11px;
+  color: #94a3b8;
+}
 .back-row {
   margin-top: 22px;
 }
@@ -198,6 +381,10 @@ onUnmounted(() => {
   padding: 28px;
   color: #94a3b8;
   font-size: 12px;
+}
+.site-footer a {
+  color: #64748b;
+  text-decoration: none;
 }
 
 /* v-html 注入的节点不带 scoped 属性，必须用 :deep 命中 */
@@ -246,6 +433,23 @@ onUnmounted(() => {
 .article-body :deep(a) { color: #2563eb; text-decoration: none; }
 .article-body :deep(a:hover) { text-decoration: underline; }
 .article-body :deep(hr) { margin: 24px 0; border: 0; border-top: 1px solid #e2e8f0; }
+.article-body :deep(del) { color: #94a3b8; }
+.article-body :deep(table) {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.article-body :deep(th),
+.article-body :deep(td) {
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  text-align: left;
+}
+.article-body :deep(th) { background: #f8fafc; font-weight: 600; }
+.article-body :deep(.task-list) { list-style: none; padding-left: 4px; }
+.article-body :deep(.task-item) { margin: 4px 0; }
+.article-body :deep(.task-item input) { margin-right: 6px; }
 
 @media (max-width: 640px) {
   .detail-card { padding: 24px 20px; }

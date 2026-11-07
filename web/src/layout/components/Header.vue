@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useUserStore } from '@/stores/user'
 import { logout as logoutApi } from '@/api/auth'
 import { removeToken } from '@/utils/auth'

@@ -60,7 +60,7 @@ const userStore = useUserStore()
 const canAdd = computed(() => userStore.hasPermission('system:permission:add'))
 const canEdit = computed(() => userStore.hasPermission('system:permission:edit'))
 const canDelete = computed(() => userStore.hasPermission('system:permission:delete'))
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import { getPermissionTree, getPermissionDetail, createPermission, updatePermission, deletePermission } from '@/api/permission'
 import type { PermissionTreeItem, PermissionForm } from '@/api/permission'
 

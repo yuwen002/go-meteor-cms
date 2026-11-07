@@ -98,7 +98,7 @@ const canAdd = computed(() => userStore.hasPermission('system:role:add'))
 const canEdit = computed(() => userStore.hasPermission('system:role:edit'))
 const canDelete = computed(() => userStore.hasPermission('system:role:delete'))
 const canAssignPerm = computed(() => userStore.hasPermission('system:role:perm_assign'))
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import {
   getRoles, createRole, updateRole, deleteRole,
   getRolePermissions, assignRolePermissions,

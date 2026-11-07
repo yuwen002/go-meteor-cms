@@ -34,6 +34,8 @@ func RegisterContentRoutes(server *rest.Server, serverCtx *svc.ServiceContext) {
 		{Method: http.MethodPost, Path: "/admin/articles/:id/publish", Handler: articlePublishHandler(serverCtx)},
 		{Method: http.MethodPost, Path: "/admin/articles/:id/withdraw", Handler: articleWithdrawHandler(serverCtx)},
 		{Method: http.MethodPost, Path: "/admin/articles/:id/toggle-top", Handler: articleToggleTopHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/admin/articles/batch-offline", Handler: articleBatchOfflineHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/admin/articles/batch-delete", Handler: articleBatchDeleteHandler(serverCtx)},
 
 		// ---------- 分类 ----------
 		{Method: http.MethodGet, Path: "/admin/categories", Handler: categoryListHandler(serverCtx)},
@@ -46,6 +48,22 @@ func RegisterContentRoutes(server *rest.Server, serverCtx *svc.ServiceContext) {
 		{Method: http.MethodPost, Path: "/admin/tags", Handler: tagCreateHandler(serverCtx)},
 		{Method: http.MethodPut, Path: "/admin/tags/:id", Handler: tagUpdateHandler(serverCtx)},
 		{Method: http.MethodDelete, Path: "/admin/tags/:id", Handler: tagDeleteHandler(serverCtx)},
+
+		// ---------- 审核流 ----------
+		{Method: http.MethodPost, Path: "/admin/articles/:id/submit", Handler: articleSubmitHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/admin/articles/:id/approve", Handler: articleApproveHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/admin/articles/:id/reject", Handler: articleRejectHandler(serverCtx)},
+		{Method: http.MethodGet, Path: "/admin/articles/:id/reviews", Handler: articleReviewListHandler(serverCtx)},
+
+		// ---------- 修订历史 ----------
+		{Method: http.MethodGet, Path: "/admin/articles/:id/revisions", Handler: articleRevisionListHandler(serverCtx)},
+		{Method: http.MethodGet, Path: "/admin/articles/:id/revisions/:rid", Handler: articleRevisionDetailHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/admin/articles/:id/revisions/:rid/restore", Handler: articleRevisionRestoreHandler(serverCtx)},
+
+		// ---------- 回收站 ----------
+		{Method: http.MethodGet, Path: "/admin/trash", Handler: trashListHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/admin/trash/:type/:id/restore", Handler: trashRestoreHandler(serverCtx)},
+		{Method: http.MethodDelete, Path: "/admin/trash/:type/:id/purge", Handler: trashPurgeHandler(serverCtx)},
 	}...))
 
 	// ---------- 公开阅读：无需登录 ----------
@@ -57,6 +75,12 @@ func RegisterContentRoutes(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{Method: http.MethodGet, Path: "/api/articles", Handler: publicArticleListHandler(serverCtx)},
 			{Method: http.MethodGet, Path: "/api/articles/:slug", Handler: publicArticleDetailHandler(serverCtx)},
 			{Method: http.MethodGet, Path: "/api/taxonomy", Handler: publicTaxonomyHandler(serverCtx)},
+			{Method: http.MethodGet, Path: "/api/rss", Handler: rssHandler(serverCtx)},
+			// 探活接口不属于 /api/ 前缀，避免被公开接口限流误伤。
+			{Method: http.MethodGet, Path: "/healthz", Handler: healthHandler(serverCtx)},
+			// sitemap/robots 是站点级约定路径，注册为真实路由以优先于 SPA 回退。
+			{Method: http.MethodGet, Path: "/sitemap.xml", Handler: sitemapHandler(serverCtx)},
+			{Method: http.MethodGet, Path: "/robots.txt", Handler: robotsHandler(serverCtx)},
 		}...,
 	))
 }

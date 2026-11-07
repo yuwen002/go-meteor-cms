@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '@/utils/auth'
-import Layout from '@/layout/index.vue'
+// Layout 改成按需加载：公开阅读页不需要后台布局代码
+const Layout = () => import('@/layout/index.vue')
 import { useUserStore } from '@/stores/user'
 import { getProfile, getMyPermissions } from '@/api/user'
 
@@ -118,6 +119,12 @@ const routes = [
         name: 'ContentTags',
         component: () => import('@/views/content/tag/index.vue'),
         meta: { title: '标签管理', permission: 'cms:tag:list' },
+      },
+      {
+        path: 'content/trash',
+        name: 'ContentTrash',
+        component: () => import('@/views/content/trash/index.vue'),
+        meta: { title: '回收站', permission: 'cms:trash:list' },
       },
       {
         path: 'profile',

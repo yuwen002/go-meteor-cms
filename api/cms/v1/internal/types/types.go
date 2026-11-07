@@ -88,6 +88,7 @@ type AdminRoleRemoveReq struct {
 }
 
 type CaptchaResp struct {
+	Enabled       bool   `json:"enabled"`        // 是否启用验证码；false 时前端不展示验证码输入
 	CaptchaID     string `json:"captcha_id"`     // 验证码ID
 	CaptchaBase64 string `json:"captcha_base64"` // 验证码图片base64
 }
@@ -211,10 +212,10 @@ type LoginLogListResp struct {
 }
 
 type LoginReq struct {
-	Username  string `json:"username" validate:"required"`   // 必填
-	Password  string `json:"password" validate:"required"`   // 必填
-	CaptchaID string `json:"captcha_id" validate:"required"` // 验证码ID
-	Captcha   string `json:"captcha" validate:"required"`    // 验证码
+	Username  string `json:"username" validate:"required"` // 必填
+	Password  string `json:"password" validate:"required"` // 必填
+	CaptchaID string `json:"captcha_id,optional"`          // 验证码ID（LOGIN_CAPTCHA_ENABLED=false 时可不传）
+	Captcha   string `json:"captcha,optional"`             // 验证码
 }
 
 type LoginResp struct {

@@ -12,12 +12,15 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articlereview"
+	"github.com/yuwen002/go-meteor-cms/ent/articlerevision"
 	"github.com/yuwen002/go-meteor-cms/ent/articletag"
 	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
 	"github.com/yuwen002/go-meteor-cms/ent/schema"
+	"github.com/yuwen002/go-meteor-cms/ent/slugredirect"
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
@@ -376,6 +379,104 @@ func init() {
 	articleDescID := articleFields[0].Descriptor()
 	// article.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	article.IDValidator = articleDescID.Validators[0].(func(int64) error)
+	articlereviewMixin := schema.ArticleReview{}.Mixin()
+	articlereviewMixinFields0 := articlereviewMixin[0].Fields()
+	_ = articlereviewMixinFields0
+	articlereviewFields := schema.ArticleReview{}.Fields()
+	_ = articlereviewFields
+	// articlereviewDescCreatedAt is the schema descriptor for created_at field.
+	articlereviewDescCreatedAt := articlereviewMixinFields0[0].Descriptor()
+	// articlereview.DefaultCreatedAt holds the default value on creation for the created_at field.
+	articlereview.DefaultCreatedAt = articlereviewDescCreatedAt.Default.(func() time.Time)
+	// articlereviewDescUpdatedAt is the schema descriptor for updated_at field.
+	articlereviewDescUpdatedAt := articlereviewMixinFields0[1].Descriptor()
+	// articlereview.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	articlereview.DefaultUpdatedAt = articlereviewDescUpdatedAt.Default.(func() time.Time)
+	// articlereview.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	articlereview.UpdateDefaultUpdatedAt = articlereviewDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// articlereviewDescArticleID is the schema descriptor for article_id field.
+	articlereviewDescArticleID := articlereviewFields[1].Descriptor()
+	// articlereview.ArticleIDValidator is a validator for the "article_id" field. It is called by the builders before save.
+	articlereview.ArticleIDValidator = articlereviewDescArticleID.Validators[0].(func(int64) error)
+	// articlereviewDescRemark is the schema descriptor for remark field.
+	articlereviewDescRemark := articlereviewFields[3].Descriptor()
+	// articlereview.DefaultRemark holds the default value on creation for the remark field.
+	articlereview.DefaultRemark = articlereviewDescRemark.Default.(string)
+	// articlereview.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	articlereview.RemarkValidator = articlereviewDescRemark.Validators[0].(func(string) error)
+	// articlereviewDescOperatorID is the schema descriptor for operator_id field.
+	articlereviewDescOperatorID := articlereviewFields[4].Descriptor()
+	// articlereview.DefaultOperatorID holds the default value on creation for the operator_id field.
+	articlereview.DefaultOperatorID = articlereviewDescOperatorID.Default.(int64)
+	// articlereviewDescOperatorName is the schema descriptor for operator_name field.
+	articlereviewDescOperatorName := articlereviewFields[5].Descriptor()
+	// articlereview.DefaultOperatorName holds the default value on creation for the operator_name field.
+	articlereview.DefaultOperatorName = articlereviewDescOperatorName.Default.(string)
+	// articlereview.OperatorNameValidator is a validator for the "operator_name" field. It is called by the builders before save.
+	articlereview.OperatorNameValidator = articlereviewDescOperatorName.Validators[0].(func(string) error)
+	// articlereviewDescID is the schema descriptor for id field.
+	articlereviewDescID := articlereviewFields[0].Descriptor()
+	// articlereview.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	articlereview.IDValidator = articlereviewDescID.Validators[0].(func(int64) error)
+	articlerevisionMixin := schema.ArticleRevision{}.Mixin()
+	articlerevisionMixinFields0 := articlerevisionMixin[0].Fields()
+	_ = articlerevisionMixinFields0
+	articlerevisionFields := schema.ArticleRevision{}.Fields()
+	_ = articlerevisionFields
+	// articlerevisionDescCreatedAt is the schema descriptor for created_at field.
+	articlerevisionDescCreatedAt := articlerevisionMixinFields0[0].Descriptor()
+	// articlerevision.DefaultCreatedAt holds the default value on creation for the created_at field.
+	articlerevision.DefaultCreatedAt = articlerevisionDescCreatedAt.Default.(func() time.Time)
+	// articlerevisionDescUpdatedAt is the schema descriptor for updated_at field.
+	articlerevisionDescUpdatedAt := articlerevisionMixinFields0[1].Descriptor()
+	// articlerevision.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	articlerevision.DefaultUpdatedAt = articlerevisionDescUpdatedAt.Default.(func() time.Time)
+	// articlerevision.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	articlerevision.UpdateDefaultUpdatedAt = articlerevisionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// articlerevisionDescArticleID is the schema descriptor for article_id field.
+	articlerevisionDescArticleID := articlerevisionFields[1].Descriptor()
+	// articlerevision.ArticleIDValidator is a validator for the "article_id" field. It is called by the builders before save.
+	articlerevision.ArticleIDValidator = articlerevisionDescArticleID.Validators[0].(func(int64) error)
+	// articlerevisionDescTitle is the schema descriptor for title field.
+	articlerevisionDescTitle := articlerevisionFields[2].Descriptor()
+	// articlerevision.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	articlerevision.TitleValidator = func() func(string) error {
+		validators := articlerevisionDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// articlerevisionDescSummary is the schema descriptor for summary field.
+	articlerevisionDescSummary := articlerevisionFields[3].Descriptor()
+	// articlerevision.DefaultSummary holds the default value on creation for the summary field.
+	articlerevision.DefaultSummary = articlerevisionDescSummary.Default.(string)
+	// articlerevision.SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
+	articlerevision.SummaryValidator = articlerevisionDescSummary.Validators[0].(func(string) error)
+	// articlerevisionDescCover is the schema descriptor for cover field.
+	articlerevisionDescCover := articlerevisionFields[4].Descriptor()
+	// articlerevision.DefaultCover holds the default value on creation for the cover field.
+	articlerevision.DefaultCover = articlerevisionDescCover.Default.(string)
+	// articlerevision.CoverValidator is a validator for the "cover" field. It is called by the builders before save.
+	articlerevision.CoverValidator = articlerevisionDescCover.Validators[0].(func(string) error)
+	// articlerevisionDescRemark is the schema descriptor for remark field.
+	articlerevisionDescRemark := articlerevisionFields[7].Descriptor()
+	// articlerevision.DefaultRemark holds the default value on creation for the remark field.
+	articlerevision.DefaultRemark = articlerevisionDescRemark.Default.(string)
+	// articlerevision.RemarkValidator is a validator for the "remark" field. It is called by the builders before save.
+	articlerevision.RemarkValidator = articlerevisionDescRemark.Validators[0].(func(string) error)
+	// articlerevisionDescID is the schema descriptor for id field.
+	articlerevisionDescID := articlerevisionFields[0].Descriptor()
+	// articlerevision.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	articlerevision.IDValidator = articlerevisionDescID.Validators[0].(func(int64) error)
 	articletagMixin := schema.ArticleTag{}.Mixin()
 	articletagMixinFields0 := articletagMixin[0].Fields()
 	_ = articletagMixinFields0
@@ -617,6 +718,65 @@ func init() {
 	operationlogDescID := operationlogFields[0].Descriptor()
 	// operationlog.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	operationlog.IDValidator = operationlogDescID.Validators[0].(func(int64) error)
+	slugredirectMixin := schema.SlugRedirect{}.Mixin()
+	slugredirectMixinFields0 := slugredirectMixin[0].Fields()
+	_ = slugredirectMixinFields0
+	slugredirectFields := schema.SlugRedirect{}.Fields()
+	_ = slugredirectFields
+	// slugredirectDescCreatedAt is the schema descriptor for created_at field.
+	slugredirectDescCreatedAt := slugredirectMixinFields0[0].Descriptor()
+	// slugredirect.DefaultCreatedAt holds the default value on creation for the created_at field.
+	slugredirect.DefaultCreatedAt = slugredirectDescCreatedAt.Default.(func() time.Time)
+	// slugredirectDescUpdatedAt is the schema descriptor for updated_at field.
+	slugredirectDescUpdatedAt := slugredirectMixinFields0[1].Descriptor()
+	// slugredirect.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	slugredirect.DefaultUpdatedAt = slugredirectDescUpdatedAt.Default.(func() time.Time)
+	// slugredirect.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	slugredirect.UpdateDefaultUpdatedAt = slugredirectDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// slugredirectDescEntityType is the schema descriptor for entity_type field.
+	slugredirectDescEntityType := slugredirectFields[1].Descriptor()
+	// slugredirect.EntityTypeValidator is a validator for the "entity_type" field. It is called by the builders before save.
+	slugredirect.EntityTypeValidator = func() func(string) error {
+		validators := slugredirectDescEntityType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(entity_type string) error {
+			for _, fn := range fns {
+				if err := fn(entity_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// slugredirectDescEntityID is the schema descriptor for entity_id field.
+	slugredirectDescEntityID := slugredirectFields[2].Descriptor()
+	// slugredirect.EntityIDValidator is a validator for the "entity_id" field. It is called by the builders before save.
+	slugredirect.EntityIDValidator = slugredirectDescEntityID.Validators[0].(func(int64) error)
+	// slugredirectDescOldSlug is the schema descriptor for old_slug field.
+	slugredirectDescOldSlug := slugredirectFields[3].Descriptor()
+	// slugredirect.OldSlugValidator is a validator for the "old_slug" field. It is called by the builders before save.
+	slugredirect.OldSlugValidator = func() func(string) error {
+		validators := slugredirectDescOldSlug.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(old_slug string) error {
+			for _, fn := range fns {
+				if err := fn(old_slug); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// slugredirectDescID is the schema descriptor for id field.
+	slugredirectDescID := slugredirectFields[0].Descriptor()
+	// slugredirect.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	slugredirect.IDValidator = slugredirectDescID.Validators[0].(func(int64) error)
 	sysconfigMixin := schema.SysConfig{}.Mixin()
 	sysconfigMixinFields0 := sysconfigMixin[0].Fields()
 	_ = sysconfigMixinFields0

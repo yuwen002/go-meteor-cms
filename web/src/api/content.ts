@@ -10,6 +10,7 @@ export interface ArticleItem {
   cover: string
   status: number
   status_text: string
+  author_name: string
   category_id: number
   category_name: string
   tag_ids: number[]
@@ -56,6 +57,8 @@ export interface ArticleListParams {
   status?: number
   category_id?: number
   tag_id?: number
+  sort?: string
+  order?: 'asc' | 'desc'
 }
 
 export function getArticles(params: ArticleListParams) {
@@ -165,4 +168,130 @@ export function updateTag(id: number, data: TagPayload) {
 
 export function deleteTag(id: number) {
   return request({ url: `/admin/tags/${id}`, method: 'delete' })
+}
+
+// ---------- 批量操作 ----------
+
+export interface ArticleBatchResp {
+  count: number
+}
+
+export function batchOfflineArticles(ids: number[]) {
+  return request({
+    url: '/admin/articles/batch-offline',
+    method: 'post',
+    data: { ids },
+  }) as Promise<ArticleBatchResp>
+}
+
+export function batchDeleteArticles(ids: number[]) {
+  return request({
+    url: '/admin/articles/batch-delete',
+    method: 'post',
+    data: { ids },
+  }) as Promise<ArticleBatchResp>
+}
+
+// ---------- 审核记录 ----------
+
+export interface ArticleReviewItem {
+  id: number
+  article_id: number
+  action: number
+  action_text: string
+  remark: string
+  operator_id: number
+  operator_name: string
+  created_at: string
+}
+
+export function getArticleReviews(id: number) {
+  return request({ url: `/admin/articles/${id}/reviews`, method: 'get' }) as Promise<{
+    list: ArticleReviewItem[]
+  }>
+}
+
+// ---------- 审核流 ----------
+
+export function submitArticle(id: number) {
+  return request({ url: `/admin/articles/${id}/submit`, method: 'post', data: {} })
+}
+
+export function approveArticle(id: number, published_at?: string) {
+  return request({
+    url: `/admin/articles/${id}/approve`,
+    method: 'post',
+    data: { published_at: published_at ?? '' },
+  })
+}
+
+export function rejectArticle(id: number, remark = '') {
+  return request({ url: `/admin/articles/${id}/reject`, method: 'post', data: { remark } })
+}
+
+// ---------- 修订历史 ----------
+
+export interface ArticleRevisionItem {
+  id: number
+  article_id: number
+  title: string
+  remark: string
+  created_at: string
+}
+
+export interface ArticleRevisionDetail extends ArticleRevisionItem {
+  summary: string
+  cover: string
+  content: string
+}
+
+export function getArticleRevisions(id: number) {
+  return request({ url: `/admin/articles/${id}/revisions`, method: 'get' }) as Promise<{
+    list: ArticleRevisionItem[]
+  }>
+}
+
+export function getArticleRevision(id: number, rid: number) {
+  return request({
+    url: `/admin/articles/${id}/revisions/${rid}`,
+    method: 'get',
+  }) as Promise<ArticleRevisionDetail>
+}
+
+export function restoreArticleRevision(id: number, rid: number) {
+  return request({ url: `/admin/articles/${id}/revisions/${rid}/restore`, method: 'post', data: {} })
+}
+
+// ---------- 回收站 ----------
+
+export type TrashEntityType = 'article' | 'category' | 'tag'
+
+export interface TrashItem {
+  id: number
+  entity_type: TrashEntityType
+  title: string
+  slug: string
+  deleted_at: string
+}
+
+export interface TrashListResp {
+  list: TrashItem[]
+  total: number
+  page: number
+  page_size: number
+}
+
+export function getTrash(params: { type?: TrashEntityType; page?: number; page_size?: number } = {}) {
+  return request({ url: '/admin/trash', method: 'get', params }) as Promise<TrashListResp>
+}
+
+export function restoreTrash(type: TrashEntityType, id: number) {
+  return request({ url: `/admin/trash/${type}/${id}/restore`, method: 'post', data: {} }) as Promise<{
+    id: number
+    message: string
+  }>
+}
+
+export function purgeTrash(type: TrashEntityType, id: number) {
+  return request({ url: `/admin/trash/${type}/${id}/purge`, method: 'delete' })
 }

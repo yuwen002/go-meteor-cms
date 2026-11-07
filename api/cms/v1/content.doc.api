@@ -1,0 +1,489 @@
+// 内容模块（文章 / 分类 / 标签 / 公开阅读）的 OpenAPI 文档源。
+//
+// 这个文件只被 cmd/apidoc 读取并合并进 openapi.json，不参与 goctl 代码生成：
+// routes.go / types.go 带 DO NOT EDIT 头却被手工追加过，内容模块统一用
+// contentroutes.go 与 article_types.go 独立维护，因此不能再把路由声明进 cms.api。
+//
+// 约定：这里的类型名、字段名、路径必须与
+//   - api/cms/v1/internal/types/article_types.go
+//   - api/cms/v1/internal/handler/contentroutes.go
+// 保持一致。修改了那两个文件时，请同步这里并重新执行 make gen-doc。
+
+type (
+	// ---------- 文章管理 ----------
+
+	ArticleListReq {
+		Page       int    `form:"page,optional"`
+		PageSize   int    `form:"page_size,optional"`
+		Keyword    string `form:"keyword,optional"`
+		Status     *int   `form:"status,optional"`
+		CategoryID int64  `form:"category_id,optional"`
+		TagID      int64  `form:"tag_id,optional"`
+		Sort       string `form:"sort,optional"`
+		Order      string `form:"order,optional"`
+	}
+
+	// 批量操作：服务端去重并限制单次最多 100 篇
+	ArticleBatchReq {
+		IDs []int64 `json:"ids"`
+	}
+
+	ArticleBatchResp {
+		Count int `json:"count"`
+	}
+
+	// 探活响应不是统一 { code, msg, data } 封装
+	HealthResp {
+		Code     int    `json:"code"`
+		Msg      string `json:"msg"`
+		Database string `json:"database"`
+		Redis    string `json:"redis"`
+	}
+
+	ArticleIDReq {
+		ID int64 `path:"id"`
+	}
+
+	ArticleCreateReq {
+		Title          string  `json:"title"`
+		Slug           string  `json:"slug,optional"`
+		Summary        string  `json:"summary,optional"`
+		Cover          string  `json:"cover,optional"`
+		Content        string  `json:"content,optional"`
+		CategoryID     int64   `json:"category_id,optional"`
+		TagIDs         []int64 `json:"tag_ids,optional"`
+		IsTop          bool    `json:"is_top,optional"`
+		SeoTitle       string  `json:"seo_title,optional"`
+		SeoDescription string  `json:"seo_description,optional"`
+		SeoKeywords    string  `json:"seo_keywords,optional"`
+	}
+
+	ArticleUpdateReq {
+		ID             int64   `path:"id"`
+		Title          string  `json:"title"`
+		Slug           string  `json:"slug,optional"`
+		Summary        string  `json:"summary,optional"`
+		Cover          string  `json:"cover,optional"`
+		Content        string  `json:"content,optional"`
+		CategoryID     int64   `json:"category_id,optional"`
+		TagIDs         []int64 `json:"tag_ids,optional"`
+		IsTop          bool    `json:"is_top,optional"`
+		SeoTitle       string  `json:"seo_title,optional"`
+		SeoDescription string  `json:"seo_description,optional"`
+		SeoKeywords    string  `json:"seo_keywords,optional"`
+	}
+
+	ArticlePublishReq {
+		ID          int64  `path:"id"`
+		PublishedAt string `json:"published_at,optional"`
+	}
+
+	ArticleRejectReq {
+		ID     int64  `path:"id"`
+		Remark string `json:"remark,optional"`
+	}
+
+	ArticleItem {
+		ID           int64    `json:"id"`
+		Title        string   `json:"title"`
+		Slug         string   `json:"slug"`
+		Summary      string   `json:"summary"`
+		Cover        string   `json:"cover"`
+		Status       int      `json:"status"`
+		StatusText   string   `json:"status_text"`
+		AuthorName   string   `json:"author_name"`
+		CategoryID   int64    `json:"category_id"`
+		CategoryName string   `json:"category_name"`
+		TagIDs       []int64  `json:"tag_ids"`
+		TagNames     []string `json:"tag_names"`
+		IsTop        bool     `json:"is_top"`
+		ViewCount    int64    `json:"view_count"`
+		PublishedAt  string   `json:"published_at"`
+		CreatedAt    string   `json:"created_at"`
+		UpdatedAt    string   `json:"updated_at"`
+	}
+
+	ArticleListResp {
+		List     []ArticleItem `json:"list"`
+		Total    int64         `json:"total"`
+		Page     int           `json:"page"`
+		PageSize int           `json:"page_size"`
+	}
+
+	// ArticleDetailResp 由 ArticleItem 嵌入展开
+	ArticleDetailResp {
+		ID             int64    `json:"id"`
+		Title          string   `json:"title"`
+		Slug           string   `json:"slug"`
+		Summary        string   `json:"summary"`
+		Cover          string   `json:"cover"`
+		Status         int      `json:"status"`
+		StatusText     string   `json:"status_text"`
+		AuthorName     string   `json:"author_name"`
+		CategoryID     int64    `json:"category_id"`
+		CategoryName   string   `json:"category_name"`
+		TagIDs         []int64  `json:"tag_ids"`
+		TagNames       []string `json:"tag_names"`
+		IsTop          bool     `json:"is_top"`
+		ViewCount      int64    `json:"view_count"`
+		PublishedAt    string   `json:"published_at"`
+		CreatedAt      string   `json:"created_at"`
+		UpdatedAt      string   `json:"updated_at"`
+		Content        string   `json:"content"`
+		SeoTitle       string   `json:"seo_title"`
+		SeoDescription string   `json:"seo_description"`
+		SeoKeywords    string   `json:"seo_keywords"`
+	}
+
+	// ---------- 修订历史 ----------
+
+	ArticleRevisionIDReq {
+		ID         int64 `path:"id"`
+		RevisionID int64 `path:"rid"`
+	}
+
+	ArticleRevisionItem {
+		ID        int64  `json:"id"`
+		ArticleID int64  `json:"article_id"`
+		Title     string `json:"title"`
+		Remark    string `json:"remark"`
+		CreatedAt string `json:"created_at"`
+	}
+
+	ArticleRevisionListResp {
+		List []ArticleRevisionItem `json:"list"`
+	}
+
+	ArticleRevisionDetailResp {
+		ID        int64  `json:"id"`
+		ArticleID int64  `json:"article_id"`
+		Title     string `json:"title"`
+		Remark    string `json:"remark"`
+		CreatedAt string `json:"created_at"`
+		Summary   string `json:"summary"`
+		Cover     string `json:"cover"`
+		Content   string `json:"content"`
+	}
+
+	// 审核动作留痕：1 提交 / 2 通过 / 3 驳回
+	ArticleReviewItem {
+		ID           int64  `json:"id"`
+		ArticleID    int64  `json:"article_id"`
+		Action       int    `json:"action"`
+		ActionText   string `json:"action_text"`
+		Remark       string `json:"remark"`
+		OperatorID   int64  `json:"operator_id"`
+		OperatorName string `json:"operator_name"`
+		CreatedAt    string `json:"created_at"`
+	}
+
+	ArticleReviewListResp {
+		List []ArticleReviewItem `json:"list"`
+	}
+
+	// ---------- 回收站 ----------
+
+	TrashListReq {
+		EntityType string `form:"type,optional"`
+		Page       int    `form:"page,optional"`
+		PageSize   int    `form:"page_size,optional"`
+	}
+
+	TrashEntityReq {
+		EntityType string `path:"type"`
+		ID         int64  `path:"id"`
+	}
+
+	TrashItem {
+		ID         int64  `json:"id"`
+		EntityType string `json:"entity_type"`
+		Title      string `json:"title"`
+		Slug       string `json:"slug"`
+		DeletedAt  string `json:"deleted_at"`
+	}
+
+	TrashListResp {
+		List     []TrashItem `json:"list"`
+		Total    int64       `json:"total"`
+		Page     int         `json:"page"`
+		PageSize int         `json:"page_size"`
+	}
+
+	// ---------- 分类 / 标签 ----------
+
+	CategoryListReq {
+		Keyword  string `form:"keyword,optional"`
+		IsActive *bool  `form:"is_active,optional"`
+	}
+
+	CategoryIDReq {
+		ID int64 `path:"id"`
+	}
+
+	CategoryCreateReq {
+		Name        string `json:"name"`
+		Slug        string `json:"slug,optional"`
+		ParentID    int64  `json:"parent_id,optional"`
+		Description string `json:"description,optional"`
+		Sort        int    `json:"sort,optional"`
+		IsActive    *bool  `json:"is_active,optional"`
+	}
+
+	CategoryUpdateReq {
+		ID          int64  `path:"id"`
+		Name        string `json:"name,optional"`
+		Slug        string `json:"slug,optional"`
+		ParentID    *int64 `json:"parent_id,optional"`
+		Description string `json:"description,optional"`
+		Sort        *int   `json:"sort,optional"`
+		IsActive    *bool  `json:"is_active,optional"`
+	}
+
+	CategoryItem {
+		ID           int64  `json:"id"`
+		Name         string `json:"name"`
+		Slug         string `json:"slug"`
+		ParentID     int64  `json:"parent_id"`
+		ParentName   string `json:"parent_name"`
+		Description  string `json:"description"`
+		Sort         int    `json:"sort"`
+		IsActive     bool   `json:"is_active"`
+		ArticleCount int    `json:"article_count"`
+		CreatedAt    string `json:"created_at"`
+	}
+
+	CategoryListResp {
+		List []CategoryItem `json:"list"`
+	}
+
+	TagListReq {
+		Keyword  string `form:"keyword,optional"`
+		IsActive *bool  `form:"is_active,optional"`
+	}
+
+	TagIDReq {
+		ID int64 `path:"id"`
+	}
+
+	TagCreateReq {
+		Name        string `json:"name"`
+		Slug        string `json:"slug,optional"`
+		Description string `json:"description,optional"`
+		Sort        int    `json:"sort,optional"`
+		IsActive    *bool  `json:"is_active,optional"`
+	}
+
+	TagUpdateReq {
+		ID          int64  `path:"id"`
+		Name        string `json:"name,optional"`
+		Slug        string `json:"slug,optional"`
+		Description string `json:"description,optional"`
+		Sort        *int   `json:"sort,optional"`
+		IsActive    *bool  `json:"is_active,optional"`
+	}
+
+	TagItem {
+		ID           int64  `json:"id"`
+		Name         string `json:"name"`
+		Slug         string `json:"slug"`
+		Description  string `json:"description"`
+		Sort         int    `json:"sort"`
+		IsActive     bool   `json:"is_active"`
+		ArticleCount int    `json:"article_count"`
+		CreatedAt    string `json:"created_at"`
+	}
+
+	TagListResp {
+		List []TagItem `json:"list"`
+	}
+
+	// ---------- 公开阅读 ----------
+
+	PublicArticleListReq {
+		Page         int    `form:"page,optional"`
+		PageSize     int    `form:"page_size,optional"`
+		Keyword      string `form:"keyword,optional"`
+		CategorySlug string `form:"category,optional"`
+		TagSlug      string `form:"tag,optional"`
+	}
+
+	PublicArticleDetailReq {
+		Slug string `path:"slug"`
+	}
+
+	PublicArticleItem {
+		ID           int64    `json:"id"`
+		Title        string   `json:"title"`
+		Slug         string   `json:"slug"`
+		Summary      string   `json:"summary"`
+		Cover        string   `json:"cover"`
+		AuthorName   string   `json:"author_name"`
+		CategoryID   int64    `json:"category_id"`
+		CategoryName string   `json:"category_name"`
+		CategorySlug string   `json:"category_slug"`
+		TagNames     []string `json:"tag_names"`
+		IsTop        bool     `json:"is_top"`
+		ViewCount    int64    `json:"view_count"`
+		PublishedAt  string   `json:"published_at"`
+	}
+
+	PublicArticleListResp {
+		List     []PublicArticleItem `json:"list"`
+		Total    int64               `json:"total"`
+		Page     int                 `json:"page"`
+		PageSize int                 `json:"page_size"`
+	}
+
+	// PublicArticleDetailResp 由 PublicArticleItem 嵌入展开
+	PublicArticleDetailResp {
+		ID             int64                `json:"id"`
+		Title          string               `json:"title"`
+		Slug           string               `json:"slug"`
+		Summary        string               `json:"summary"`
+		Cover          string               `json:"cover"`
+		AuthorName     string               `json:"author_name"`
+		CategoryID     int64                `json:"category_id"`
+		CategoryName   string               `json:"category_name"`
+		CategorySlug   string               `json:"category_slug"`
+		TagNames       []string             `json:"tag_names"`
+		IsTop          bool                 `json:"is_top"`
+		ViewCount      int64                `json:"view_count"`
+		PublishedAt    string               `json:"published_at"`
+		Content        string               `json:"content"`
+		SeoTitle       string               `json:"seo_title"`
+		SeoDescription string               `json:"seo_description"`
+		SeoKeywords    string               `json:"seo_keywords"`
+		CanonicalURL   string               `json:"canonical_url"`
+		Related        []PublicArticleItem  `json:"related"`
+		Prev           *PublicArticleItem   `json:"prev"`
+		Next           *PublicArticleItem   `json:"next"`
+	}
+
+	PublicCategoryItem {
+		ID           int64  `json:"id"`
+		Name         string `json:"name"`
+		Slug         string `json:"slug"`
+		ParentID     int64  `json:"parent_id"`
+		ArticleCount int64  `json:"article_count"`
+	}
+
+	PublicTagItem {
+		ID           int64  `json:"id"`
+		Name         string `json:"name"`
+		Slug         string `json:"slug"`
+		ArticleCount int64  `json:"article_count"`
+	}
+
+	PublicTaxonomyResp {
+		Categories []PublicCategoryItem `json:"categories"`
+		Tags       []PublicTagItem      `json:"tags"`
+	}
+)
+
+// 这一组路由由 contentroutes.go 手工注册，文档源单独维护以便 gen-doc 合并输出。
+service cms-content-api {
+	@handler articleList
+	get /admin/articles (ArticleListReq) returns (ArticleListResp)
+
+	@handler articleCreate
+	post /admin/articles (ArticleCreateReq) returns (CommonResp)
+
+	@handler articleDetail
+	get /admin/articles/:id (ArticleIDReq) returns (ArticleDetailResp)
+
+	@handler articleUpdate
+	put /admin/articles/:id (ArticleUpdateReq) returns (CommonResp)
+
+	@handler articleDelete
+	delete /admin/articles/:id (ArticleIDReq)
+
+	@handler articlePublish
+	post /admin/articles/:id/publish (ArticlePublishReq)
+
+	@handler articleWithdraw
+	post /admin/articles/:id/withdraw (ArticleIDReq)
+
+	@handler articleToggleTop
+	post /admin/articles/:id/toggle-top (ArticleIDReq)
+
+	@handler articleBatchOffline
+	post /admin/articles/batch-offline (ArticleBatchReq) returns (ArticleBatchResp)
+
+	@handler articleBatchDelete
+	post /admin/articles/batch-delete (ArticleBatchReq) returns (ArticleBatchResp)
+
+	@handler categoryList
+	get /admin/categories (CategoryListReq) returns (CategoryListResp)
+
+	@handler categoryCreate
+	post /admin/categories (CategoryCreateReq) returns (CommonResp)
+
+	@handler categoryUpdate
+	put /admin/categories/:id (CategoryUpdateReq) returns (CommonResp)
+
+	@handler categoryDelete
+	delete /admin/categories/:id (CategoryIDReq)
+
+	@handler tagList
+	get /admin/tags (TagListReq) returns (TagListResp)
+
+	@handler tagCreate
+	post /admin/tags (TagCreateReq) returns (CommonResp)
+
+	@handler tagUpdate
+	put /admin/tags/:id (TagUpdateReq) returns (CommonResp)
+
+	@handler tagDelete
+	delete /admin/tags/:id (TagIDReq)
+
+	@handler articleSubmit
+	post /admin/articles/:id/submit (ArticleIDReq)
+
+	@handler articleApprove
+	post /admin/articles/:id/approve (ArticlePublishReq)
+
+	@handler articleReject
+	post /admin/articles/:id/reject (ArticleRejectReq)
+
+	@handler articleRevisionList
+	get /admin/articles/:id/revisions (ArticleIDReq) returns (ArticleRevisionListResp)
+
+	@handler articleRevisionDetail
+	get /admin/articles/:id/revisions/:rid (ArticleRevisionIDReq) returns (ArticleRevisionDetailResp)
+
+	@handler articleRevisionRestore
+	post /admin/articles/:id/revisions/:rid/restore (ArticleRevisionIDReq)
+
+	@handler articleReviewList
+	get /admin/articles/:id/reviews (ArticleIDReq) returns (ArticleReviewListResp)
+
+	@handler trashList
+	get /admin/trash (TrashListReq) returns (TrashListResp)
+
+	@handler trashRestore
+	post /admin/trash/:type/:id/restore (TrashEntityReq) returns (CommonResp)
+
+	@handler trashPurge
+	delete /admin/trash/:type/:id/purge (TrashEntityReq)
+
+	@handler publicArticleList
+	get /api/articles (PublicArticleListReq) returns (PublicArticleListResp)
+
+	@handler publicArticleDetail
+	get /api/articles/:slug (PublicArticleDetailReq) returns (PublicArticleDetailResp)
+
+	@handler publicTaxonomy
+	get /api/taxonomy returns (PublicTaxonomyResp)
+
+	@handler publicRss
+	get /api/rss
+
+	@handler publicSitemap
+	get /sitemap.xml
+
+	@handler publicRobots
+	get /robots.txt
+
+	@handler health
+	get /healthz returns (HealthResp)
+}

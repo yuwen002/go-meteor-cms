@@ -26,7 +26,12 @@ func NewGetCaptchaLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetCap
 }
 
 func (l *GetCaptchaLogic) GetCaptcha() (resp *types.CaptchaResp, err error) {
-	// 生成验证码
+	// 关闭验证码时不下发图片，前端据 enabled=false 隐藏输入项。
+	// 保留这个接口是为了让前端在不知道后端配置的情况下也能自适应。
+	if !l.svcCtx.Config.Login.CaptchaEnabled {
+		return &types.CaptchaResp{Enabled: false}, nil
+	}
+
 	captchaID, captchaBase64, err := utils.GenerateCaptcha()
 	if err != nil {
 		l.Logger.Errorf("生成验证码失败: %v", err)
@@ -34,6 +39,7 @@ func (l *GetCaptchaLogic) GetCaptcha() (resp *types.CaptchaResp, err error) {
 	}
 
 	return &types.CaptchaResp{
+		Enabled:       true,
 		CaptchaID:     captchaID,
 		CaptchaBase64: captchaBase64,
 	}, nil

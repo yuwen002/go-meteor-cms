@@ -93,6 +93,30 @@ func (f ArticleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArticleMutation", m)
 }
 
+// The ArticleReviewFunc type is an adapter to allow the use of ordinary
+// function as ArticleReview mutator.
+type ArticleReviewFunc func(context.Context, *ent.ArticleReviewMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ArticleReviewFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ArticleReviewMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArticleReviewMutation", m)
+}
+
+// The ArticleRevisionFunc type is an adapter to allow the use of ordinary
+// function as ArticleRevision mutator.
+type ArticleRevisionFunc func(context.Context, *ent.ArticleRevisionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ArticleRevisionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ArticleRevisionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArticleRevisionMutation", m)
+}
+
 // The ArticleTagFunc type is an adapter to allow the use of ordinary
 // function as ArticleTag mutator.
 type ArticleTagFunc func(context.Context, *ent.ArticleTagMutation) (ent.Value, error)
@@ -151,6 +175,18 @@ func (f OperationLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OperationLogMutation", m)
+}
+
+// The SlugRedirectFunc type is an adapter to allow the use of ordinary
+// function as SlugRedirect mutator.
+type SlugRedirectFunc func(context.Context, *ent.SlugRedirectMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SlugRedirectFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SlugRedirectMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SlugRedirectMutation", m)
 }
 
 // The SysConfigFunc type is an adapter to allow the use of ordinary

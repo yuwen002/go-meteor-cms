@@ -111,6 +111,11 @@ func (Article) Indexes() []ent.Index {
 		index.Fields("status", "published_at"),
 		index.Fields("category_id"),
 		index.Fields("is_top"),
+		// 软删除拦截器会给每个查询追加 deleted_at IS NULL，把它放进联合索引
+		// 的最左列，列表查询与排序才能走索引而不是全表 + filesort。
+		index.Fields("deleted_at", "status", "published_at", "id"),
+		index.Fields("deleted_at", "is_top", "id"),
+		index.Fields("deleted_at", "category_id", "status"),
 	}
 }
 

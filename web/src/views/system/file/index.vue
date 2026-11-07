@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import { useUserStore } from '@/stores/user'
 import { deleteFile, getFileList, renameFile, type FileItem } from '@/api/file'
 

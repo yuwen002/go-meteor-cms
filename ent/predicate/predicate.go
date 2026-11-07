@@ -27,6 +27,12 @@ type AdminUserRole func(*sql.Selector)
 // Article is the predicate function for article builders.
 type Article func(*sql.Selector)
 
+// ArticleReview is the predicate function for articlereview builders.
+type ArticleReview func(*sql.Selector)
+
+// ArticleRevision is the predicate function for articlerevision builders.
+type ArticleRevision func(*sql.Selector)
+
 // ArticleTag is the predicate function for articletag builders.
 type ArticleTag func(*sql.Selector)
 
@@ -41,6 +47,9 @@ type LoginLog func(*sql.Selector)
 
 // OperationLog is the predicate function for operationlog builders.
 type OperationLog func(*sql.Selector)
+
+// SlugRedirect is the predicate function for slugredirect builders.
+type SlugRedirect func(*sql.Selector)
 
 // SysConfig is the predicate function for sysconfig builders.
 type SysConfig func(*sql.Selector)

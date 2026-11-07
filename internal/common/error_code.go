@@ -130,6 +130,22 @@ const (
 	ErrTagCreateFail        = 5924 // 创建标签失败
 	ErrTagUpdateFail        = 5925 // 更新标签失败
 	ErrTagDeleteFail        = 5926 // 删除标签失败
+
+	// Trash / revision / review errors (6000-6099)
+	ErrTrashInvalidType     = 6001 // 回收站实体类型不合法
+	ErrTrashNotFound        = 6002 // 回收站记录不存在
+	ErrTrashRestoreFail     = 6003 // 恢复失败
+	ErrTrashPurgeFail       = 6004 // 彻底删除失败
+	ErrTrashSlugConflict    = 6005 // 原 slug 已被占用，恢复后需重新设置
+	ErrRevisionNotFound     = 6021 // 修订版本不存在
+	ErrRevisionListFail     = 6022 // 获取修订历史失败
+	ErrRevisionRestoreFail  = 6023 // 恢复修订版本失败
+	ErrArticleForbidden     = 6031 // 无权操作他人文章
+	ErrArticleApproveNeeded = 6032 // 待审核文章需审核通过后才能发布
+	ErrArticleNotPending    = 6033 // 文章不处于待审核状态
+	ErrArticleApproveForbid = 6034 // 缺少审核权限
+	ErrArticlePublishForbid = 6035 // 缺少发布权限
+	ErrArticleInvalidEntity = 6036 // 内容实体类型不合法
 )
 
 var errorMessages = map[int]string{
@@ -246,6 +262,21 @@ var errorMessages = map[int]string{
 	ErrTagCreateFail:        "创建标签失败",
 	ErrTagUpdateFail:        "更新标签失败",
 	ErrTagDeleteFail:        "删除标签失败",
+	// Trash / revision / review error messages
+	ErrTrashInvalidType:     "回收站实体类型不合法",
+	ErrTrashNotFound:        "回收站记录不存在",
+	ErrTrashRestoreFail:     "恢复失败",
+	ErrTrashPurgeFail:       "彻底删除失败",
+	ErrTrashSlugConflict:    "原别名已被其它内容占用，请先修改后再恢复",
+	ErrRevisionNotFound:     "修订版本不存在",
+	ErrRevisionListFail:     "获取修订历史失败",
+	ErrRevisionRestoreFail:  "恢复修订版本失败",
+	ErrArticleForbidden:     "只能操作自己创建的文章",
+	ErrArticleApproveNeeded: "待审核文章需审核通过后才能发布",
+	ErrArticleNotPending:    "文章不处于待审核状态",
+	ErrArticleApproveForbid: "缺少文章审核权限",
+	ErrArticlePublishForbid: "缺少文章发布权限",
+	ErrArticleInvalidEntity: "内容实体类型不合法",
 }
 
 // GetErrorMessage 获取错误码对应的错误信息

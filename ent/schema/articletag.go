@@ -51,6 +51,9 @@ func (ArticleTag) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("article_id", "tag_id").
 			Unique(),
+		// 按标签反查文章（前台标签筛选、标签文章数聚合）以 tag_id 为入口，
+		// 原唯一索引以 article_id 为前导，用不上。
+		index.Fields("tag_id", "article_id"),
 	}
 }
 

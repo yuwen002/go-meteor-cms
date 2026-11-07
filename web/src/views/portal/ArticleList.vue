@@ -5,6 +5,7 @@
         <router-link to="/articles" class="brand">Meteor<span>CMS</span></router-link>
         <nav class="nav-links">
           <router-link to="/articles">全部文章</router-link>
+          <a href="/api/rss" target="_blank" rel="noopener noreferrer">RSS</a>
           <router-link to="/login">管理后台</router-link>
         </nav>
       </div>
@@ -42,6 +43,7 @@
                 <p class="summary">{{ a.summary || '暂无摘要' }}</p>
                 <div class="card-footer">
                   <span v-for="t in a.tag_names" :key="t" class="tag"># {{ t }}</span>
+                  <span v-if="a.author_name" class="author">{{ a.author_name }}</span>
                   <span class="views">{{ a.view_count }} 次阅读</span>
                 </div>
               </div>
@@ -70,15 +72,18 @@
               全部文章
             </a>
             <a
-              v-for="c in taxonomy.categories"
+              v-for="c in categoryTree"
               :key="c.id"
               class="side-link"
               :class="{ active: query.category === c.slug }"
+              :style="{ paddingLeft: `${10 + c.depth * 14}px` }"
               @click="pickCategory(c.slug)"
             >
-              {{ c.name }} <span>{{ c.article_count }}</span>
+              <span><span v-if="c.depth" class="tree-prefix">└ </span>{{ c.name }}</span>
+              <span>{{ c.article_count }}</span>
             </a>
             <p v-if="taxonomy.categories.length === 0" class="side-empty">暂无分类</p>
+            <p class="side-hint">选择父级分类会同时包含其子分类下的文章</p>
           </section>
 
           <section class="side-card">
@@ -100,19 +105,26 @@
       </div>
     </main>
 
-    <footer class="site-footer">Powered by Go Meteor CMS</footer>
+    <footer class="site-footer">
+      Powered by Go Meteor CMS ·
+      <a href="/api/rss" target="_blank" rel="noopener noreferrer">RSS</a> ·
+      <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   getPublicArticles,
   getPublicTaxonomy,
   type PublicArticle,
+  type PublicCategory,
   type PublicTaxonomyResp,
 } from '@/api/public'
+
+type CategoryNode = PublicCategory & { depth: number }
 
 const router = useRouter()
 const list = ref<PublicArticle[]>([])
@@ -121,6 +133,37 @@ const loading = ref(false)
 const keyword = ref('')
 const query = reactive({ page: 1, page_size: 9, category: '', tag: '' })
 const taxonomy = ref<PublicTaxonomyResp>({ categories: [], tags: [] })
+
+// 公开分类接口返回的是带 parent_id 的扁平列表，这里按父子关系排成树序，
+// 父级筛选会由后端自动包含所有子孙分类的文章。
+const categoryTree = computed<CategoryNode[]>(() => {
+  const cats = taxonomy.value.categories
+  const byParent = new Map<number, PublicCategory[]>()
+  for (const c of cats) {
+    const parent = c.parent_id || 0
+    const group = byParent.get(parent) ?? []
+    group.push(c)
+    byParent.set(parent, group)
+  }
+  const out: CategoryNode[] = []
+  const seen = new Set<number>()
+  const visit = (parent: number, depth: number) => {
+    for (const c of byParent.get(parent) ?? []) {
+      if (seen.has(c.id)) continue
+      seen.add(c.id)
+      out.push({ ...c, depth })
+      visit(c.id, Math.min(depth + 1, 5))
+    }
+  }
+  visit(0, 0)
+  for (const c of cats) {
+    if (!seen.has(c.id)) {
+      seen.add(c.id)
+      out.push({ ...c, depth: 0 })
+    }
+  }
+  return out
+})
 
 function formatDate(s: string): string {
   return s ? s.slice(0, 10) : ''
@@ -335,6 +378,10 @@ onMounted(() => {
   font-size: 12px;
   color: #64748b;
 }
+.author {
+  font-size: 12px;
+  color: #475569;
+}
 .views {
   margin-left: auto;
   font-size: 12px;
@@ -377,10 +424,22 @@ onMounted(() => {
 .side-link span {
   color: #94a3b8;
 }
+.side-link > span:first-child {
+  color: inherit;
+}
+.tree-prefix {
+  opacity: 0.5;
+}
 .side-empty {
   font-size: 12px;
   color: #94a3b8;
   margin: 6px 0 0;
+}
+.side-hint {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #94a3b8;
 }
 .tag-cloud {
   display: flex;
@@ -405,6 +464,10 @@ onMounted(() => {
   padding: 28px;
   color: #94a3b8;
   font-size: 12px;
+}
+.site-footer a {
+  color: #64748b;
+  text-decoration: none;
 }
 @media (max-width: 860px) {
   .layout {

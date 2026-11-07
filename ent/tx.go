@@ -26,6 +26,10 @@ type Tx struct {
 	AdminUserRole *AdminUserRoleClient
 	// Article is the client for interacting with the Article builders.
 	Article *ArticleClient
+	// ArticleReview is the client for interacting with the ArticleReview builders.
+	ArticleReview *ArticleReviewClient
+	// ArticleRevision is the client for interacting with the ArticleRevision builders.
+	ArticleRevision *ArticleRevisionClient
 	// ArticleTag is the client for interacting with the ArticleTag builders.
 	ArticleTag *ArticleTagClient
 	// Category is the client for interacting with the Category builders.
@@ -36,6 +40,8 @@ type Tx struct {
 	LoginLog *LoginLogClient
 	// OperationLog is the client for interacting with the OperationLog builders.
 	OperationLog *OperationLogClient
+	// SlugRedirect is the client for interacting with the SlugRedirect builders.
+	SlugRedirect *SlugRedirectClient
 	// SysConfig is the client for interacting with the SysConfig builders.
 	SysConfig *SysConfigClient
 	// SysDict is the client for interacting with the SysDict builders.
@@ -184,11 +190,14 @@ func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.AdminUserRole = NewAdminUserRoleClient(tx.config)
 	tx.Article = NewArticleClient(tx.config)
+	tx.ArticleReview = NewArticleReviewClient(tx.config)
+	tx.ArticleRevision = NewArticleRevisionClient(tx.config)
 	tx.ArticleTag = NewArticleTagClient(tx.config)
 	tx.Category = NewCategoryClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.LoginLog = NewLoginLogClient(tx.config)
 	tx.OperationLog = NewOperationLogClient(tx.config)
+	tx.SlugRedirect = NewSlugRedirectClient(tx.config)
 	tx.SysConfig = NewSysConfigClient(tx.config)
 	tx.SysDict = NewSysDictClient(tx.config)
 	tx.SysDictItem = NewSysDictItemClient(tx.config)

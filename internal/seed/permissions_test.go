@@ -32,6 +32,9 @@ func TestContentAPIPermissionsComplete(t *testing.T) {
 		"cms:article:delete", "cms:article:publish", "cms:article:withdraw", "cms:article:toggle_top",
 		"cms:category:list", "cms:category:add", "cms:category:edit", "cms:category:delete",
 		"cms:tag:list", "cms:tag:add", "cms:tag:edit", "cms:tag:delete",
+		"cms:article:submit", "cms:article:approve", "cms:article:reject",
+		"cms:article:revision", "cms:article:revision_restore", "cms:article:review",
+		"cms:trash:list", "cms:trash:restore", "cms:trash:purge",
 	}
 	apis := make(map[string]bool)
 	buttons := make(map[string]bool)
@@ -73,5 +76,60 @@ func TestMenuParentsDeclaredBeforeChildren(t *testing.T) {
 			t.Errorf("菜单 %s 的父级 %s 尚未声明", p.Name, p.ParentName)
 		}
 		declared[p.Name] = true
+	}
+}
+
+// contentroutes.go 中受保护的后台路由必须逐条登记 Type=3 权限，
+// 权限中间件按 method + api_path 精确匹配，缺一条就会让非超管收到「权限不足」。
+func TestContentRoutesCoveredByAPIPermissions(t *testing.T) {
+	routes := []struct{ method, path string }{
+		{"GET", "/admin/articles"}, {"POST", "/admin/articles"},
+		{"GET", "/admin/articles/:id"}, {"PUT", "/admin/articles/:id"}, {"DELETE", "/admin/articles/:id"},
+		{"POST", "/admin/articles/:id/publish"}, {"POST", "/admin/articles/:id/withdraw"},
+		{"POST", "/admin/articles/:id/toggle-top"},
+		{"POST", "/admin/articles/batch-offline"}, {"POST", "/admin/articles/batch-delete"},
+		{"GET", "/admin/categories"}, {"POST", "/admin/categories"},
+		{"PUT", "/admin/categories/:id"}, {"DELETE", "/admin/categories/:id"},
+		{"GET", "/admin/tags"}, {"POST", "/admin/tags"},
+		{"PUT", "/admin/tags/:id"}, {"DELETE", "/admin/tags/:id"},
+		{"POST", "/admin/articles/:id/submit"}, {"POST", "/admin/articles/:id/approve"},
+		{"POST", "/admin/articles/:id/reject"}, {"GET", "/admin/articles/:id/reviews"},
+		{"GET", "/admin/articles/:id/revisions"}, {"GET", "/admin/articles/:id/revisions/:rid"},
+		{"POST", "/admin/articles/:id/revisions/:rid/restore"},
+		{"GET", "/admin/trash"}, {"POST", "/admin/trash/:type/:id/restore"},
+		{"DELETE", "/admin/trash/:type/:id/purge"},
+	}
+	registered := make(map[string]bool)
+	for _, p := range DefaultPermissions {
+		if p.Type == PermissionTypeAPI {
+			registered[strings.ToUpper(p.Method)+" "+p.APIPath] = true
+		}
+	}
+	for _, r := range routes {
+		key := strings.ToUpper(r.method) + " " + r.path
+		if !registered[key] {
+			t.Errorf("受保护路由缺少 Type=3 API 权限：%s", key)
+		}
+	}
+}
+
+// 同一权限码会绑定多条接口（单条操作 + 批量操作、修订列表 + 修订详情）。
+// UpsertPermissions 必须按 (type, permission, method, api_path) 去重，
+// 否则后写入的 spec 会覆盖前面的记录，运行时只剩最后一条接口可用。
+func TestSameCodeAPIPermissionsUseDistinctRoutes(t *testing.T) {
+	byCode := make(map[string]map[string]bool)
+	for _, p := range DefaultPermissions {
+		if p.Type != PermissionTypeAPI {
+			continue
+		}
+		if byCode[p.Permission] == nil {
+			byCode[p.Permission] = make(map[string]bool)
+		}
+		byCode[p.Permission][strings.ToUpper(p.Method)+" "+p.APIPath] = true
+	}
+	for _, code := range []string{"cms:article:delete", "cms:article:withdraw", "cms:article:revision"} {
+		if len(byCode[code]) < 2 {
+			t.Errorf("权限 %s 应绑定多条接口，实际 %d 条", code, len(byCode[code]))
+		}
 	}
 }

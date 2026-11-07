@@ -56,7 +56,7 @@ gen-api: ## 按 cms.api 重新生成 API 代码（需 goctl 1.10.2，必须指�
 gen-ent: ## 重新生成 Ent 代码
 	go run -mod=mod entgo.io/ent/cmd/ent generate --feature intercept,schema/snapshot ./ent/schema
 
-gen-doc: ## 由 cms.api 生成 OpenAPI 文档（输出 openapi.json）
+gen-doc: ## 由 cms.api + content.doc.api 生成全量 OpenAPI 文档（输出 openapi.json）
 	go run ./cmd/apidoc
 
 docker-build: ## 构建镜像

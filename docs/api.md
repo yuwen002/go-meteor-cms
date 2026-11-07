@@ -47,12 +47,13 @@ Authorization: Bearer <token>
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/api/captcha` | 获取图形验证码，返回 `captcha_id` 与 base64 图片 |
-| POST | `/admin/login` | 登录，需提交验证码 |
+| GET | `/api/captcha` | 获取图形验证码；`LOGIN_CAPTCHA_ENABLED=false` 时返回 `enabled=false` |
+| POST | `/admin/login` | 登录；验证码开启时需提交 `captcha_id` 与 `captcha` |
 | POST | `/admin/register` | 注册管理员 |
 | POST | `/admin/forgot-password` | 申请密码重置令牌（账号不存在也返回成功，防账号枚举） |
 | POST | `/admin/reset-password` | 用令牌设置新密码，令牌一次性、1 小时有效 |
 | POST | `/admin/refresh` | 用 refresh_token 换取新的 access_token |
+| GET | `/healthz` | 存活探活：返回 `database` / `redis` 状态；数据库不可用返回 503，Redis 故障仅标 `degraded`（有内存降级） |
 
 ### 登录
 
@@ -493,8 +494,9 @@ Authorization: Bearer <token>
 
 > 本模块路由注册在 `api/cms/v1/internal/handler/contentroutes.go`，请求/响应类型在
 > `api/cms/v1/internal/types/article_types.go`。与字典 / 配置 / 文件管理一样，它们没有写进
-> `cms.api`；`openapi.json` 由 `cmd/apidoc` 从 `cms.api` 生成，因此**不包含**这些路径，
-> 手工注册模块的接口清单以本文档与 `contentroutes.go` 为准。
+> `cms.api`；文档源单独放在 `api/cms/v1/content.doc.api`（**只供文档生成，不参与 goctl**）。
+> 执行 `make gen-doc` 会由 `cmd/apidoc` 把两份源合并输出到 `openapi.json`，
+> 因此 `openapi.json` 已覆盖内容模块的路径、query/path 参数与响应模型。
 >
 > 独立注册而非追加到 `routes.go` 的原因：`routes.go` / `types.go` 是 goctl 生成文件且被项目
 > 手工追加过内容，重跑 `make gen-api` 会冲掉这些追加段。
@@ -503,23 +505,31 @@ Authorization: Bearer <token>
 
 | 表 | 说明 |
 | --- | --- |
-| `articles` | 文章主表：标题、slug、摘要、封面、Markdown 正文、状态、发布时间、浏览量、置顶、SEO 字段 |
+| `articles` | 文章主表：标题、slug、摘要、封面、Markdown 正文、状态、发布时间、浏览量、置顶、SEO 字段、作者 |
 | `categories` | 分类：支持父子层级，slug 唯一 |
 | `tags` | 标签：名称与 slug 唯一 |
 | `article_tags` | 文章与标签关联表；刻意不继承软删除，避免复合唯一索引被软删行占用 |
+| `slug_redirects` | 旧别名历史：`(entity_type, old_slug, entity_id)`，支撑 301 与回收站恢复 |
+| `article_revisions` | 修订快照：编辑前 / 恢复版本前自动存档，最多在列表中展示最近 50 条 |
+| `article_reviews` | 审核动作留痕：提交 / 通过 / 驳回各一条，含操作人快照与驳回备注，随文章彻底删除一并清理 |
 
-四张表由 `cmd/migrate` 的 `client.Schema.Create` 自动创建。文章 / 分类 / 标签继承
+六张表由 `cmd/migrate` 的 `client.Schema.Create` 自动创建。文章 / 分类 / 标签继承
 `BaseMixin + SoftDeleteMixin`，查询自动过滤软删除行。
 
-**状态机**：`0 草稿 → 1 已发布 → 2 已下线`，下线后可再次发布。新建文章一律落草稿，
-状态只能经发布 / 撤回接口变更，编辑接口不会绕过状态机。发布状态是流程状态，
-刻意不放进数据字典（避免运营改字典破坏状态机）。
+**状态机**：`0 草稿 → 3 待审核 → 1 已发布 → 2 已下线`，下线后可再次发布；
+`3 待审核` 可驳回退回 `0 草稿`。新建文章一律落草稿，状态只能经发布 / 撤回 / 审核接口变更，
+编辑接口不会绕过状态机。发布状态是流程状态，刻意不放进数据字典（避免运营改字典破坏状态机）。
 
-**公开可见条件**：`status = 1 AND published_at <= NOW()`。发布时传入未来的
-`published_at` 即为定时发布，到点后公开接口自动放行，无需后台定时任务。
+**列表展示**：`status_text` 为服务端派生文案；已发布但 `published_at` 在未来的文章显示
+「定时中」。**公开可见条件**：`status = 1 AND published_at <= NOW()`，定时发布到点后
+公开接口自动放行，无需后台定时任务。
 
-**slug**：全局唯一，仅允许小写字母 / 数字 / 连字符。留空时从标题派生，纯中文标题
-退化为 `post-<纳秒时间戳>`。软删除前先把 slug 改为一次性值，避免唯一索引被已删行长期占用。
+**数据权限**：超级管理员可管理全部文章；普通用户只能编辑 / 删除 / 提交审核 / 恢复版本
+自己创建的文章（`ensureOwner`），越权返回 `6031`。
+
+**slug 与旧地址**：全局唯一，仅允许小写字母 / 数字 / 连字符。留空时从标题派生，纯中文标题
+退化为 `post-<纳秒时间戳>`。改名或软删除时旧 slug 写入 `slug_redirects`；前台访问旧地址且
+目标仍公开时返回 `301` 到新地址。软删除前把 slug 改为一次性占位值，避免唯一索引被已删行占用。
 
 ### 后台接口（需登录 + 权限码）
 
@@ -528,11 +538,23 @@ Authorization: Bearer <token>
 | GET | `/admin/articles` | `cms:article:list` | 分页列表：`keyword` / `status` / `category_id` / `tag_id` |
 | GET | `/admin/articles/:id` | `cms:article:detail` | 详情，含 Markdown 正文与 SEO 字段 |
 | POST | `/admin/articles` | `cms:article:add` | 新建，落草稿；返回 `data.id` |
-| PUT | `/admin/articles/:id` | `cms:article:edit` | 整单更新（不改状态与发布时间） |
-| DELETE | `/admin/articles/:id` | `cms:article:delete` | 软删除 |
+| PUT | `/admin/articles/:id` | `cms:article:edit` | 整单更新（不改状态与发布时间），事务内存档旧版本 |
+| DELETE | `/admin/articles/:id` | `cms:article:delete` | 事务内软删除，移入回收站 |
 | POST | `/admin/articles/:id/publish` | `cms:article:publish` | 发布 / 定时发布 |
 | POST | `/admin/articles/:id/withdraw` | `cms:article:withdraw` | 撤回下线 |
 | POST | `/admin/articles/:id/toggle-top` | `cms:article:toggle_top` | 切换置顶 |
+| POST | `/admin/articles/batch-offline` | `cms:article:withdraw` | 批量下线，仅处理已发布文章；请求体 `{"ids":[1,2]}` |
+| POST | `/admin/articles/batch-delete` | `cms:article:delete` | 批量移入回收站，事务内留痕并释放 slug |
+| POST | `/admin/articles/:id/submit` | `cms:article:submit` | 提交审核：仅草稿且正文非空 |
+| POST | `/admin/articles/:id/approve` | `cms:article:approve` | 审核通过，可带 `published_at` 定时发布 |
+| POST | `/admin/articles/:id/reject` | `cms:article:reject` | 驳回，回退草稿；`remark` 写入审核记录 |
+| GET | `/admin/articles/:id/reviews` | `cms:article:review` | 最近 50 条审核动作：提交 / 通过 / 驳回、操作人快照与备注 |
+| GET | `/admin/articles/:id/revisions` | `cms:article:revision` | 最近 50 条修订记录 |
+| GET | `/admin/articles/:id/revisions/:rid` | `cms:article:revision` | 修订详情（标题 / 摘要 / 封面 / 正文） |
+| POST | `/admin/articles/:id/revisions/:rid/restore` | `cms:article:revision_restore` | 恢复版本，恢复前先存档当前内容 |
+| GET | `/admin/trash` | `cms:trash:list` | 回收站：`type=article\|category\|tag` / `page` / `page_size` |
+| POST | `/admin/trash/:type/:id/restore` | `cms:trash:restore` | 恢复并尝试还原原 slug；冲突时返回消息提示重设别名 |
+| DELETE | `/admin/trash/:type/:id/purge` | `cms:trash:purge` | 事务内物理删除并清理不再被引用的上传文件 |
 | GET | `/admin/categories` | `cms:category:list` | 分类列表（平铺 + `article_count`） |
 | POST | `/admin/categories` | `cms:category:add` | 新增分类 |
 | PUT | `/admin/categories/:id` | `cms:category:edit` | 修改分类（含父级成环检测） |
@@ -543,8 +565,23 @@ Authorization: Bearer <token>
 | DELETE | `/admin/tags/:id` | `cms:tag:delete` | 删除标签并清理关联 |
 
 **列表请求参数（query）**：`page`（默认 1）、`page_size`（默认 20，上限 100）、
-`keyword`（标题 / 摘要模糊）、`status`（0/1/2）、`category_id`、`tag_id`。
-响应 data：`list[]`、`total`、`page`、`page_size`。
+`keyword`（标题 / 摘要模糊）、`status`（0 草稿 / 1 已发布 / 2 已下线 / 3 待审核）、
+`category_id`、`tag_id`、`sort` + `order`。`sort` 走白名单：`published_at` /
+`view_count` / `updated_at` / `created_at` / `id`，`order` 为 `asc` / `desc`；
+不传或传非法值时回退「置顶优先 + ID 倒序」，用户输入不会拼进 SQL。
+响应 data：`list[]`、`total`、`page`、`page_size`，列表项含 `author_name` 与
+派生 `status_text`。
+
+批量接口单次最多 100 篇，会先去重、过滤非法 ID，再逐条做数据权限校验；
+批量删除与单条删除行为一致（事务内写旧 slug 历史、释放 slug、写 `deleted_at`）。
+
+**审核与修订请求体**：`approve` 与 `publish` 相同（`{"published_at": ""}` 留空为立即发布）；
+`reject` 为 `{"remark": "..."}`；其余动作类接口发送空 JSON 对象即可。
+
+**审核留痕**：提交 / 通过 / 驳回三个动作都在同一事务里写状态与一条 `article_reviews` 记录，
+包含动作类型、操作人 ID 与名称快照、驳回备注；任何一步失败整体回滚。
+`GET /admin/articles/:id/reviews` 返回最近 50 条，编辑页「文章轨迹」抽屉的审核记录页签展示。
+文章彻底删除时会一并清理这些记录。
 
 **新建 / 更新文章请求体**：
 
@@ -566,24 +603,91 @@ Authorization: Bearer <token>
 `5811` 标签无效、`5812` 时间格式不合法、`5813` 置顶失败；
 `5901~5910` 分类错误、`5921~5926` 标签错误。
 
+扩展能力错误码 `6000~6099`：`6001` 回收站类型非法、`6002` 回收站记录不存在、
+`6003` 恢复失败、`6004` 彻底删除失败、`6005` 原 slug 冲突；
+`6021` 修订版本不存在、`6022` 获取修订历史失败、`6023` 恢复版本失败；
+`6031` 无权操作他人文章、`6032` 待审核文章需审核通过、`6033` 非待审核状态、
+`6034` 缺少审核权限、`6035` 缺少发布权限、`6036` 内容实体类型非法。
+
 ### 公开接口（无需登录）
 
-只挂 `ClientInfoMiddleware`，不经过 JWT / 权限 / 操作日志中间件。`/api` 前缀同时被
-`SPAHandler` 排除，因此前台页面刷新不会误回退到 API 404。
+只挂 `ClientInfoMiddleware`（及可选的公开接口限流），不经过 JWT / 权限 / 操作日志中间件。
+`/api` 前缀同时被 `SPAHandler` 排除，因此前台页面刷新不会误回退到 API 404。
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/api/articles` | 已发布文章列表：`page` / `page_size`（默认 10）/ `keyword` / `category`（slug）/ `tag`（slug） |
-| GET | `/api/articles/:slug` | 按 slug 取详情，返回 Markdown 正文并累加浏览量 |
-| GET | `/api/taxonomy` | 前台分类 / 标签导航，只返回至少有一篇公开文章的条目 |
+| GET | `/api/articles` | 已发布文章列表：`page` / `page_size`（默认 10）/ `keyword` / `category`（slug，含子孙分类）/ `tag`（slug） |
+| GET | `/api/articles/:slug` | 按 slug 取详情，返回 Markdown 正文、作者、`canonical_url`、相关文章与上下篇 |
+| GET | `/api/taxonomy` | 前台分类 / 标签导航，含 `parent_id` 便于前端渲染分类树 |
+| GET | `/api/rss` | RSS 2.0（最近 50 篇），`application/rss+xml` |
+| GET | `/sitemap.xml` | 站点地图（最近 200 篇），`application/xml` |
+| GET | `/robots.txt` | 允许抓取、屏蔽 `/admin`，并指向 sitemap，`text/plain` |
 
-公开接口不返回草稿 / 下线 / 未到点文章，列表也不返回正文。对应前台页面为
+公开接口不返回草稿 / 下线 / 未到点 / 待审核文章，列表也不返回正文。对应前台页面为
 `/articles`（列表）与 `/articles/:slug`（详情），二者是顶层路由、不套后台 Layout、无需登录。
 
+**服务端 SEO 与旧地址**：纯 SPA 客户端改 `document.title` 对爬虫无效，`SPAHandler` 会在返回
+`index.html` 时服务端注入 `<title>` / `description` / `keywords` / `og:*` / `canonical`；
+所有动态值经 `html.EscapeString`。访问历史 slug 且目标文章仍公开时返回 `301` 到新地址。
+SPA 内部切换文章时由前端同步这些 meta。
+
+**浏览量去重与原子累加**：详情接口按「IP 哈希 + 文章 ID」去重，Redis `SetnxEx` 24 小时窗口；
+Redis 不可用时降级为进程内 `sync.Map`，并每小时惰性清理过期项避免内存无限增长。
+通过去重后用 SQL `view_count = view_count + 1` 原子自增，避免并发访问丢计数；
+自增失败会释放去重占位，保证该访客下次访问仍可重新计数。
+
+**聚合计数**：`/api/taxonomy` 用「一次全量分类建树 + 两条 `GROUP BY` 聚合」得出分类与标签的
+公开文章数，不再对每个分类 / 标签各执行一次 COUNT；父分类计数包含所有子孙分类。
+`/api/articles/:slug` 把相关文章与上下篇一并纳入批量作者名查询，避免这些条目作者为空。
+
+**公开接口限流**：`PUBLIC_RATE_LIMIT_ENABLED` / `PUBLIC_RATE_LIMIT_MAX` /
+`PUBLIC_RATE_LIMIT_WINDOW` / `PUBLIC_RATE_LIMIT_BLOCK` 控制 `/api/` 前缀按 IP 的固定窗口限流，
+与登录限流共用 Lua 保证 `INCR + EXPIRE` 原子性。Redis 不可用时降级为进程内计数；
+超限时按项目统一响应约定返回 `HTTP 200` + `code=2029`（而非 429），并带上 `Retry-After`。
+
 **正文安全**：`content` 是 Markdown 源码而非 HTML。前端 `web/src/utils/markdown.ts`
-先做 HTML 转义再套用有限语法，链接 / 图片地址白名单为 `http(s)`、站内绝对路径与 `#`，
-阻断 `javascript:` 等协议，然后才用于 `v-html`。
+先做 HTML 转义再套用有限语法（标题、列表、任务列表、表格、引用、代码块、删除线等），
+链接 / 图片地址白名单为 `http(s)`、站内绝对路径与 `#`，显式拒绝 `//` 协议相对地址与
+`javascript:` 等协议，然后才用于 `v-html`。
 
 **操作日志归类**：`/admin/articles`、`/admin/categories`、`/admin/tags` 已加入
 `operationlogmiddleware.go` 的 `moduleByPrefix`，分别记为「文章管理 / 分类管理 / 标签管理」。
+
+---
+
+### 扩展能力实现要点
+
+| 能力 | 落点 | 说明 |
+| --- | --- | --- |
+| 事务化 | `articlelogic.go` / `categorylogic.go` / `taglogic.go` / `trashlogic.go` | 删除、改 slug、存档修订、恢复与彻底删除统一走 `ent.Client.Tx`；软删除用 `SetDeletedAt` 而非绕过 hook 的 `DeleteOneID` |
+| 事务超时隔离 | `etc/cms-api.yaml` / `logic/txcontext.go` | go-zero `RestConf.Timeout` 默认 3000ms 会给请求 ctx 加 deadline，事务继承后一旦到期会被 `database/sql` 自动回滚，产生 `context deadline exceeded` 与「事务回滚失败」噪声。现显式配置请求 15s，17 处写事务统一用 `context.WithoutCancel` 剥离取消信号、保留 trace/claims，并设 10s 独立上限，避免客户端先超时而事务随后提交 |
+| 事务后文件清理 | `trashlogic.go` | 彻底删除文章时，收集仅被该文章引用的 `/uploads/` 封面与正文图片，事务提交后再删文件；失败只记日志 |
+| 审核流 | `articlelogic.go` + `internal/seed/permissions.go` | `submit / approve / reject` 三个动作与权限码，待审核文章不能直接发布（`6032`） |
+| 审核留痕 | `article_reviews` + `GET /admin/articles/:id/reviews` | 三个审核动作与状态变更同事务写记录（含操作人快照、驳回备注），编辑页「文章轨迹」可查，彻底删除文章时一并清理 |
+| 数据权限 | `ensureOwner` | 超管放行，普通用户仅能操作本人文章 |
+| 权限种子去重 | `internal/seed/permissions.go` | API 权限按 `(type, permission, method, api_path)` 幂等 upsert，允许同一权限码绑定多条接口；早期只按 `(type, permission)` 去重，批量下线/删除等后写入的 spec 会覆盖单条撤回/删除记录，使非超管被误判「权限不足」 |
+| 删除用户清理关联 | `admindeletelogic.go` | 软删管理员与清理 `admin_user_roles` 同事务；该关联表无软删除字段，残留行会让角色删除接口一直误判「角色正在被使用」 |
+| 修订历史 | `article_revisions` | 编辑前存档；恢复版本前再次存档，保证可逆 |
+| 分类树筛选 | `publicarticlelogic.go` | `descendantCategoryIDs` 让父分类筛选自动包含所有子孙分类文章 |
+| 验证码开关 | `LOGIN_CAPTCHA_ENABLED` | 关闭时 `/api/captcha` 返回 `enabled=false`，登录不再校验 `captcha_id` / `captcha`，前端登录页隐藏验证码输入；仅限本地开发与 E2E，生产必须开启 |
+| 站点绝对地址 | `WEB_BASE_URL` | 用于 canonical、RSS、sitemap 的绝对链接；缺省时回退到请求 Host |
+| 组合索引 | `ent/schema/article.go` / `articletag.go` | `deleted_at` 作为最左列覆盖软删除条件，配合 `status/published_at/is_top/category_id` 及 `tag_id` 反查，避免列表全表扫描与 filesort |
+| 健康检查 | `/healthz` + `docker-compose.yml` | DB `EXISTS` 探活（2 秒超时），Redis 故障只标 `degraded` 不判死；compose 每 15 秒探活 |
+| 批量操作 | `/admin/articles/batch-offline` / `batch-delete` | 单次最多 100 篇，逐条数据权限校验 + 单事务提交 |
+| 前端按需加载 | `web/vite.config.ts` / `src/utils/element.ts` / `MenuItem.vue` | 组件样式按需解析、菜单图标按映射表精确引入（171KB → 29KB）、服务式 API 走组件深路径、后台 Layout 动态 import；Element Plus 组件 JS 仍是单个 790KB chunk，进一步压缩需要组件级懒加载或替换 UI 库 |
+
+### 文档生成链路
+
+```bash
+make gen-doc   # go run ./cmd/apidoc
+```
+
+生成器读取 `api/cms/v1/cms.api`（含其 `import` 的 `.api` 文件）与
+`api/cms/v1/content.doc.api`（内容模块文档源），输出根目录 `openapi.json`。
+它会把 `:id` / `:slug` / `:type` / `:rid` 转成 OpenAPI 占位符，把 `form` / `path` 标签
+转成 query / path parameters，把复合类型转成 `$ref`，并对 RSS / sitemap / robots
+标注纯文本响应。`go test ./cmd/apidoc` 校验内容模块路径、schema 与参数没有漏出文档。
+
+新增内容接口时，请同时更新 `contentroutes.go`、`article_types.go`、
+`content.doc.api`、权限种子与本文档，再执行 `make gen-doc`。
 

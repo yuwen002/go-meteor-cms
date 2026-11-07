@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -123,19 +122,13 @@ func (l *CategoryLogic) CategoryCreate(req *types.CategoryCreateReq) (*types.Com
 	return &types.CommonResp{ID: c.ID, Message: "分类已创建"}, nil
 }
 
-// CategoryUpdate 更新分类；仅覆盖传入字段
+// CategoryUpdate 更新分类：slug 变更时在同一事务里留下 301 历史记录
 func (l *CategoryLogic) CategoryUpdate(req *types.CategoryUpdateReq) error {
 	c, err := l.svcCtx.EntClient.Category.Get(l.ctx, req.ID)
 	if err != nil {
 		return categoryGetError(err)
 	}
-	update := c.Update()
-	if name := strings.TrimSpace(req.Name); name != "" {
-		if err := l.ensureCategoryNameFree(name, req.ID); err != nil {
-			return err
-		}
-		update = update.SetName(name)
-	}
+	newSlug := c.Slug
 	if raw := strings.TrimSpace(req.Slug); raw != "" {
 		if !IsValidSlug(raw) {
 			return common.NewBizError(common.ErrArticleInvalidSlug)
@@ -143,7 +136,46 @@ func (l *CategoryLogic) CategoryUpdate(req *types.CategoryUpdateReq) error {
 		if err := l.ensureCategorySlugFree(raw, req.ID); err != nil {
 			return err
 		}
-		update = update.SetSlug(raw)
+		newSlug = raw
+	}
+	if name := strings.TrimSpace(req.Name); name != "" {
+		if err := l.ensureCategoryNameFree(name, req.ID); err != nil {
+			return err
+		}
+	}
+	if req.ParentID != nil {
+		pid := *req.ParentID
+		if pid == req.ID {
+			return common.NewBizError(common.ErrCategoryParentSelf)
+		}
+		if pid > 0 {
+			if err := l.ensureParentChainValid(pid, req.ID); err != nil {
+				return err
+			}
+		}
+	}
+
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
+	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
+	if err != nil {
+		return common.NewBizError(common.ErrCategoryUpdateFail)
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+	if newSlug != c.Slug {
+		if err := upsertSlugHistory(l.ctx, tx, EntityTypeCategory, c.ID, c.Slug); err != nil {
+			return common.NewBizError(common.ErrCategoryUpdateFail)
+		}
+	}
+
+	update := tx.Category.UpdateOneID(c.ID).SetSlug(newSlug)
+	if name := strings.TrimSpace(req.Name); name != "" {
+		update = update.SetName(name)
 	}
 	if req.Description != "" {
 		update = update.SetDescription(strings.TrimSpace(req.Description))
@@ -155,15 +187,8 @@ func (l *CategoryLogic) CategoryUpdate(req *types.CategoryUpdateReq) error {
 		update = update.SetIsActive(*req.IsActive)
 	}
 	if req.ParentID != nil {
-		pid := *req.ParentID
-		if pid == req.ID {
-			return common.NewBizError(common.ErrCategoryParentSelf)
-		}
-		if pid > 0 {
-			if err := l.ensureParentChainValid(pid, req.ID); err != nil {
-				return err
-			}
-			update = update.SetParentID(pid)
+		if *req.ParentID > 0 {
+			update = update.SetParentID(*req.ParentID)
 		} else {
 			update = update.ClearParent()
 		}
@@ -172,10 +197,14 @@ func (l *CategoryLogic) CategoryUpdate(req *types.CategoryUpdateReq) error {
 		logx.Errorf("update category failed: %v", err)
 		return common.NewBizError(common.ErrCategoryUpdateFail)
 	}
+	if err := tx.Commit(); err != nil {
+		return common.NewBizError(common.ErrCategoryUpdateFail)
+	}
+	committed = true
 	return nil
 }
 
-// CategoryDelete 删除空分类；软删除前释放 slug 唯一索引
+// CategoryDelete 软删除空分类：事务内记录原 slug 快照、释放唯一索引、写 deleted_at
 func (l *CategoryLogic) CategoryDelete(req *types.CategoryIDReq) error {
 	c, err := l.svcCtx.EntClient.Category.Get(l.ctx, req.ID)
 	if err != nil {
@@ -197,15 +226,32 @@ func (l *CategoryLogic) CategoryDelete(req *types.CategoryIDReq) error {
 	if hasArticles {
 		return common.NewBizError(common.ErrCategoryHasArticles)
 	}
-	if _, err := c.Update().
-		SetSlug(fmt.Sprintf("deleted-%d-%d", c.ID, time.Now().UnixNano())).
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
+	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
+	if err != nil {
+		return common.NewBizError(common.ErrCategoryDeleteFail)
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+	now := time.Now()
+	if err := upsertSlugHistory(l.ctx, tx, EntityTypeCategory, c.ID, c.Slug); err != nil {
+		return common.NewBizError(common.ErrCategoryDeleteFail)
+	}
+	if _, err := tx.Category.UpdateOneID(c.ID).
+		SetSlug(TrashSlug(c.ID, now)).
+		SetDeletedAt(now).
 		Save(l.ctx); err != nil {
 		return common.NewBizError(common.ErrCategoryDeleteFail)
 	}
-	if err := l.svcCtx.EntClient.Category.DeleteOneID(req.ID).Exec(l.ctx); err != nil {
-		logx.Errorf("delete category failed: %v", err)
+	if err := tx.Commit(); err != nil {
 		return common.NewBizError(common.ErrCategoryDeleteFail)
 	}
+	committed = true
 	return nil
 }
 

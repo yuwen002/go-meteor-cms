@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -106,19 +105,13 @@ func (l *TagLogic) TagCreate(req *types.TagCreateReq) (*types.CommonResp, error)
 	return &types.CommonResp{ID: tg.ID, Message: "标签已创建"}, nil
 }
 
-// TagUpdate 更新标签；仅覆盖传入字段
+// TagUpdate 更新标签：slug 变更时在同一事务里留下 301 历史记录
 func (l *TagLogic) TagUpdate(req *types.TagUpdateReq) error {
 	tg, err := l.svcCtx.EntClient.Tag.Get(l.ctx, req.ID)
 	if err != nil {
 		return tagGetError(err)
 	}
-	update := tg.Update()
-	if name := strings.TrimSpace(req.Name); name != "" {
-		if err := l.ensureTagNameFree(name, req.ID); err != nil {
-			return err
-		}
-		update = update.SetName(name)
-	}
+	newSlug := tg.Slug
 	if raw := strings.TrimSpace(req.Slug); raw != "" {
 		if !IsValidSlug(raw) {
 			return common.NewBizError(common.ErrArticleInvalidSlug)
@@ -126,7 +119,34 @@ func (l *TagLogic) TagUpdate(req *types.TagUpdateReq) error {
 		if err := l.ensureTagSlugFree(raw, req.ID); err != nil {
 			return err
 		}
-		update = update.SetSlug(raw)
+		newSlug = raw
+	}
+	if name := strings.TrimSpace(req.Name); name != "" {
+		if err := l.ensureTagNameFree(name, req.ID); err != nil {
+			return err
+		}
+	}
+
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
+	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
+	if err != nil {
+		return common.NewBizError(common.ErrTagUpdateFail)
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+	if newSlug != tg.Slug {
+		if err := upsertSlugHistory(l.ctx, tx, EntityTypeTag, tg.ID, tg.Slug); err != nil {
+			return common.NewBizError(common.ErrTagUpdateFail)
+		}
+	}
+	update := tx.Tag.UpdateOneID(tg.ID).SetSlug(newSlug)
+	if name := strings.TrimSpace(req.Name); name != "" {
+		update = update.SetName(name)
 	}
 	if req.Description != "" {
 		update = update.SetDescription(strings.TrimSpace(req.Description))
@@ -141,26 +161,47 @@ func (l *TagLogic) TagUpdate(req *types.TagUpdateReq) error {
 		logx.Errorf("update tag failed: %v", err)
 		return common.NewBizError(common.ErrTagUpdateFail)
 	}
+	if err := tx.Commit(); err != nil {
+		return common.NewBizError(common.ErrTagUpdateFail)
+	}
+	committed = true
 	return nil
 }
 
-// TagDelete 软删除标签；删除前释放 slug，并清理关联行避免唯一索引残留
+// TagDelete 软删除标签：事务内记录原 slug、清理关联行、释放唯一索引并写 deleted_at
 func (l *TagLogic) TagDelete(req *types.TagIDReq) error {
 	tg, err := l.svcCtx.EntClient.Tag.Get(l.ctx, req.ID)
 	if err != nil {
 		return tagGetError(err)
 	}
-	if _, err := tg.Update().
-		SetSlug(fmt.Sprintf("deleted-%d-%d", tg.ID, time.Now().UnixNano())).
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
+	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
+	if err != nil {
+		return common.NewBizError(common.ErrTagDeleteFail)
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+	now := time.Now()
+	if err := upsertSlugHistory(l.ctx, tx, EntityTypeTag, tg.ID, tg.Slug); err != nil {
+		return common.NewBizError(common.ErrTagDeleteFail)
+	}
+	if _, err := tx.Tag.UpdateOneID(tg.ID).
+		SetSlug(TrashSlug(tg.ID, now)).
+		SetDeletedAt(now).
 		ClearArticles().
 		Save(l.ctx); err != nil {
-		logx.Errorf("release tag slug failed: %v", err)
+		logx.Errorf("soft delete tag failed: %v", err)
 		return common.NewBizError(common.ErrTagDeleteFail)
 	}
-	if err := l.svcCtx.EntClient.Tag.DeleteOneID(req.ID).Exec(l.ctx); err != nil {
-		logx.Errorf("delete tag failed: %v", err)
+	if err := tx.Commit(); err != nil {
 		return common.NewBizError(common.ErrTagDeleteFail)
 	}
+	committed = true
 	return nil
 }
 

@@ -22,11 +22,14 @@ import (
 	"github.com/yuwen002/go-meteor-cms/ent/adminuser"
 	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/ent/article"
+	"github.com/yuwen002/go-meteor-cms/ent/articlereview"
+	"github.com/yuwen002/go-meteor-cms/ent/articlerevision"
 	"github.com/yuwen002/go-meteor-cms/ent/articletag"
 	"github.com/yuwen002/go-meteor-cms/ent/category"
 	"github.com/yuwen002/go-meteor-cms/ent/department"
 	"github.com/yuwen002/go-meteor-cms/ent/loginlog"
 	"github.com/yuwen002/go-meteor-cms/ent/operationlog"
+	"github.com/yuwen002/go-meteor-cms/ent/slugredirect"
 	"github.com/yuwen002/go-meteor-cms/ent/sysconfig"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdict"
 	"github.com/yuwen002/go-meteor-cms/ent/sysdictitem"
@@ -53,6 +56,10 @@ type Client struct {
 	AdminUserRole *AdminUserRoleClient
 	// Article is the client for interacting with the Article builders.
 	Article *ArticleClient
+	// ArticleReview is the client for interacting with the ArticleReview builders.
+	ArticleReview *ArticleReviewClient
+	// ArticleRevision is the client for interacting with the ArticleRevision builders.
+	ArticleRevision *ArticleRevisionClient
 	// ArticleTag is the client for interacting with the ArticleTag builders.
 	ArticleTag *ArticleTagClient
 	// Category is the client for interacting with the Category builders.
@@ -63,6 +70,8 @@ type Client struct {
 	LoginLog *LoginLogClient
 	// OperationLog is the client for interacting with the OperationLog builders.
 	OperationLog *OperationLogClient
+	// SlugRedirect is the client for interacting with the SlugRedirect builders.
+	SlugRedirect *SlugRedirectClient
 	// SysConfig is the client for interacting with the SysConfig builders.
 	SysConfig *SysConfigClient
 	// SysDict is the client for interacting with the SysDict builders.
@@ -91,11 +100,14 @@ func (c *Client) init() {
 	c.AdminUser = NewAdminUserClient(c.config)
 	c.AdminUserRole = NewAdminUserRoleClient(c.config)
 	c.Article = NewArticleClient(c.config)
+	c.ArticleReview = NewArticleReviewClient(c.config)
+	c.ArticleRevision = NewArticleRevisionClient(c.config)
 	c.ArticleTag = NewArticleTagClient(c.config)
 	c.Category = NewCategoryClient(c.config)
 	c.Department = NewDepartmentClient(c.config)
 	c.LoginLog = NewLoginLogClient(c.config)
 	c.OperationLog = NewOperationLogClient(c.config)
+	c.SlugRedirect = NewSlugRedirectClient(c.config)
 	c.SysConfig = NewSysConfigClient(c.config)
 	c.SysDict = NewSysDictClient(c.config)
 	c.SysDictItem = NewSysDictItemClient(c.config)
@@ -200,11 +212,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AdminUser:           NewAdminUserClient(cfg),
 		AdminUserRole:       NewAdminUserRoleClient(cfg),
 		Article:             NewArticleClient(cfg),
+		ArticleReview:       NewArticleReviewClient(cfg),
+		ArticleRevision:     NewArticleRevisionClient(cfg),
 		ArticleTag:          NewArticleTagClient(cfg),
 		Category:            NewCategoryClient(cfg),
 		Department:          NewDepartmentClient(cfg),
 		LoginLog:            NewLoginLogClient(cfg),
 		OperationLog:        NewOperationLogClient(cfg),
+		SlugRedirect:        NewSlugRedirectClient(cfg),
 		SysConfig:           NewSysConfigClient(cfg),
 		SysDict:             NewSysDictClient(cfg),
 		SysDictItem:         NewSysDictItemClient(cfg),
@@ -236,11 +251,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AdminUser:           NewAdminUserClient(cfg),
 		AdminUserRole:       NewAdminUserRoleClient(cfg),
 		Article:             NewArticleClient(cfg),
+		ArticleReview:       NewArticleReviewClient(cfg),
+		ArticleRevision:     NewArticleRevisionClient(cfg),
 		ArticleTag:          NewArticleTagClient(cfg),
 		Category:            NewCategoryClient(cfg),
 		Department:          NewDepartmentClient(cfg),
 		LoginLog:            NewLoginLogClient(cfg),
 		OperationLog:        NewOperationLogClient(cfg),
+		SlugRedirect:        NewSlugRedirectClient(cfg),
 		SysConfig:           NewSysConfigClient(cfg),
 		SysDict:             NewSysDictClient(cfg),
 		SysDictItem:         NewSysDictItemClient(cfg),
@@ -276,9 +294,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AdminPermission, c.AdminRole, c.AdminRoleDept, c.AdminRolePermission,
-		c.AdminUser, c.AdminUserRole, c.Article, c.ArticleTag, c.Category,
-		c.Department, c.LoginLog, c.OperationLog, c.SysConfig, c.SysDict,
-		c.SysDictItem, c.Tag, c.TokenBlacklist,
+		c.AdminUser, c.AdminUserRole, c.Article, c.ArticleReview, c.ArticleRevision,
+		c.ArticleTag, c.Category, c.Department, c.LoginLog, c.OperationLog,
+		c.SlugRedirect, c.SysConfig, c.SysDict, c.SysDictItem, c.Tag, c.TokenBlacklist,
 	} {
 		n.Use(hooks...)
 	}
@@ -289,9 +307,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AdminPermission, c.AdminRole, c.AdminRoleDept, c.AdminRolePermission,
-		c.AdminUser, c.AdminUserRole, c.Article, c.ArticleTag, c.Category,
-		c.Department, c.LoginLog, c.OperationLog, c.SysConfig, c.SysDict,
-		c.SysDictItem, c.Tag, c.TokenBlacklist,
+		c.AdminUser, c.AdminUserRole, c.Article, c.ArticleReview, c.ArticleRevision,
+		c.ArticleTag, c.Category, c.Department, c.LoginLog, c.OperationLog,
+		c.SlugRedirect, c.SysConfig, c.SysDict, c.SysDictItem, c.Tag, c.TokenBlacklist,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -314,6 +332,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AdminUserRole.mutate(ctx, m)
 	case *ArticleMutation:
 		return c.Article.mutate(ctx, m)
+	case *ArticleReviewMutation:
+		return c.ArticleReview.mutate(ctx, m)
+	case *ArticleRevisionMutation:
+		return c.ArticleRevision.mutate(ctx, m)
 	case *ArticleTagMutation:
 		return c.ArticleTag.mutate(ctx, m)
 	case *CategoryMutation:
@@ -324,6 +346,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.LoginLog.mutate(ctx, m)
 	case *OperationLogMutation:
 		return c.OperationLog.mutate(ctx, m)
+	case *SlugRedirectMutation:
+		return c.SlugRedirect.mutate(ctx, m)
 	case *SysConfigMutation:
 		return c.SysConfig.mutate(ctx, m)
 	case *SysDictMutation:
@@ -1536,6 +1560,272 @@ func (c *ArticleClient) mutate(ctx context.Context, m *ArticleMutation) (Value, 
 	}
 }
 
+// ArticleReviewClient is a client for the ArticleReview schema.
+type ArticleReviewClient struct {
+	config
+}
+
+// NewArticleReviewClient returns a client for the ArticleReview from the given config.
+func NewArticleReviewClient(c config) *ArticleReviewClient {
+	return &ArticleReviewClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `articlereview.Hooks(f(g(h())))`.
+func (c *ArticleReviewClient) Use(hooks ...Hook) {
+	c.hooks.ArticleReview = append(c.hooks.ArticleReview, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `articlereview.Intercept(f(g(h())))`.
+func (c *ArticleReviewClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ArticleReview = append(c.inters.ArticleReview, interceptors...)
+}
+
+// Create returns a builder for creating a ArticleReview entity.
+func (c *ArticleReviewClient) Create() *ArticleReviewCreate {
+	mutation := newArticleReviewMutation(c.config, OpCreate)
+	return &ArticleReviewCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ArticleReview entities.
+func (c *ArticleReviewClient) CreateBulk(builders ...*ArticleReviewCreate) *ArticleReviewCreateBulk {
+	return &ArticleReviewCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ArticleReviewClient) MapCreateBulk(slice any, setFunc func(*ArticleReviewCreate, int)) *ArticleReviewCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ArticleReviewCreateBulk{err: fmt.Errorf("calling to ArticleReviewClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ArticleReviewCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ArticleReviewCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ArticleReview.
+func (c *ArticleReviewClient) Update() *ArticleReviewUpdate {
+	mutation := newArticleReviewMutation(c.config, OpUpdate)
+	return &ArticleReviewUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ArticleReviewClient) UpdateOne(_m *ArticleReview) *ArticleReviewUpdateOne {
+	mutation := newArticleReviewMutation(c.config, OpUpdateOne, withArticleReview(_m))
+	return &ArticleReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ArticleReviewClient) UpdateOneID(id int64) *ArticleReviewUpdateOne {
+	mutation := newArticleReviewMutation(c.config, OpUpdateOne, withArticleReviewID(id))
+	return &ArticleReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ArticleReview.
+func (c *ArticleReviewClient) Delete() *ArticleReviewDelete {
+	mutation := newArticleReviewMutation(c.config, OpDelete)
+	return &ArticleReviewDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ArticleReviewClient) DeleteOne(_m *ArticleReview) *ArticleReviewDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ArticleReviewClient) DeleteOneID(id int64) *ArticleReviewDeleteOne {
+	builder := c.Delete().Where(articlereview.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ArticleReviewDeleteOne{builder}
+}
+
+// Query returns a query builder for ArticleReview.
+func (c *ArticleReviewClient) Query() *ArticleReviewQuery {
+	return &ArticleReviewQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeArticleReview},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ArticleReview entity by its id.
+func (c *ArticleReviewClient) Get(ctx context.Context, id int64) (*ArticleReview, error) {
+	return c.Query().Where(articlereview.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ArticleReviewClient) GetX(ctx context.Context, id int64) *ArticleReview {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ArticleReviewClient) Hooks() []Hook {
+	return c.hooks.ArticleReview
+}
+
+// Interceptors returns the client interceptors.
+func (c *ArticleReviewClient) Interceptors() []Interceptor {
+	return c.inters.ArticleReview
+}
+
+func (c *ArticleReviewClient) mutate(ctx context.Context, m *ArticleReviewMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ArticleReviewCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ArticleReviewUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ArticleReviewUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ArticleReviewDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ArticleReview mutation op: %q", m.Op())
+	}
+}
+
+// ArticleRevisionClient is a client for the ArticleRevision schema.
+type ArticleRevisionClient struct {
+	config
+}
+
+// NewArticleRevisionClient returns a client for the ArticleRevision from the given config.
+func NewArticleRevisionClient(c config) *ArticleRevisionClient {
+	return &ArticleRevisionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `articlerevision.Hooks(f(g(h())))`.
+func (c *ArticleRevisionClient) Use(hooks ...Hook) {
+	c.hooks.ArticleRevision = append(c.hooks.ArticleRevision, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `articlerevision.Intercept(f(g(h())))`.
+func (c *ArticleRevisionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ArticleRevision = append(c.inters.ArticleRevision, interceptors...)
+}
+
+// Create returns a builder for creating a ArticleRevision entity.
+func (c *ArticleRevisionClient) Create() *ArticleRevisionCreate {
+	mutation := newArticleRevisionMutation(c.config, OpCreate)
+	return &ArticleRevisionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ArticleRevision entities.
+func (c *ArticleRevisionClient) CreateBulk(builders ...*ArticleRevisionCreate) *ArticleRevisionCreateBulk {
+	return &ArticleRevisionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ArticleRevisionClient) MapCreateBulk(slice any, setFunc func(*ArticleRevisionCreate, int)) *ArticleRevisionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ArticleRevisionCreateBulk{err: fmt.Errorf("calling to ArticleRevisionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ArticleRevisionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ArticleRevisionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ArticleRevision.
+func (c *ArticleRevisionClient) Update() *ArticleRevisionUpdate {
+	mutation := newArticleRevisionMutation(c.config, OpUpdate)
+	return &ArticleRevisionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ArticleRevisionClient) UpdateOne(_m *ArticleRevision) *ArticleRevisionUpdateOne {
+	mutation := newArticleRevisionMutation(c.config, OpUpdateOne, withArticleRevision(_m))
+	return &ArticleRevisionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ArticleRevisionClient) UpdateOneID(id int64) *ArticleRevisionUpdateOne {
+	mutation := newArticleRevisionMutation(c.config, OpUpdateOne, withArticleRevisionID(id))
+	return &ArticleRevisionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ArticleRevision.
+func (c *ArticleRevisionClient) Delete() *ArticleRevisionDelete {
+	mutation := newArticleRevisionMutation(c.config, OpDelete)
+	return &ArticleRevisionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ArticleRevisionClient) DeleteOne(_m *ArticleRevision) *ArticleRevisionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ArticleRevisionClient) DeleteOneID(id int64) *ArticleRevisionDeleteOne {
+	builder := c.Delete().Where(articlerevision.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ArticleRevisionDeleteOne{builder}
+}
+
+// Query returns a query builder for ArticleRevision.
+func (c *ArticleRevisionClient) Query() *ArticleRevisionQuery {
+	return &ArticleRevisionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeArticleRevision},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ArticleRevision entity by its id.
+func (c *ArticleRevisionClient) Get(ctx context.Context, id int64) (*ArticleRevision, error) {
+	return c.Query().Where(articlerevision.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ArticleRevisionClient) GetX(ctx context.Context, id int64) *ArticleRevision {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ArticleRevisionClient) Hooks() []Hook {
+	return c.hooks.ArticleRevision
+}
+
+// Interceptors returns the client interceptors.
+func (c *ArticleRevisionClient) Interceptors() []Interceptor {
+	return c.inters.ArticleRevision
+}
+
+func (c *ArticleRevisionClient) mutate(ctx context.Context, m *ArticleRevisionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ArticleRevisionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ArticleRevisionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ArticleRevisionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ArticleRevisionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ArticleRevision mutation op: %q", m.Op())
+	}
+}
+
 // ArticleTagClient is a client for the ArticleTag schema.
 type ArticleTagClient struct {
 	config
@@ -2333,6 +2623,139 @@ func (c *OperationLogClient) mutate(ctx context.Context, m *OperationLogMutation
 	}
 }
 
+// SlugRedirectClient is a client for the SlugRedirect schema.
+type SlugRedirectClient struct {
+	config
+}
+
+// NewSlugRedirectClient returns a client for the SlugRedirect from the given config.
+func NewSlugRedirectClient(c config) *SlugRedirectClient {
+	return &SlugRedirectClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `slugredirect.Hooks(f(g(h())))`.
+func (c *SlugRedirectClient) Use(hooks ...Hook) {
+	c.hooks.SlugRedirect = append(c.hooks.SlugRedirect, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `slugredirect.Intercept(f(g(h())))`.
+func (c *SlugRedirectClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SlugRedirect = append(c.inters.SlugRedirect, interceptors...)
+}
+
+// Create returns a builder for creating a SlugRedirect entity.
+func (c *SlugRedirectClient) Create() *SlugRedirectCreate {
+	mutation := newSlugRedirectMutation(c.config, OpCreate)
+	return &SlugRedirectCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SlugRedirect entities.
+func (c *SlugRedirectClient) CreateBulk(builders ...*SlugRedirectCreate) *SlugRedirectCreateBulk {
+	return &SlugRedirectCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SlugRedirectClient) MapCreateBulk(slice any, setFunc func(*SlugRedirectCreate, int)) *SlugRedirectCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SlugRedirectCreateBulk{err: fmt.Errorf("calling to SlugRedirectClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SlugRedirectCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SlugRedirectCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SlugRedirect.
+func (c *SlugRedirectClient) Update() *SlugRedirectUpdate {
+	mutation := newSlugRedirectMutation(c.config, OpUpdate)
+	return &SlugRedirectUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SlugRedirectClient) UpdateOne(_m *SlugRedirect) *SlugRedirectUpdateOne {
+	mutation := newSlugRedirectMutation(c.config, OpUpdateOne, withSlugRedirect(_m))
+	return &SlugRedirectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SlugRedirectClient) UpdateOneID(id int64) *SlugRedirectUpdateOne {
+	mutation := newSlugRedirectMutation(c.config, OpUpdateOne, withSlugRedirectID(id))
+	return &SlugRedirectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SlugRedirect.
+func (c *SlugRedirectClient) Delete() *SlugRedirectDelete {
+	mutation := newSlugRedirectMutation(c.config, OpDelete)
+	return &SlugRedirectDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SlugRedirectClient) DeleteOne(_m *SlugRedirect) *SlugRedirectDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SlugRedirectClient) DeleteOneID(id int64) *SlugRedirectDeleteOne {
+	builder := c.Delete().Where(slugredirect.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SlugRedirectDeleteOne{builder}
+}
+
+// Query returns a query builder for SlugRedirect.
+func (c *SlugRedirectClient) Query() *SlugRedirectQuery {
+	return &SlugRedirectQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSlugRedirect},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SlugRedirect entity by its id.
+func (c *SlugRedirectClient) Get(ctx context.Context, id int64) (*SlugRedirect, error) {
+	return c.Query().Where(slugredirect.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SlugRedirectClient) GetX(ctx context.Context, id int64) *SlugRedirect {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SlugRedirectClient) Hooks() []Hook {
+	return c.hooks.SlugRedirect
+}
+
+// Interceptors returns the client interceptors.
+func (c *SlugRedirectClient) Interceptors() []Interceptor {
+	return c.inters.SlugRedirect
+}
+
+func (c *SlugRedirectClient) mutate(ctx context.Context, m *SlugRedirectMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SlugRedirectCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SlugRedirectUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SlugRedirectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SlugRedirectDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SlugRedirect mutation op: %q", m.Op())
+	}
+}
+
 // SysConfigClient is a client for the SysConfig schema.
 type SysConfigClient struct {
 	config
@@ -3020,13 +3443,14 @@ func (c *TokenBlacklistClient) mutate(ctx context.Context, m *TokenBlacklistMuta
 type (
 	hooks struct {
 		AdminPermission, AdminRole, AdminRoleDept, AdminRolePermission, AdminUser,
-		AdminUserRole, Article, ArticleTag, Category, Department, LoginLog,
-		OperationLog, SysConfig, SysDict, SysDictItem, Tag, TokenBlacklist []ent.Hook
+		AdminUserRole, Article, ArticleReview, ArticleRevision, ArticleTag, Category,
+		Department, LoginLog, OperationLog, SlugRedirect, SysConfig, SysDict,
+		SysDictItem, Tag, TokenBlacklist []ent.Hook
 	}
 	inters struct {
 		AdminPermission, AdminRole, AdminRoleDept, AdminRolePermission, AdminUser,
-		AdminUserRole, Article, ArticleTag, Category, Department, LoginLog,
-		OperationLog, SysConfig, SysDict, SysDictItem, Tag,
-		TokenBlacklist []ent.Interceptor
+		AdminUserRole, Article, ArticleReview, ArticleRevision, ArticleTag, Category,
+		Department, LoginLog, OperationLog, SlugRedirect, SysConfig, SysDict,
+		SysDictItem, Tag, TokenBlacklist []ent.Interceptor
 	}
 )

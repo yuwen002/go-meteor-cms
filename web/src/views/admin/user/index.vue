@@ -129,7 +129,7 @@ const canDisable = computed(() => userStore.hasPermission('system:admin_user:dis
 const canEnable = computed(() => userStore.hasPermission('system:admin_user:enable'))
 const canResetPwd = computed(() => userStore.hasPermission('system:admin_user:reset_pwd'))
 const canAssignRole = computed(() => userStore.hasPermission('system:admin_user:role_assign'))
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import {
   getAdminList,
   createAdmin,

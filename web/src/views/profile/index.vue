@@ -34,8 +34,8 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import type { UploadRequestOptions } from 'element-plus'
+import { ElMessage } from '@/utils/element'
+import type { UploadRequestOptions } from '@/utils/element'
 import { getProfile, updateProfile } from '@/api/user'
 import { uploadFile } from '@/api/upload'
 import { useUserStore } from '@/stores/user'

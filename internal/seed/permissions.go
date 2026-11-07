@@ -232,6 +232,9 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "撤回文章", Permission: "cms:article:withdraw", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/withdraw", Sort: 116},
 	{Name: "置顶文章", Permission: "cms:article:toggle_top", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 117},
 	{Name: "置顶文章", Permission: "cms:article:toggle_top", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/toggle-top", Sort: 117},
+	// 批量操作复用单条撤回 / 删除权限码，但 API 路径必须单独登记，否则非超管会被权限中间件拒绝
+	{Name: "批量下线", Permission: "cms:article:withdraw", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/batch-offline", Sort: 118},
+	{Name: "批量删除", Permission: "cms:article:delete", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/batch-delete", Sort: 118},
 
 	// ---------- 分类管理（按钮 / API） ----------
 	{Name: "查看分类", Permission: "cms:category:list", Type: PermissionTypeButton, ParentName: "分类管理", Sort: 120},
@@ -252,6 +255,31 @@ var DefaultPermissions = []PermissionSpec{
 	{Name: "编辑标签", Permission: "cms:tag:edit", Type: PermissionTypeAPI, ParentName: "标签管理", Method: "PUT", APIPath: "/admin/tags/:id", Sort: 132},
 	{Name: "删除标签", Permission: "cms:tag:delete", Type: PermissionTypeButton, ParentName: "标签管理", Sort: 133},
 	{Name: "删除标签", Permission: "cms:tag:delete", Type: PermissionTypeAPI, ParentName: "标签管理", Method: "DELETE", APIPath: "/admin/tags/:id", Sort: 133},
+
+	// ---------- 回收站（菜单 / 按钮 / API） ----------
+	{Name: "回收站", Permission: "cms:trash:list", Type: PermissionTypeMenu,
+		Path: "/content/trash", Component: "views/content/trash/index.vue", Icon: "trash", Sort: 104, ParentName: "内容管理"},
+	{Name: "查看回收站", Permission: "cms:trash:list", Type: PermissionTypeButton, ParentName: "回收站", Sort: 140},
+	{Name: "查看回收站", Permission: "cms:trash:list", Type: PermissionTypeAPI, ParentName: "回收站", Method: "GET", APIPath: "/admin/trash", Sort: 140},
+	{Name: "恢复内容", Permission: "cms:trash:restore", Type: PermissionTypeButton, ParentName: "回收站", Sort: 141},
+	{Name: "恢复内容", Permission: "cms:trash:restore", Type: PermissionTypeAPI, ParentName: "回收站", Method: "POST", APIPath: "/admin/trash/:type/:id/restore", Sort: 141},
+	{Name: "彻底删除", Permission: "cms:trash:purge", Type: PermissionTypeButton, ParentName: "回收站", Sort: 142},
+	{Name: "彻底删除", Permission: "cms:trash:purge", Type: PermissionTypeAPI, ParentName: "回收站", Method: "DELETE", APIPath: "/admin/trash/:type/:id/purge", Sort: 142},
+
+	// ---------- 审核流与修订历史（按钮 / API） ----------
+	{Name: "提交审核", Permission: "cms:article:submit", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 118},
+	{Name: "提交审核", Permission: "cms:article:submit", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/submit", Sort: 118},
+	{Name: "审核通过", Permission: "cms:article:approve", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 119},
+	{Name: "审核通过", Permission: "cms:article:approve", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/approve", Sort: 119},
+	{Name: "驳回审核", Permission: "cms:article:reject", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 120},
+	{Name: "驳回审核", Permission: "cms:article:reject", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/reject", Sort: 120},
+	{Name: "查看修订历史", Permission: "cms:article:revision", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 121},
+	{Name: "查看修订历史", Permission: "cms:article:revision", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "GET", APIPath: "/admin/articles/:id/revisions", Sort: 121},
+	{Name: "修订版本详情", Permission: "cms:article:revision", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "GET", APIPath: "/admin/articles/:id/revisions/:rid", Sort: 121},
+	{Name: "恢复修订版本", Permission: "cms:article:revision_restore", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 122},
+	{Name: "恢复修订版本", Permission: "cms:article:revision_restore", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "POST", APIPath: "/admin/articles/:id/revisions/:rid/restore", Sort: 122},
+	{Name: "查看审核记录", Permission: "cms:article:review", Type: PermissionTypeButton, ParentName: "文章管理", Sort: 123},
+	{Name: "查看审核记录", Permission: "cms:article:review", Type: PermissionTypeAPI, ParentName: "文章管理", Method: "GET", APIPath: "/admin/articles/:id/reviews", Sort: 123},
 }
 
 // legacyPermissions 历史版本的权限标识，已被 DefaultPermissions 中的新标识取代。
@@ -285,21 +313,30 @@ func CleanupLegacyPermissions(ctx context.Context, client *ent.Client) error {
 
 // UpsertPermissions 幂等写入权限清单，返回全部权限实体。
 //
-// 同一 (type, permission) 只会存在一条记录：已存在时更新展示信息与 API 属性，不存在时创建。
-// 因此该过程可以随每次迁移重复执行，不会因唯一索引而中断。
+// 菜单/按钮按 (type, permission) 去重；API 权限按 (type, permission, method, api_path) 去重，
+// 允许同一个权限码绑定多条接口（例如 cms:article:delete 同时覆盖单条删除与批量删除）。
+// 早期版本对 API 也只按 (type, permission) 去重，后写入的 spec 会把前面的接口记录
+// 覆盖掉，导致非超管访问这些接口被权限中间件以「未登记权限」拒绝。
+// 表本身没有唯一约束，因此该过程可随每次迁移重复执行。
 func UpsertPermissions(ctx context.Context, client *ent.Client, specs []PermissionSpec) ([]*ent.AdminPermission, error) {
 	result := make([]*ent.AdminPermission, 0, len(specs))
 	// 菜单名称 -> 实体 ID，用于解析 ParentName
 	parentIndex := make(map[string]int64, len(specs))
 
 	writePermission := func(spec PermissionSpec, parentID int64) (*ent.AdminPermission, error) {
-		existing, err := client.AdminPermission.
+		query := client.AdminPermission.
 			Query().
 			Where(
 				adminpermission.TypeEQ(spec.Type),
 				adminpermission.PermissionEQ(spec.Permission),
-			).
-			First(ctx)
+			)
+		if spec.Type == PermissionTypeAPI {
+			query = query.Where(
+				adminpermission.MethodEqualFold(spec.Method),
+				adminpermission.APIPathEQ(spec.APIPath),
+			)
+		}
+		existing, err := query.First(ctx)
 		if err == nil {
 			// 已存在则同步展示信息与接口属性
 			update := existing.Update().

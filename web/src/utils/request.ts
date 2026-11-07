@@ -4,7 +4,7 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import router from '@/router'
 import { getToken, getRefreshToken } from './auth'
 import { useUserStore } from '@/stores/user'

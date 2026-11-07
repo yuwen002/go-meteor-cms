@@ -15,11 +15,22 @@ import (
 )
 
 type field struct {
-	name     string
-	json     string
-	goType   string
-	optional bool
+	name      string
+	json      string
+	goType    string
+	optional  bool
+	paramIn   string // "query" / "path"，来自 form / path 标签
+	paramName string
 }
+
+// 站点级纯文本输出不走统一 JSON 响应封装
+var textResponseTypes = map[string]string{
+	"publicRss":     "application/rss+xml",
+	"publicSitemap": "application/xml",
+	"publicRobots":  "text/plain",
+}
+
+var pathParamRe = regexp.MustCompile(`:([A-Za-z_][A-Za-z0-9_]*)`)
 
 type typeDef struct {
 	name   string
@@ -73,6 +84,15 @@ func loadAPI(mainPath string) string {
 			base += "\n" + read(filepath.Join(dir, line))
 		}
 	}
+
+	// 内容模块的路由由 contentroutes.go 手工注册，没有进 cms.api；
+	// 这里单独合并一份仅用于文档的 .api 源，保证 gen-doc 覆盖全量接口。
+	docExtra := filepath.Join(dir, "content.doc.api")
+	if b, err := os.ReadFile(docExtra); err == nil {
+		base += "\n" + string(b)
+	} else {
+		fmt.Fprintln(os.Stderr, "warn: content doc source missing:", err)
+	}
 	return base
 }
 
@@ -98,6 +118,11 @@ func findBlock(src, token string, openB, closeB byte) []string {
 			break
 		}
 		start := idx + len(token)
+		// token 自身以开括号结尾时（如 "type ("），回退到该括号，
+		// 否则会跳过当前块、误把下一个括号当成块起点。
+		if strings.HasSuffix(token, string(openB)) {
+			start--
+		}
 		k := start
 		for k < len(rest) && rest[k] != openB {
 			k++
@@ -142,7 +167,11 @@ func splitStructs(block string) []struct {
 			break
 		}
 		before := strings.TrimSpace(rest[:idx])
-		name := before[strings.LastIndex(before, " ")+1:]
+		name := before
+		// .api 文件用 tab / 换行缩进，不能只按空格取最后一个 token
+		if i := strings.LastIndexAny(before, " \t\n"); i >= 0 {
+			name = before[i+1:]
+		}
 		depth := 0
 		j := idx
 		for j < len(rest) {
@@ -194,7 +223,22 @@ func parseTypes(src string) map[string]typeDef {
 						}
 					}
 				}
-				if f.json == "" {
+				if fm := regexp.MustCompile(`form:"([^"]*)"`).FindStringSubmatch(tag); fm != nil {
+					parts := strings.Split(fm[1], ",")
+					f.paramIn = "query"
+					f.paramName = parts[0]
+					for _, p := range parts[1:] {
+						if p == "optional" {
+							f.optional = true
+						}
+					}
+				}
+				if pm := regexp.MustCompile(`path:"([^"]*)"`).FindStringSubmatch(tag); pm != nil {
+					f.paramIn = "path"
+					f.paramName = pm[1]
+				}
+				// form / path 字段属于 URL 参数，不应出现在请求体 schema 里
+				if f.json == "" && f.paramIn == "" {
 					f.json = f.name
 				}
 				if strings.Contains(tag, "optional") {
@@ -210,7 +254,9 @@ func parseTypes(src string) map[string]typeDef {
 
 func parseRoutes(src string) []route {
 	var routes []route
-	re := regexp.MustCompile(`^(get|post|put|delete|patch|head|options)\s+(\S+)\s*(?:\((\w+)\))?(?:\s+returns\s*\((\w+)\))?`)
+	// 每个可选段自带前导空白：早期版本在路径后用 \s* 吃掉空格，
+	// 会让「get /path returns (Resp)」这种没有请求体的路由漏掉响应类型。
+	re := regexp.MustCompile(`^(get|post|put|delete|patch|head|options)\s+(\S+)(?:\s+\((\w+)\))?(?:\s+returns\s*\((\w+)\))?`)
 	for _, block := range findBlock(src, "service", '{', '}') {
 		lines := strings.Split(block, "\n")
 		var cur route
@@ -240,7 +286,7 @@ func parseRoutes(src string) []route {
 	return routes
 }
 
-func toSchema(t string) map[string]interface{} {
+func toSchema(t string, types map[string]typeDef) map[string]interface{} {
 	t = strings.TrimSpace(t)
 	nullable := false
 	if strings.HasPrefix(t, "*") {
@@ -248,12 +294,20 @@ func toSchema(t string) map[string]interface{} {
 		t = t[1:]
 	}
 	if strings.HasPrefix(t, "[]") {
-		item := toSchema(t[2:])
+		item := toSchema(t[2:], types)
 		return map[string]interface{}{"type": "array", "items": item}
 	}
 	if strings.HasPrefix(t, "map[string]") {
-		val := toSchema(t[len("map[string]"):])
+		val := toSchema(t[len("map[string]"):], types)
 		return map[string]interface{}{"type": "object", "additionalProperties": val}
+	}
+	// 已声明的复合类型生成 $ref，避免 []PublicArticleItem 被降级为 string
+	if _, ok := types[t]; ok {
+		ref := map[string]interface{}{"$ref": "#/components/schemas/" + t}
+		if nullable {
+			return map[string]interface{}{"allOf": []interface{}{ref}, "nullable": true}
+		}
+		return ref
 	}
 	var schema map[string]interface{}
 	switch t {
@@ -276,11 +330,14 @@ func toSchema(t string) map[string]interface{} {
 	return schema
 }
 
-func buildSchema(td typeDef) map[string]interface{} {
+func buildSchema(td typeDef, types map[string]typeDef) map[string]interface{} {
 	props := map[string]interface{}{}
 	required := []string{}
 	for _, f := range td.fields {
-		props[f.json] = toSchema(f.goType)
+		if f.json == "" {
+			continue // query / path 参数不属于请求体
+		}
+		props[f.json] = toSchema(f.goType, types)
 		if !f.optional {
 			required = append(required, f.json)
 		}
@@ -292,6 +349,21 @@ func buildSchema(td typeDef) map[string]interface{} {
 	return schema
 }
 
+func operationTag(path string) string {
+	switch {
+	case strings.HasPrefix(path, "/admin/articles"),
+		strings.HasPrefix(path, "/admin/categories"),
+		strings.HasPrefix(path, "/admin/tags"),
+		strings.HasPrefix(path, "/admin/trash"):
+		return "内容管理"
+	case strings.HasPrefix(path, "/api/"),
+		path == "/sitemap.xml", path == "/robots.txt":
+		return "公开阅读"
+	default:
+		return "系统管理"
+	}
+}
+
 func generate(src string) map[string]interface{} {
 	src = stripComments(src)
 	types := parseTypes(src)
@@ -299,36 +371,83 @@ func generate(src string) map[string]interface{} {
 
 	paths := map[string]interface{}{}
 	for _, r := range routes {
-		p := strings.ReplaceAll(r.path, ":id", "{id}")
-		p = strings.ReplaceAll(p, ":Id", "{id}")
+		p := pathParamRe.ReplaceAllString(r.path, "{$1}")
 		method := strings.ToLower(r.method)
 		op := map[string]interface{}{
 			"summary":     r.handler,
 			"operationId": r.handler,
+			"tags":        []string{operationTag(r.path)},
 		}
+
 		if r.req != "" {
-			op["requestBody"] = map[string]interface{}{
-				"content": map[string]interface{}{
-					"application/json": map[string]interface{}{
-						"schema": map[string]interface{}{"$ref": "#/components/schemas/" + r.req},
+			if td, ok := types[r.req]; ok {
+				params := []interface{}{}
+				hasBody := false
+				for _, f := range td.fields {
+					if f.paramIn != "" {
+						params = append(params, map[string]interface{}{
+							"name":     f.paramName,
+							"in":       f.paramIn,
+							"required": f.paramIn == "path" || !f.optional,
+							"schema":   toSchema(f.goType, types),
+						})
+					}
+					if f.json != "" {
+						hasBody = true
+					}
+				}
+				if len(params) > 0 {
+					op["parameters"] = params
+				}
+				if hasBody {
+					op["requestBody"] = map[string]interface{}{
+						"content": map[string]interface{}{
+							"application/json": map[string]interface{}{
+								"schema": map[string]interface{}{"$ref": "#/components/schemas/" + r.req},
+							},
+						},
+					}
+				}
+			} else {
+				op["requestBody"] = map[string]interface{}{
+					"content": map[string]interface{}{
+						"application/json": map[string]interface{}{
+							"schema": map[string]interface{}{"$ref": "#/components/schemas/" + r.req},
+						},
+					},
+				}
+			}
+		}
+
+		// RSS / sitemap / robots 输出原始文本，不套 { code, msg, data }
+		if contentType, ok := textResponseTypes[r.handler]; ok {
+			op["responses"] = map[string]interface{}{
+				"200": map[string]interface{}{
+					"description": "成功",
+					"content": map[string]interface{}{
+						contentType: map[string]interface{}{
+							"schema": map[string]interface{}{"type": "string"},
+						},
+					},
+				},
+			}
+		} else {
+			respContent := map[string]interface{}{}
+			if r.resp != "" {
+				respContent["schema"] = map[string]interface{}{"$ref": "#/components/schemas/" + r.resp}
+			} else {
+				respContent["schema"] = map[string]interface{}{"type": "object"}
+			}
+			op["responses"] = map[string]interface{}{
+				"200": map[string]interface{}{
+					"description": "成功",
+					"content": map[string]interface{}{
+						"application/json": respContent,
 					},
 				},
 			}
 		}
-		respContent := map[string]interface{}{}
-		if r.resp != "" {
-			respContent["schema"] = map[string]interface{}{"$ref": "#/components/schemas/" + r.resp}
-		} else {
-			respContent["schema"] = map[string]interface{}{"type": "object"}
-		}
-		op["responses"] = map[string]interface{}{
-			"200": map[string]interface{}{
-				"description": "成功",
-				"content": map[string]interface{}{
-					"application/json": respContent,
-				},
-			},
-		}
+
 		pm, ok := paths[p].(map[string]interface{})
 		if !ok {
 			pm = map[string]interface{}{}
@@ -339,7 +458,7 @@ func generate(src string) map[string]interface{} {
 
 	schemas := map[string]interface{}{}
 	for name, td := range types {
-		schemas[name] = buildSchema(td)
+		schemas[name] = buildSchema(td, types)
 	}
 
 	return map[string]interface{}{
@@ -347,8 +466,9 @@ func generate(src string) map[string]interface{} {
 		"info": map[string]interface{}{
 			"title":   "Go Meteor CMS API",
 			"version": "v1",
-			"description": "由 cms.api 自动生成的 OpenAPI 文档（make gen-doc）。" +
-				"所有接口统一响应结构为 { code:int, msg:string, data:any }，其中 data 即下方各接口标注的响应模型。",
+			"description": "由 cms.api 与 content.doc.api 自动生成的 OpenAPI 文档（make gen-doc）。" +
+				"除 RSS / sitemap / robots 等纯文本输出外，所有接口统一响应结构为 { code:int, msg:string, data:any }，" +
+				"其中 data 即各接口标注的响应模型；query / path 参数已在 parameters 中标注。",
 		},
 		"servers": []interface{}{map[string]interface{}{"url": "/"}},
 		"paths":   paths,

@@ -40,7 +40,7 @@ const userStore = useUserStore()
 const canAdd = computed(() => userStore.hasPermission('system:dept:add'))
 const canEdit = computed(() => userStore.hasPermission('system:dept:edit'))
 const canDelete = computed(() => userStore.hasPermission('system:dept:delete'))
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import { getDeptTree, getDeptDetail, createDept, updateDept, deleteDept } from '@/api/dept'
 import type { DeptTreeItem, DeptForm } from '@/api/dept'
 

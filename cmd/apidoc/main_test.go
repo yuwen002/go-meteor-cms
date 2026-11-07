@@ -1,0 +1,82 @@
+package main
+
+import (
+	"strings"
+	"testing"
+)
+
+// 内容模块路由由 contentroutes.go 手工注册，必须出现在 gen-doc 输出里，
+// 否则 openapi.json 会漏掉文章发布相关的全部接口。
+func TestGenerateIncludesContentModule(t *testing.T) {
+	spec := generate(loadAPI("../../api/cms/v1/cms.api"))
+	paths, ok := spec["paths"].(map[string]interface{})
+	if !ok {
+		t.Fatal("spec.paths 类型错误")
+	}
+
+	want := []string{
+		"/admin/articles",
+		"/admin/articles/{id}/revisions/{rid}",
+		"/admin/articles/{id}/revisions/{rid}/restore",
+		"/admin/trash/{type}/{id}/restore",
+		"/api/articles",
+		"/api/articles/{slug}",
+		"/api/taxonomy",
+		"/api/rss",
+		"/sitemap.xml",
+		"/robots.txt",
+		"/admin/articles/batch-offline",
+		"/admin/articles/batch-delete",
+		"/healthz",
+	}
+	for _, p := range want {
+		if _, ok := paths[p]; !ok {
+			t.Errorf("openapi 缺少内容模块路径：%s", p)
+		}
+	}
+	for p := range paths {
+		if strings.Contains(p, ":") {
+			t.Errorf("路径参数未转换为 OpenAPI 占位符：%s", p)
+		}
+	}
+
+	components, ok := spec["components"].(map[string]interface{})
+	if !ok {
+		t.Fatal("spec.components 类型错误")
+	}
+	schemas, ok := components["schemas"].(map[string]interface{})
+	if !ok {
+		t.Fatal("spec.components.schemas 类型错误")
+	}
+	for _, name := range []string{"ArticleDetailResp", "PublicArticleDetailResp", "TrashListResp"} {
+		if _, ok := schemas[name]; !ok {
+			t.Errorf("openapi 缺少 schema：%s", name)
+		}
+	}
+
+	// GET /admin/articles 的分页/筛选条件是 query 参数，不应被当成请求体
+	listOp := paths["/admin/articles"].(map[string]interface{})["get"].(map[string]interface{})
+	params, ok := listOp["parameters"].([]interface{})
+	if !ok || len(params) == 0 {
+		t.Error("GET /admin/articles 缺少 query 参数定义")
+	}
+	if _, ok := listOp["requestBody"]; ok {
+		t.Error("GET /admin/articles 不应生成 requestBody")
+	}
+
+	// RSS 是纯文本输出，不能声明成 application/json
+	rssOp := paths["/api/rss"].(map[string]interface{})["get"].(map[string]interface{})
+	responses := rssOp["responses"].(map[string]interface{})["200"].(map[string]interface{})
+	content := responses["content"].(map[string]interface{})
+	if _, ok := content["application/rss+xml"]; !ok {
+		t.Error("/api/rss 响应缺少 application/rss+xml")
+	}
+
+	// 没有请求体的 GET 也要带上响应模型引用
+	taxOp := paths["/api/taxonomy"].(map[string]interface{})["get"].(map[string]interface{})
+	taxResp := taxOp["responses"].(map[string]interface{})["200"].(map[string]interface{})
+	taxSchema := taxResp["content"].(map[string]interface{})["application/json"].(map[string]interface{})["schema"].(map[string]interface{})
+	if taxSchema["$ref"] != "#/components/schemas/PublicTaxonomyResp" {
+		t.Errorf("/api/taxonomy 响应模型错误：%v", taxSchema)
+	}
+}

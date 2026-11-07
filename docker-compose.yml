@@ -82,6 +82,13 @@ services:
       MYSQL_DSN: ${MYSQL_DSN:-root:123456@tcp(mysql:3306)/go_meteor_cms?parseTime=True&loc=Local}
       REDIS_HOST: ${REDIS_HOST:-redis:6379}
       WEB_DIST: ${WEB_DIST:-/app/web/dist}
+      # 登录验证码：生产环境保持 true；仅本地开发 / 自动化 E2E 设为 false
+      LOGIN_CAPTCHA_ENABLED: ${LOGIN_CAPTCHA_ENABLED:-true}
+      # 免鉴权 /api/ 接口限流（防刷）
+      PUBLIC_RATE_LIMIT_ENABLED: ${PUBLIC_RATE_LIMIT_ENABLED:-true}
+      PUBLIC_RATE_LIMIT_MAX: ${PUBLIC_RATE_LIMIT_MAX:-60}
+      PUBLIC_RATE_LIMIT_WINDOW: ${PUBLIC_RATE_LIMIT_WINDOW:-60}
+      PUBLIC_RATE_LIMIT_BLOCK: ${PUBLIC_RATE_LIMIT_BLOCK:-60}
     depends_on:
       mysql:
         condition: service_healthy
@@ -89,6 +96,12 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8888/healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     restart: unless-stopped
 
 volumes:

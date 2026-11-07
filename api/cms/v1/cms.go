@@ -9,12 +9,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/config"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/handler"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/middleware"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
+	"github.com/yuwen002/go-meteor-cms/ent"
 	"github.com/yuwen002/go-meteor-cms/internal/pkg/cleanup"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -27,6 +30,30 @@ var configFile = flag.String("f", "api/cms/v1/etc/cms-api.yaml", "the config fil
 
 // uploadURLPrefix 上传文件的访问路径前缀
 const uploadURLPrefix = "/uploads"
+
+// envBool / envInt 提供环境变量覆盖配置的能力；未设置或值非法时保留配置文件的值。
+// 配置不会自动映射环境变量，新增开关必须在这里显式读取，否则容器里传入的 env 不生效。
+func envBool(name string, current bool) bool {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv(name))) {
+	case "1", "true", "yes", "on":
+		return true
+	case "0", "false", "no", "off":
+		return false
+	}
+	return current
+}
+
+func envInt(name string, current int) int {
+	v := strings.TrimSpace(os.Getenv(name))
+	if v == "" {
+		return current
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil || n <= 0 {
+		return current
+	}
+	return n
+}
 
 func main() {
 	flag.Parse()
@@ -46,19 +73,36 @@ func main() {
 	if rh := os.Getenv("REDIS_HOST"); rh != "" {
 		c.Redis.Host = rh
 	}
+	// 登录验证码开关：默认开启；仅本地开发 / 自动化 E2E 可关闭。
+	c.Login.CaptchaEnabled = envBool("LOGIN_CAPTCHA_ENABLED", c.Login.CaptchaEnabled)
+	// 公开接口限流：默认开启，防止免鉴权接口被刷。
+	c.Public.RateLimit.Enabled = envBool("PUBLIC_RATE_LIMIT_ENABLED", c.Public.RateLimit.Enabled)
+	c.Public.RateLimit.Max = envInt("PUBLIC_RATE_LIMIT_MAX", c.Public.RateLimit.Max)
+	c.Public.RateLimit.Window = envInt("PUBLIC_RATE_LIMIT_WINDOW", c.Public.RateLimit.Window)
+	c.Public.RateLimit.BlockSeconds = envInt("PUBLIC_RATE_LIMIT_BLOCK", c.Public.RateLimit.BlockSeconds)
 
 	// 静态资源：让 public/uploads 下的文件可通过 /uploads/xxx 访问。
 	// WithFileServer 是 RunOption，必须在创建 server 时传入；它仅拦截 GET 且
 	// 路径以 /uploads/ 前缀开头且文件存在的请求，其余请求仍走 API 路由。
 	uploadDir := c.Upload.Defaults().Dir
-	// 跨域：通过 go-zero 内置 WithCors 启用（内部以 NotAllowedHandler 接管 OPTIONS 预检并返回 204）。
-	// 仅在显式配置 Cors 源时开启；未配置则保持同源部署（不暴露 CORS 头）。
+
+	// ent client 在 ServiceContext 里创建，但 SPAHandler 必须在 MustNewServer 时构造。
+	// 用闭包延迟绑定：resolver 只在请求到达时调用，此时 entClient 已经赋值。
+	var entClient *ent.Client
 	opts := []rest.RunOption{
 		rest.WithFileServer(uploadURLPrefix, http.Dir(uploadDir)),
 		// 若配置了前端产物目录，则通过自定义 NotFoundHandler 直接托管 SPA（含 history 路由回退）。
 		// 不能用 server.Use 注册：go-zero 的全局中间件不会作用于 404（未匹配）路由，
 		// 而 notFoundHandler 在 MustNewServer 时即绑定中间件链，早于 server.Use 调用。
-		rest.WithNotFoundHandler(middleware.SPAHandler(c.StaticDir)),
+		rest.WithNotFoundHandler(middleware.SPAHandler(
+			c.StaticDir,
+			middleware.WithPageResolver(func(slug string) (middleware.PageData, bool) {
+				if entClient == nil {
+					return middleware.PageData{}, false
+				}
+				return newArticlePageResolver(entClient)(slug)
+			}),
+		)),
 	}
 	if len(c.Cors) > 0 {
 		opts = append(opts, rest.WithCors(c.Cors...))
@@ -86,8 +130,17 @@ func main() {
 		c.Login.RateLimit.Window,
 		c.Login.RateLimit.BlockSeconds,
 	))
+	// 公开接口限流：只拦截 /api/ 前缀，后台接口与静态资源不受影响。
+	server.Use(middleware.NewPublicRateLimitMiddleware(
+		rds,
+		c.Public.RateLimit.Enabled,
+		c.Public.RateLimit.Max,
+		c.Public.RateLimit.Window,
+		c.Public.RateLimit.BlockSeconds,
+	))
 
 	ctx := svc.NewServiceContext(c, rds)
+	entClient = ctx.EntClient
 	handler.RegisterHandlers(server, ctx)
 	// 文章发布模块独立注册：routes.go 是 goctl 生成文件且被手工追加过，
 	// 单独注册可避免重跑 make gen-api 时丢失路由。

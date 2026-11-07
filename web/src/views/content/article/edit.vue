@@ -8,6 +8,14 @@
           <el-tag v-if="isEdit" size="small" :type="statusTagType">{{ statusText }}</el-tag>
         </div>
         <div class="actions">
+          <el-button v-if="isEdit && canRevision" @click="openRevisions">修订历史</el-button>
+          <el-button
+            v-if="isEdit && status === 0 && canSubmit"
+            :loading="submitting"
+            @click="onSubmit"
+          >
+            提交审核
+          </el-button>
           <el-button :loading="saving" @click="save">保存草稿</el-button>
           <el-button v-if="canPublish" type="primary" :loading="publishing" @click="publish">保存并发布</el-button>
         </div>
@@ -75,41 +83,108 @@
       </el-collapse>
 
       <p class="hint">
-        定时发布请在文章列表页点「发布」并选择未来时间；到点后文章会自动对前台可见，无需后台任务。
+        定时发布请在文章列表页点「发布」并选择未来时间；到点后文章会自动对前台可见，无需后台任务。修改别名会保留旧地址的 301 跳转。
       </p>
     </el-card>
+
+    <el-drawer v-model="revisionVisible" title="文章轨迹" size="540px">
+      <el-tabs v-model="traceTab">
+        <el-tab-pane label="修订历史" name="revisions">
+          <div v-loading="revisionLoading" class="revision-list">
+            <div v-for="r in revisions" :key="r.id" class="revision-item">
+              <div class="revision-head">
+                <span class="revision-time">{{ formatDate(r.created_at) }}</span>
+                <span class="revision-title">{{ r.title }}</span>
+              </div>
+              <p class="revision-remark">{{ r.remark || '编辑前自动存档' }}</p>
+              <div class="revision-actions">
+                <el-button link type="primary" @click="toggleRevisionDetail(r.id)">
+                  {{ currentRevision?.id === r.id ? '收起预览' : '查看内容' }}
+                </el-button>
+                <el-button v-if="canRevisionRestore" link type="warning" @click="onRestoreRevision(r.id)">
+                  恢复此版本
+                </el-button>
+              </div>
+              <!-- renderMarkdown 先转义 HTML 再套用有限语法，可安全用于 v-html -->
+              <div
+                v-if="currentRevision?.id === r.id"
+                class="revision-preview"
+                v-html="revisionRendered"
+              />
+            </div>
+            <el-empty v-if="!revisionLoading && revisions.length === 0" description="暂无历史版本" :image-size="60" />
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane v-if="canReview" label="审核记录" name="reviews">
+          <div v-loading="reviewLoading" class="review-list">
+            <div v-for="rw in reviews" :key="rw.id" class="review-item">
+              <div class="review-head">
+                <el-tag size="small" :type="reviewTagType(rw.action)">{{ rw.action_text }}</el-tag>
+                <span class="review-time">{{ formatDate(rw.created_at) }}</span>
+              </div>
+              <p class="review-operator">
+                {{ rw.operator_name || '系统' }}<span v-if="rw.operator_id">（#{{ rw.operator_id }}）</span>
+              </p>
+              <p v-if="rw.remark" class="review-remark">备注：{{ rw.remark }}</p>
+            </div>
+            <el-empty v-if="!reviewLoading && reviews.length === 0" description="暂无审核记录" :image-size="60" />
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import MarkdownEditor from '@/components/MarkdownEditor.vue'
 import { useUserStore } from '@/stores/user'
 import { uploadFile } from '@/api/upload'
+import { renderMarkdown } from '@/utils/markdown'
 import {
   createArticle,
   getArticle,
+  getArticleRevision,
+  getArticleReviews,
+  getArticleRevisions,
   getCategories,
   getTags,
   publishArticle,
+  restoreArticleRevision,
+  submitArticle,
   updateArticle,
   type ArticlePayload,
+  type ArticleReviewItem,
+  type ArticleRevisionDetail,
+  type ArticleRevisionItem,
   type CategoryItem,
   type TagItem,
 } from '@/api/content'
+
+type TagType = 'primary' | 'success' | 'info' | 'warning' | 'danger'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const canPublish = computed(() => userStore.hasPermission('cms:article:publish'))
+const canSubmit = computed(() => userStore.hasPermission('cms:article:submit'))
+const canRevision = computed(() => userStore.hasPermission('cms:article:revision'))
+const canRevisionRestore = computed(() => userStore.hasPermission('cms:article:revision_restore'))
 
 const articleId = computed(() => Number(route.params.id || 0))
 const isEdit = computed(() => articleId.value > 0)
 const status = ref(0)
 const statusText = ref('草稿')
-const statusTagType = computed(() => (status.value === 1 ? 'success' : status.value === 2 ? 'info' : 'warning'))
+const statusTagType = computed<TagType>(() => {
+  if (statusText.value === '定时中') return 'primary'
+  if (status.value === 1) return 'success'
+  if (status.value === 2) return 'info'
+  if (status.value === 3) return 'danger'
+  return 'warning'
+})
 
 interface ArticleForm {
   title: string
@@ -143,7 +218,21 @@ const categories = ref<CategoryItem[]>([])
 const tags = ref<TagItem[]>([])
 const saving = ref(false)
 const publishing = ref(false)
+const submitting = ref(false)
 const coverUploading = ref(false)
+
+const revisionVisible = ref(false)
+const revisionLoading = ref(false)
+const revisions = ref<ArticleRevisionItem[]>([])
+const currentRevision = ref<ArticleRevisionDetail | null>(null)
+const revisionRendered = computed(() => renderMarkdown(currentRevision.value?.content ?? ''))
+
+const canReview = computed(() => userStore.hasPermission('cms:article:review'))
+const traceTab = ref('revisions')
+const reviewLoading = ref(false)
+const reviews = ref<ArticleReviewItem[]>([])
+const reviewTagType = (action: number): TagType =>
+  action === 2 ? 'success' : action === 3 ? 'danger' : 'primary'
 
 function payload(): ArticlePayload {
   return {
@@ -243,6 +332,92 @@ async function publish() {
   }
 }
 
+async function onSubmit() {
+  if (!validate()) return
+  submitting.value = true
+  try {
+    await updateArticle(articleId.value, payload())
+    await submitArticle(articleId.value)
+    status.value = 3
+    statusText.value = '待审核'
+    ElMessage.success('已提交审核')
+  } catch {
+    // 统一拦截器已提示错误
+  } finally {
+    submitting.value = false
+  }
+}
+
+function formatDate(s: string): string {
+  return s ? s.replace('T', ' ').slice(0, 19) : ''
+}
+
+function openRevisions() {
+  revisionVisible.value = true
+  void loadRevisions()
+  if (canReview.value) {
+    void loadReviews()
+  }
+}
+
+async function loadReviews() {
+  if (!isEdit.value) return
+  reviewLoading.value = true
+  try {
+    const res = await getArticleReviews(articleId.value)
+    reviews.value = res.list ?? []
+  } catch {
+    reviews.value = []
+  } finally {
+    reviewLoading.value = false
+  }
+}
+
+async function loadRevisions() {
+  if (!isEdit.value) return
+  revisionLoading.value = true
+  try {
+    const res = await getArticleRevisions(articleId.value)
+    revisions.value = res.list ?? []
+  } catch {
+    revisions.value = []
+  } finally {
+    revisionLoading.value = false
+  }
+}
+
+async function toggleRevisionDetail(rid: number) {
+  if (currentRevision.value?.id === rid) {
+    currentRevision.value = null
+    return
+  }
+  try {
+    currentRevision.value = await getArticleRevision(articleId.value, rid)
+  } catch {
+    currentRevision.value = null
+  }
+}
+
+async function onRestoreRevision(rid: number) {
+  try {
+    await ElMessageBox.confirm(
+      '恢复该版本会覆盖当前标题、摘要、封面与正文；当前内容会先自动存为新版本，可再次恢复。确定继续吗？',
+      '提示',
+      { type: 'warning' },
+    )
+  } catch {
+    return
+  }
+  try {
+    await restoreArticleRevision(articleId.value, rid)
+    ElMessage.success('已恢复该版本')
+    currentRevision.value = null
+    await Promise.all([loadDetail(), loadRevisions()])
+  } catch {
+    // 统一拦截器已提示错误
+  }
+}
+
 async function uploadCover(options: unknown) {
   const opts = options as { file: File }
   coverUploading.value = true
@@ -264,6 +439,9 @@ function goBack() {
 onMounted(() => {
   void loadTaxonomy()
   void loadDetail()
+  if (route.query.tab === 'revisions') {
+    openRevisions()
+  }
 })
 </script>
 
@@ -278,6 +456,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
 }
 .title {
   font-size: 17px;
@@ -302,5 +484,81 @@ onMounted(() => {
   margin: 16px 0 0;
   font-size: 12px;
   color: var(--el-text-color-secondary);
+}
+.revision-list {
+  min-height: 120px;
+}
+.revision-item {
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  padding: 4px 0 14px;
+  margin-bottom: 12px;
+}
+.revision-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.revision-time {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+.revision-title {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.revision-remark {
+  margin: 6px 0 2px;
+  font-size: 12px;
+  color: var(--el-text-color-regular);
+}
+.revision-actions {
+  display: flex;
+  gap: 6px;
+}
+.revision-preview {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--el-fill-color-light);
+  font-size: 13px;
+  line-height: 1.7;
+  max-height: 320px;
+  overflow: auto;
+  word-break: break-word;
+}
+.revision-preview :deep(img) { max-width: 100%; }
+.revision-preview :deep(pre) { overflow: auto; }
+.review-list {
+  min-height: 120px;
+}
+.review-item {
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  padding: 4px 0 12px;
+  margin-bottom: 10px;
+}
+.review-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.review-time {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+.review-operator {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--el-text-color-regular);
+}
+.review-remark {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--el-text-color-regular);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>

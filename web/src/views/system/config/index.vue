@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
 import { useUserStore } from '@/stores/user'
 import { createConfig, deleteConfig, getConfigs, updateConfig, type ConfigItem } from '@/api/config'
 

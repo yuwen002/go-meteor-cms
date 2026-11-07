@@ -30,16 +30,17 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (*types.LoginResp, error) {
-	// 验证验证码
-	if req.Captcha == "" || req.CaptchaID == "" {
-		l.recordLoginLog(0, req.Username, common.GetErrorMessage(common.ErrMissingCaptcha))
-		return nil, common.NewBizError(common.ErrMissingCaptcha)
-	}
-
-	// 验证验证码
-	if !utils.VerifyCaptcha(req.CaptchaID, req.Captcha) {
-		l.recordLoginLog(0, req.Username, common.GetErrorMessage(common.ErrInvalidCaptcha))
-		return nil, common.NewBizError(common.ErrInvalidCaptcha)
+	// 验证码校验。LOGIN_CAPTCHA_ENABLED=false 时跳过，供本地开发与自动化 E2E 使用；
+	// 生产环境必须保持开启（配置默认 true）。
+	if l.svcCtx.Config.Login.CaptchaEnabled {
+		if req.Captcha == "" || req.CaptchaID == "" {
+			l.recordLoginLog(0, req.Username, common.GetErrorMessage(common.ErrMissingCaptcha))
+			return nil, common.NewBizError(common.ErrMissingCaptcha)
+		}
+		if !utils.VerifyCaptcha(req.CaptchaID, req.Captcha) {
+			l.recordLoginLog(0, req.Username, common.GetErrorMessage(common.ErrInvalidCaptcha))
+			return nil, common.NewBizError(common.ErrInvalidCaptcha)
+		}
 	}
 
 	// 查询数据库用户

@@ -4,8 +4,9 @@ import { getRefreshToken } from '@/utils/auth'
 export interface LoginData {
   username: string
   password: string
-  captcha_id: string
-  captcha: string
+  // 后端 LOGIN_CAPTCHA_ENABLED=false 时这两个字段可省略
+  captcha_id?: string
+  captcha?: string
 }
 
 export interface LoginResult {
@@ -13,12 +14,18 @@ export interface LoginResult {
   refresh_token: string
 }
 
+export interface CaptchaResult {
+  enabled: boolean
+  captcha_id: string
+  captcha_base64: string
+}
+
 export function login(data: LoginData): Promise<LoginResult> {
   return request({ url: '/admin/login', method: 'post', data }) as Promise<LoginResult>
 }
 
-export function getCaptcha() {
-  return request({ url: '/api/captcha', method: 'get' })
+export function getCaptcha(): Promise<CaptchaResult> {
+  return request({ url: '/api/captcha', method: 'get' }) as Promise<CaptchaResult>
 }
 
 export function logout() {

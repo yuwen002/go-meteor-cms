@@ -92,6 +92,8 @@ func (l *RoleDeptAssignLogic) RoleDeptAssign(req *types.RoleDeptReq) (resp *type
 
 	// 6. 事务：整表重建该角色的部门关联。
 	// 关联表带软删除，这里用 SkipSoftDelete 真删，避免历史软删除行继续占用 (role_id, dept_id) 唯一索引。
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
 	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
 	if err != nil {
 		l.Logger.Errorf("开启事务失败: %v", err)

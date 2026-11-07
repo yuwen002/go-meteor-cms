@@ -49,6 +49,9 @@ type Config struct {
 		MaxFailCount int `json:",default=5"`
 		// LockMinutes 锁定持续时间（分钟），<=0 时按 15 处理
 		LockMinutes int `json:",default=15"`
+		// CaptchaEnabled 登录是否强制校验验证码。默认 true；
+		// 仅本地开发与自动化 E2E 可通过 LOGIN_CAPTCHA_ENABLED=false 关闭，生产环境务必保持开启。
+		CaptchaEnabled bool `json:",default=true"`
 		// RateLimit 登录接口按客户端 IP 的限流配置（防爆破）；默认关闭，需显式开启
 		RateLimit struct {
 			Enabled      bool `json:",default=false"`
@@ -57,7 +60,18 @@ type Config struct {
 			BlockSeconds int  `json:",default=300"` // 触发限流后拒绝时长（秒）
 		}
 	}
-	// WebBaseURL 前端站点地址，用于拼接找回密码等邮件中的跳转链接；为空时仅下发裸令牌
+	// Public 公开（免鉴权）接口的配置
+	Public struct {
+		// RateLimit 按客户端 IP 限制 /api/ 前缀公开接口的访问频率，防止被刷。
+		// 默认开启；Redis 不可用时自动降级为单实例内存限流。
+		RateLimit struct {
+			Enabled      bool `json:",default=true"`
+			Max          int  `json:",default=60"` // 窗口内允许的最大请求数
+			Window       int  `json:",default=60"` // 统计窗口（秒）
+			BlockSeconds int  `json:",default=60"` // 触发限流后拒绝时长（秒）
+		}
+	}
+	// WebBaseURL 前端站点地址，用于拼接找回密码邮件链接与文章 canonical / RSS / sitemap 绝对地址
 	WebBaseURL string
 	// StaticDir 前端构建产物（dist）目录；非空时由本服务直接托管 SPA（含 history 路由回退）。
 	// 容器化部署通常通过环境变量 WEB_DIST 注入，本地开发留空即可（仅暴露 API）。

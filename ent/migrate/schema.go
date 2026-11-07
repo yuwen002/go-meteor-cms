@@ -311,6 +311,83 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{ArticlesColumns[13]},
 			},
+			{
+				Name:    "article_deleted_at_status_published_at_id",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[3], ArticlesColumns[9], ArticlesColumns[11], ArticlesColumns[0]},
+			},
+			{
+				Name:    "article_deleted_at_is_top_id",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[3], ArticlesColumns[13], ArticlesColumns[0]},
+			},
+			{
+				Name:    "article_deleted_at_category_id_status",
+				Unique:  false,
+				Columns: []*schema.Column{ArticlesColumns[3], ArticlesColumns[17], ArticlesColumns[9]},
+			},
+		},
+	}
+	// ArticleReviewsColumns holds the columns for the "article_reviews" table.
+	ArticleReviewsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "article_id", Type: field.TypeInt64, Comment: "文章 ID"},
+		{Name: "action", Type: field.TypeInt, Comment: "1 提交审核 / 2 审核通过 / 3 驳回"},
+		{Name: "remark", Type: field.TypeString, Size: 500, Comment: "审核备注（驳回原因等）", Default: ""},
+		{Name: "operator_id", Type: field.TypeInt64, Nullable: true, Comment: "操作人管理员 ID", Default: 0},
+		{Name: "operator_name", Type: field.TypeString, Size: 64, Comment: "操作人名称快照", Default: ""},
+	}
+	// ArticleReviewsTable holds the schema information for the "article_reviews" table.
+	ArticleReviewsTable = &schema.Table{
+		Name:       "article_reviews",
+		Comment:    "文章审核记录表",
+		Columns:    ArticleReviewsColumns,
+		PrimaryKey: []*schema.Column{ArticleReviewsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "articlereview_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ArticleReviewsColumns[1]},
+			},
+			{
+				Name:    "articlereview_article_id_id",
+				Unique:  false,
+				Columns: []*schema.Column{ArticleReviewsColumns[3], ArticleReviewsColumns[0]},
+			},
+		},
+	}
+	// ArticleRevisionsColumns holds the columns for the "article_revisions" table.
+	ArticleRevisionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "article_id", Type: field.TypeInt64, Comment: "文章 ID"},
+		{Name: "title", Type: field.TypeString, Size: 255, Comment: "该版本的标题"},
+		{Name: "summary", Type: field.TypeString, Size: 512, Comment: "该版本的摘要", Default: ""},
+		{Name: "cover", Type: field.TypeString, Size: 512, Comment: "该版本的封面 URL", Default: ""},
+		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "该版本的 Markdown 正文"},
+		{Name: "editor_id", Type: field.TypeInt64, Nullable: true, Comment: "编辑人管理员 ID"},
+		{Name: "remark", Type: field.TypeString, Size: 255, Comment: "版本备注", Default: ""},
+	}
+	// ArticleRevisionsTable holds the schema information for the "article_revisions" table.
+	ArticleRevisionsTable = &schema.Table{
+		Name:       "article_revisions",
+		Comment:    "文章修订历史表",
+		Columns:    ArticleRevisionsColumns,
+		PrimaryKey: []*schema.Column{ArticleRevisionsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "articlerevision_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ArticleRevisionsColumns[1]},
+			},
+			{
+				Name:    "articlerevision_article_id_id",
+				Unique:  false,
+				Columns: []*schema.Column{ArticleRevisionsColumns[3], ArticleRevisionsColumns[0]},
+			},
 		},
 	}
 	// ArticleTagsColumns holds the columns for the "article_tags" table.
@@ -351,6 +428,11 @@ var (
 				Name:    "articletag_article_id_tag_id",
 				Unique:  true,
 				Columns: []*schema.Column{ArticleTagsColumns[3], ArticleTagsColumns[4]},
+			},
+			{
+				Name:    "articletag_tag_id_article_id",
+				Unique:  false,
+				Columns: []*schema.Column{ArticleTagsColumns[4], ArticleTagsColumns[3]},
 			},
 		},
 	}
@@ -525,6 +607,39 @@ var (
 				Name:    "operationlog_status",
 				Unique:  false,
 				Columns: []*schema.Column{OperationLogsColumns[11]},
+			},
+		},
+	}
+	// SlugRedirectsColumns holds the columns for the "slug_redirects" table.
+	SlugRedirectsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "主键 ID"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "entity_type", Type: field.TypeString, Size: 32, Comment: "实体类型：article / category / tag"},
+		{Name: "entity_id", Type: field.TypeInt64, Comment: "实体 ID"},
+		{Name: "old_slug", Type: field.TypeString, Size: 191, Comment: "历史 slug"},
+	}
+	// SlugRedirectsTable holds the schema information for the "slug_redirects" table.
+	SlugRedirectsTable = &schema.Table{
+		Name:       "slug_redirects",
+		Comment:    "内容实体历史 slug 表，用于 301 与回收站恢复",
+		Columns:    SlugRedirectsColumns,
+		PrimaryKey: []*schema.Column{SlugRedirectsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "slugredirect_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{SlugRedirectsColumns[1]},
+			},
+			{
+				Name:    "slugredirect_entity_type_old_slug",
+				Unique:  true,
+				Columns: []*schema.Column{SlugRedirectsColumns[3], SlugRedirectsColumns[5]},
+			},
+			{
+				Name:    "slugredirect_entity_type_entity_id",
+				Unique:  false,
+				Columns: []*schema.Column{SlugRedirectsColumns[3], SlugRedirectsColumns[4]},
 			},
 		},
 	}
@@ -706,11 +821,14 @@ var (
 		AdminUsersTable,
 		AdminUserRolesTable,
 		ArticlesTable,
+		ArticleReviewsTable,
+		ArticleRevisionsTable,
 		ArticleTagsTable,
 		CategoriesTable,
 		DepartmentsTable,
 		LoginLogsTable,
 		OperationLogsTable,
+		SlugRedirectsTable,
 		SysConfigsTable,
 		SysDictsTable,
 		SysDictItemsTable,
@@ -750,6 +868,12 @@ func init() {
 	ArticlesTable.Annotation = &entsql.Annotation{
 		Table: "articles",
 	}
+	ArticleReviewsTable.Annotation = &entsql.Annotation{
+		Table: "article_reviews",
+	}
+	ArticleRevisionsTable.Annotation = &entsql.Annotation{
+		Table: "article_revisions",
+	}
 	ArticleTagsTable.ForeignKeys[0].RefTable = ArticlesTable
 	ArticleTagsTable.ForeignKeys[1].RefTable = TagsTable
 	ArticleTagsTable.Annotation = &entsql.Annotation{
@@ -762,6 +886,9 @@ func init() {
 	DepartmentsTable.ForeignKeys[0].RefTable = DepartmentsTable
 	DepartmentsTable.Annotation = &entsql.Annotation{
 		Table: "departments",
+	}
+	SlugRedirectsTable.Annotation = &entsql.Annotation{
+		Table: "slug_redirects",
 	}
 	TagsTable.Annotation = &entsql.Annotation{
 		Table: "tags",

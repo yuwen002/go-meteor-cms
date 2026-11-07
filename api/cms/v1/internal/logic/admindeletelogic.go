@@ -10,6 +10,7 @@ import (
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/svc"
 	"github.com/yuwen002/go-meteor-cms/api/cms/v1/internal/types"
 	"github.com/yuwen002/go-meteor-cms/ent"
+	"github.com/yuwen002/go-meteor-cms/ent/adminuserrole"
 	"github.com/yuwen002/go-meteor-cms/internal/common"
 	"github.com/yuwen002/go-meteor-cms/internal/pkg/tokenversion"
 	"github.com/yuwen002/go-meteor-cms/internal/utils"
@@ -52,15 +53,40 @@ func (l *AdminDeleteLogic) AdminDelete(req *types.DeleteAdminReq) (resp *types.C
 		return nil, common.NewBizErrorWithMsg(common.ErrPermissionDenied, "超级管理员不可删除")
 	}
 
-	// 执行软删除：更新 deleted_at 字段
-	_, err = l.svcCtx.EntClient.AdminUser.UpdateOneID(req.Id).
-		SetDeletedAt(time.Now()).
-		Save(l.ctx)
-
+	// 软删除用户与清理角色关联必须同事务：admin_user_roles 没有软删除字段，
+	// 残留行不会被拦截器过滤，会让角色删除接口一直误判「角色正在被使用」。
+	cancel := newTxContext(&l.ctx)
+	defer cancel()
+	tx, err := l.svcCtx.EntClient.Tx(l.ctx)
 	if err != nil {
+		l.Logger.Errorf("开启删除管理员事务失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+
+	if _, err := tx.AdminUserRole.
+		Delete().
+		Where(adminuserrole.UserID(req.Id)).
+		Exec(l.ctx); err != nil {
+		l.Logger.Errorf("清理管理员角色关联失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	if _, err := tx.AdminUser.UpdateOneID(req.Id).
+		SetDeletedAt(time.Now()).
+		Save(l.ctx); err != nil {
 		l.Logger.Errorf("删除管理员失败: %v", err)
 		return nil, common.NewBizError(common.ErrInternalServer)
 	}
+	if err := tx.Commit(); err != nil {
+		l.Logger.Errorf("提交删除管理员事务失败: %v", err)
+		return nil, common.NewBizError(common.ErrInternalServer)
+	}
+	committed = true
 
 	// 删除后吊销该用户所有会话（全局踢人）
 	if _, berr := tokenversion.Bump(l.ctx, l.svcCtx.Redis, req.Id); berr != nil {

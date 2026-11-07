@@ -14,41 +14,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type Component } from 'vue'
+import {
+  Avatar,
+  Clock,
+  Collection,
+  Document,
+  EditPen,
+  Files,
+  Folder,
+  FolderOpened,
+  Lock,
+  Menu,
+  Odometer,
+  OfficeBuilding,
+  PriceTag,
+  Setting,
+  User,
+} from '@element-plus/icons-vue'
 import type { MyMenuItem } from '@/api/user'
 
 const props = defineProps<{ item: MyMenuItem }>()
 
-// 后端菜单 icon 存的是语义键（与具体图标库解耦），这里映射为 Element Plus
-// 全局注册的图标组件名；未配置的键回落到通用 Menu 图标。
-const iconMap: Record<string, string> = {
-  dashboard: 'Odometer',
-  user: 'User',
-  dept: 'OfficeBuilding',
-  role: 'Avatar',
-  permission: 'Lock',
-  document: 'Document',
-  clock: 'Clock',
-  file: 'Folder',
-  dict: 'Collection',
-  setting: 'Setting',
-  content: 'Files',
-  article: 'EditPen',
-  category: 'FolderOpened',
-  tag: 'PriceTag',
+// 后端菜单 icon 存的是语义键（与具体图标库解耦），这里映射为按需引入的图标组件；
+// 未配置的键回落到通用 Menu 图标。精确引入避免把整套图标塞进首屏包。
+const iconMap: Record<string, Component> = {
+  dashboard: Odometer,
+  user: User,
+  dept: OfficeBuilding,
+  role: Avatar,
+  permission: Lock,
+  document: Document,
+  clock: Clock,
+  file: Folder,
+  dict: Collection,
+  setting: Setting,
+  content: Files,
+  article: EditPen,
+  category: FolderOpened,
+  tag: PriceTag,
 }
 
 // 未在映射表中的 icon 键只在控制台提示一次，便于定位后端下发了哪些未配置的图标
 const warnedKeys = new Set<string>()
 
 const hasChildren = computed(() => !!props.item.children && props.item.children.length > 0)
-const iconName = computed(() => {
+const iconName = computed<Component>(() => {
   const key = props.item.icon || ''
-  const name = iconMap[key]
-  if (!name && !warnedKeys.has(key)) {
+  const component = iconMap[key]
+  if (!component && !warnedKeys.has(key)) {
     warnedKeys.add(key)
     console.warn(`[menu] 未配置的菜单图标: "${key}"，已回落到 Menu（菜单：${props.item.name}）`)
   }
-  return name || 'Menu'
+  return component || Menu
 })
 </script>

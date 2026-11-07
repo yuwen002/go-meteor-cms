@@ -33,9 +33,13 @@
 - 🖼️ 文件管理：上传 / 列表 / 重命名 / 删除
 - 📈 仪表盘统计：管理员 / 部门 / 角色 / 权限总量与今日登录、本周操作数
 - 🗂️ 操作日志与登录日志：分页查询，便于审计
-- ✍️ 文章发布：Markdown 编辑与预览、草稿 / 发布 / 下线状态机、定时发布、置顶、封面、SEO
+- ✍️ 文章发布：Markdown 编辑与预览、草稿 / 待审核 / 发布 / 下线状态机、定时发布、置顶、封面、SEO
 - 🗃️ 内容分类与标签：分类树、标签管理，均带 slug 与文章数统计
+- 🔎 内容治理：审核流与数据权限、修订历史与版本回滚、回收站（恢复 / 彻底删除）、旧 slug 301
+- 🔒 安全与体验：服务端 SEO 注入、浏览量 IP 去重、公开接口限流、登录验证码开关、安全 Markdown 渲染
+- 📡 内容分发：相关文章 / 上下篇、作者展示、RSS 2.0、sitemap.xml、robots.txt
 - 🌐 公开阅读站点：`/articles` 前台列表与详情，无需登录，正文安全渲染
+- ⚡ 性能与运维：组合索引、列表排序与批量操作、公开导航聚合计数、`/healthz` 探活、前端依赖分包、写事务独立超时、权限种子按接口幂等去重
 - 🖥️ 配套 Vue3 + Element Plus 前端管理后台（见「前端 Web 管理后台」一节）
 
 ## 技术栈
@@ -460,9 +464,16 @@ Authorization: Bearer <token>
 | 文章 | `GET/POST /admin/articles`、`GET/PUT/DELETE /admin/articles/:id`、`POST /admin/articles/:id/publish`、`/withdraw`、`/toggle-top` | 草稿 / 发布 / 下线状态机、定时发布、置顶、Markdown 正文、封面与 SEO |
 | 分类 | `GET/POST /admin/categories`、`PUT/DELETE /admin/categories/:id` | 父子层级、slug、删除前置校验 |
 | 标签 | `GET/POST /admin/tags`、`PUT/DELETE /admin/tags/:id` | 名称 / slug 唯一、文章数统计 |
+| 审核与修订 | `POST /admin/articles/:id/submit` `/approve` `/reject`、`GET/POST /admin/articles/:id/revisions...` | 待审核状态机、编辑前存档、版本回滚 |
+| 回收站 | `GET /admin/trash`、`POST /admin/trash/:type/:id/restore`、`DELETE /admin/trash/:type/:id/purge` | 软删除内容恢复 / 物理删除与孤儿文件清理 |
 
-另有**无需认证**的公开接口：`GET /api/articles`、`GET /api/articles/:slug`、`GET /api/taxonomy`，
+另有**无需认证**的公开接口：`GET /api/articles`、`GET /api/articles/:slug`、`GET /api/taxonomy`、
+`GET /api/rss`、`GET /sitemap.xml`、`GET /robots.txt`，
 对应前台阅读页 `/articles` 与 `/articles/:slug`。字段定义与状态机说明见 `docs/api.md`「文章发布」章节。
+
+OpenAPI 文档由 `make gen-doc` 生成：合并 `api/cms/v1/cms.api` 与
+`api/cms/v1/content.doc.api`（内容模块文档源，不参与 goctl），输出根目录 `openapi.json`，
+镜像内同时发布到 `/openapi.json` 供 `/docs.html` 使用。
 
 ## 默认管理员账户
 
@@ -538,6 +549,9 @@ go test ./internal/... ./api/cms/v1/internal/middleware/...
 
 # 运行测试并生成覆盖率报告
 go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
+
+# 重新生成全量 OpenAPI 文档并校验内容模块覆盖
+make gen-doc && go test ./cmd/apidoc
 ```
 
 当前已覆盖的纯逻辑单测（均不依赖外部 MySQL / Redis / Docker，可直接进 CI）：
@@ -548,8 +562,9 @@ go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
 - `internal/pkg/tokenversion`：token 版本号读取 / 自增、按用户隔离、未配置 Redis 时降级（进程内 miniredis）
 - `api/cms/v1/internal/middleware`：路由匹配规则、静态路由优先于动态路由、免鉴权路由判定；
   SPA 托管的 history 回退与目录穿越防护；JWT 中间件的 token 版本比对与全局踢人
-- `api/cms/v1/internal/logic`：文章状态机与公开可见性（含定时发布到点放行）、slug 规范化与中文兜底、发布时间格式解析
-- `internal/seed`：权限种子的 `(method, api_path)` 唯一性、文章模块 API / 按钮 / 菜单齐备、菜单父级声明顺序
+- `api/cms/v1/internal/logic`：文章状态机与公开可见性（含定时发布到点放行）、slug 规范化与中文兜底、发布时间格式解析、写事务 ctx 剥离请求取消信号后保留 trace/claims
+- `internal/seed`：权限种子的 `(method, api_path)` 唯一性、文章模块 API / 按钮 / 菜单齐备、菜单父级声明顺序、contentroutes 全路由登记覆盖、同权限码多接口不被覆盖
+- `cmd/apidoc`：OpenAPI 输出覆盖内容模块路径、schema、query / path 参数与 RSS / sitemap 纯文本响应
 - JWT 中间件测试用进程内 Redis + 空结果集 ent driver 替代数据库，无需 MySQL / Docker
 
 只跑文章相关的回归用例：

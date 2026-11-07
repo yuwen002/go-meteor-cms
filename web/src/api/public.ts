@@ -6,6 +6,7 @@ export interface PublicArticle {
   slug: string
   summary: string
   cover: string
+  author_name: string
   category_id: number
   category_name: string
   category_slug: string
@@ -27,6 +28,10 @@ export interface PublicArticleDetail extends PublicArticle {
   seo_title: string
   seo_description: string
   seo_keywords: string
+  canonical_url: string
+  related: PublicArticle[]
+  prev: PublicArticle | null
+  next: PublicArticle | null
 }
 
 export interface PublicCategory {

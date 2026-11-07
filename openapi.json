@@ -1,9 +1,2493 @@
 {
   "components": {
-    "schemas": {}
+    "schemas": {
+      "AdminBindDeptReq": {
+        "properties": {
+          "dept_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dept_id"
+        ],
+        "type": "object"
+      },
+      "AdminDetailReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "AdminDetailResp": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "nickname",
+          "email",
+          "phone",
+          "is_active"
+        ],
+        "type": "object"
+      },
+      "AdminItem": {
+        "properties": {
+          "avatar": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isSuper": {
+            "type": "boolean"
+          },
+          "last_login_at": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "nickname",
+          "email",
+          "phone",
+          "avatar",
+          "isSuper",
+          "isActive",
+          "last_login_at",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "AdminListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "AdminListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/AdminItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "page_size",
+          "list"
+        ],
+        "type": "object"
+      },
+      "AdminProfileResp": {
+        "properties": {
+          "avatar": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "dept_id": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_super": {
+            "type": "boolean"
+          },
+          "last_login_at": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "nickname",
+          "email",
+          "phone",
+          "avatar",
+          "is_super",
+          "dept_id",
+          "last_login_at",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "AdminRoleAssignReq": {
+        "properties": {
+          "role_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "role_ids"
+        ],
+        "type": "object"
+      },
+      "AdminRoleItem": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "data_scope": {
+            "type": "integer"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "is_system": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "desc",
+          "data_scope",
+          "is_system",
+          "is_active",
+          "sort",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "AdminRoleListResp": {
+        "properties": {
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/AdminRoleItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "roles"
+        ],
+        "type": "object"
+      },
+      "AdminRoleRemoveReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "ArticleBatchReq": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "ArticleBatchResp": {
+        "properties": {
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "type": "object"
+      },
+      "ArticleCreateReq": {
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "is_top": {
+            "type": "boolean"
+          },
+          "seo_description": {
+            "type": "string"
+          },
+          "seo_keywords": {
+            "type": "string"
+          },
+          "seo_title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tag_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "ArticleDetailResp": {
+        "properties": {
+          "author_name": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_top": {
+            "type": "boolean"
+          },
+          "published_at": {
+            "type": "string"
+          },
+          "seo_description": {
+            "type": "string"
+          },
+          "seo_keywords": {
+            "type": "string"
+          },
+          "seo_title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "status_text": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tag_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "tag_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "view_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "summary",
+          "cover",
+          "status",
+          "status_text",
+          "author_name",
+          "category_id",
+          "category_name",
+          "tag_ids",
+          "tag_names",
+          "is_top",
+          "view_count",
+          "published_at",
+          "created_at",
+          "updated_at",
+          "content",
+          "seo_title",
+          "seo_description",
+          "seo_keywords"
+        ],
+        "type": "object"
+      },
+      "ArticleIDReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "ArticleItem": {
+        "properties": {
+          "author_name": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_top": {
+            "type": "boolean"
+          },
+          "published_at": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "status_text": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tag_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "tag_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "view_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "summary",
+          "cover",
+          "status",
+          "status_text",
+          "author_name",
+          "category_id",
+          "category_name",
+          "tag_ids",
+          "tag_names",
+          "is_top",
+          "view_count",
+          "published_at",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "ArticleListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "ArticleListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/ArticleItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "list",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "ArticlePublishReq": {
+        "properties": {
+          "published_at": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ArticleRejectReq": {
+        "properties": {
+          "remark": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ArticleReviewItem": {
+        "properties": {
+          "action": {
+            "type": "integer"
+          },
+          "action_text": {
+            "type": "string"
+          },
+          "article_id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "operator_id": {
+            "type": "integer"
+          },
+          "operator_name": {
+            "type": "string"
+          },
+          "remark": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "article_id",
+          "action",
+          "action_text",
+          "remark",
+          "operator_id",
+          "operator_name",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "ArticleReviewListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/ArticleReviewItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "list"
+        ],
+        "type": "object"
+      },
+      "ArticleRevisionDetailResp": {
+        "properties": {
+          "article_id": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "remark": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "article_id",
+          "title",
+          "remark",
+          "created_at",
+          "summary",
+          "cover",
+          "content"
+        ],
+        "type": "object"
+      },
+      "ArticleRevisionIDReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "ArticleRevisionItem": {
+        "properties": {
+          "article_id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "remark": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "article_id",
+          "title",
+          "remark",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "ArticleRevisionListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/ArticleRevisionItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "list"
+        ],
+        "type": "object"
+      },
+      "ArticleUpdateReq": {
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "is_top": {
+            "type": "boolean"
+          },
+          "seo_description": {
+            "type": "string"
+          },
+          "seo_keywords": {
+            "type": "string"
+          },
+          "seo_title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tag_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "CaptchaResp": {
+        "properties": {
+          "captcha_base64": {
+            "type": "string"
+          },
+          "captcha_id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "captcha_id",
+          "captcha_base64"
+        ],
+        "type": "object"
+      },
+      "CategoryCreateReq": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "CategoryIDReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "CategoryItem": {
+        "properties": {
+          "article_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "parent_name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "parent_id",
+          "parent_name",
+          "description",
+          "sort",
+          "is_active",
+          "article_count",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "CategoryListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "CategoryListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "list"
+        ],
+        "type": "object"
+      },
+      "CategoryUpdateReq": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ChangeMyPasswordReq": {
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "old_password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "old_password",
+          "new_password"
+        ],
+        "type": "object"
+      },
+      "CommonResp": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "message"
+        ],
+        "type": "object"
+      },
+      "CreateAdminReq": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "is_super": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "nickname",
+          "email",
+          "phone",
+          "is_active",
+          "is_super"
+        ],
+        "type": "object"
+      },
+      "DeleteAdminReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "DepartmentCreateReq": {
+        "properties": {
+          "is_active": {
+            "type": "boolean"
+          },
+          "leader_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "parent_id",
+          "sort",
+          "is_active",
+          "leader_id"
+        ],
+        "type": "object"
+      },
+      "DepartmentDeleteReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "DepartmentDetailReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "DepartmentDetailResp": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "leader_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parent_id",
+          "sort",
+          "is_active",
+          "leader_id"
+        ],
+        "type": "object"
+      },
+      "DepartmentTreeResp": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/DepartmentTreeResp"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sort",
+          "is_active",
+          "children"
+        ],
+        "type": "object"
+      },
+      "DepartmentUpdateReq": {
+        "properties": {
+          "is_active": {
+            "type": "boolean"
+          },
+          "leader_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "parent_id",
+          "sort",
+          "is_active",
+          "leader_id"
+        ],
+        "type": "object"
+      },
+      "DisableAdminReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "EnableAdminReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "ForgotPasswordReq": {
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ],
+        "type": "object"
+      },
+      "ForgotPasswordResp": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "HealthResp": {
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "database": {
+            "type": "string"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "redis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "msg",
+          "database",
+          "redis"
+        ],
+        "type": "object"
+      },
+      "LoginLogItem": {
+        "properties": {
+          "fail_reason": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "login_at": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "user_agent": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "username",
+          "ip",
+          "user_agent",
+          "status",
+          "fail_reason",
+          "login_at"
+        ],
+        "type": "object"
+      },
+      "LoginLogListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "LoginLogListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/LoginLogItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "page_size",
+          "list"
+        ],
+        "type": "object"
+      },
+      "LoginReq": {
+        "properties": {
+          "captcha": {
+            "type": "string"
+          },
+          "captcha_id": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object"
+      },
+      "LoginResp": {
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "type": "object"
+      },
+      "MyMenuItem": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/MyMenuItem"
+            },
+            "type": "array"
+          },
+          "component": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parent_id",
+          "path",
+          "component",
+          "icon",
+          "permission",
+          "sort",
+          "children"
+        ],
+        "type": "object"
+      },
+      "MyPermissionResp": {
+        "properties": {
+          "is_super": {
+            "type": "boolean"
+          },
+          "menus": {
+            "items": {
+              "$ref": "#/components/schemas/MyMenuItem"
+            },
+            "type": "array"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "is_super",
+          "menus",
+          "permissions"
+        ],
+        "type": "object"
+      },
+      "OperationLogItem": {
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "duration_ms": {
+            "type": "integer"
+          },
+          "error_msg": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "params": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "user_agent": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "username",
+          "module",
+          "action",
+          "method",
+          "path",
+          "ip",
+          "user_agent",
+          "status",
+          "error_msg",
+          "duration_ms",
+          "params",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "OperationLogListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "OperationLogListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/OperationLogItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "page_size",
+          "list"
+        ],
+        "type": "object"
+      },
+      "PermissionCreateReq": {
+        "properties": {
+          "api_path": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "method": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "parent_id",
+          "type",
+          "path",
+          "component",
+          "icon",
+          "method",
+          "api_path",
+          "permission",
+          "is_active",
+          "sort"
+        ],
+        "type": "object"
+      },
+      "PermissionDeleteReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "PermissionDetailItem": {
+        "properties": {
+          "api_path": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "method": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parent_id",
+          "type",
+          "path",
+          "component",
+          "icon",
+          "method",
+          "api_path",
+          "permission",
+          "is_active",
+          "sort",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "PermissionDetailReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "PermissionDetailResp": {
+        "properties": {},
+        "type": "object"
+      },
+      "PermissionItem": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "PermissionListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "PermissionListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/PermissionDetailItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "page_size",
+          "list"
+        ],
+        "type": "object"
+      },
+      "PermissionTreeItem": {
+        "properties": {
+          "api_path": {
+            "type": "string"
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/PermissionTreeItem"
+            },
+            "type": "array"
+          },
+          "component": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "method": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parent_id",
+          "type",
+          "path",
+          "component",
+          "icon",
+          "method",
+          "api_path",
+          "permission",
+          "is_active",
+          "sort",
+          "children"
+        ],
+        "type": "object"
+      },
+      "PermissionUpdateReq": {
+        "properties": {
+          "api_path": {
+            "nullable": true,
+            "type": "string"
+          },
+          "component": {
+            "nullable": true,
+            "type": "string"
+          },
+          "icon": {
+            "nullable": true,
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "method": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "parent_id": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "path": {
+            "nullable": true,
+            "type": "string"
+          },
+          "permission": {
+            "nullable": true,
+            "type": "string"
+          },
+          "sort": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "type": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PublicArticleDetailReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "PublicArticleDetailResp": {
+        "properties": {
+          "author_name": {
+            "type": "string"
+          },
+          "canonical_url": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "category_slug": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_top": {
+            "type": "boolean"
+          },
+          "next": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicArticleItem"
+              }
+            ],
+            "nullable": true
+          },
+          "prev": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicArticleItem"
+              }
+            ],
+            "nullable": true
+          },
+          "published_at": {
+            "type": "string"
+          },
+          "related": {
+            "items": {
+              "$ref": "#/components/schemas/PublicArticleItem"
+            },
+            "type": "array"
+          },
+          "seo_description": {
+            "type": "string"
+          },
+          "seo_keywords": {
+            "type": "string"
+          },
+          "seo_title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tag_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          },
+          "view_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "summary",
+          "cover",
+          "author_name",
+          "category_id",
+          "category_name",
+          "category_slug",
+          "tag_names",
+          "is_top",
+          "view_count",
+          "published_at",
+          "content",
+          "seo_title",
+          "seo_description",
+          "seo_keywords",
+          "canonical_url",
+          "related",
+          "prev",
+          "next"
+        ],
+        "type": "object"
+      },
+      "PublicArticleItem": {
+        "properties": {
+          "author_name": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "category_slug": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_top": {
+            "type": "boolean"
+          },
+          "published_at": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tag_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          },
+          "view_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "summary",
+          "cover",
+          "author_name",
+          "category_id",
+          "category_name",
+          "category_slug",
+          "tag_names",
+          "is_top",
+          "view_count",
+          "published_at"
+        ],
+        "type": "object"
+      },
+      "PublicArticleListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "PublicArticleListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/PublicArticleItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "list",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "PublicCategoryItem": {
+        "properties": {
+          "article_count": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "parent_id",
+          "article_count"
+        ],
+        "type": "object"
+      },
+      "PublicTagItem": {
+        "properties": {
+          "article_count": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "article_count"
+        ],
+        "type": "object"
+      },
+      "PublicTaxonomyResp": {
+        "properties": {
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/PublicCategoryItem"
+            },
+            "type": "array"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/PublicTagItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "categories",
+          "tags"
+        ],
+        "type": "object"
+      },
+      "RefreshTokenReq": {
+        "properties": {
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "type": "object"
+      },
+      "RefreshTokenResp": {
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "type": "object"
+      },
+      "RegisterReq": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "email",
+          "nickname"
+        ],
+        "type": "object"
+      },
+      "RegisterResp": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "ResetAdminPasswordReq": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "new_password"
+        ],
+        "type": "object"
+      },
+      "ResetPasswordByTokenReq": {
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "new_password"
+        ],
+        "type": "object"
+      },
+      "RoleCreateReq": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data_scope": {
+            "type": "integer"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "code",
+          "desc",
+          "data_scope",
+          "is_active",
+          "sort"
+        ],
+        "type": "object"
+      },
+      "RoleDeleteReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "RoleDeptReq": {
+        "properties": {
+          "dept_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "dept_ids"
+        ],
+        "type": "object"
+      },
+      "RoleDeptResp": {
+        "properties": {
+          "dept_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "dept_ids"
+        ],
+        "type": "object"
+      },
+      "RoleDetailReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "RoleDetailResp": {
+        "properties": {},
+        "type": "object"
+      },
+      "RoleItem": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "data_scope": {
+            "type": "integer"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "is_system": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "desc",
+          "data_scope",
+          "is_system",
+          "is_active",
+          "sort",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "RoleListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "RoleListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/RoleItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "page_size",
+          "list"
+        ],
+        "type": "object"
+      },
+      "RolePermissionAssignReq": {
+        "properties": {
+          "permission_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "permission_ids"
+        ],
+        "type": "object"
+      },
+      "RolePermissionIDsResp": {
+        "properties": {
+          "permission_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "permission_ids"
+        ],
+        "type": "object"
+      },
+      "RolePermissionListResp": {
+        "properties": {
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PermissionItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "permissions"
+        ],
+        "type": "object"
+      },
+      "RoleUpdateReq": {
+        "properties": {
+          "code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "data_scope": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "desc": {
+            "nullable": true,
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "sort": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "TagCreateReq": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "TagIDReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "TagItem": {
+        "properties": {
+          "article_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "description",
+          "sort",
+          "is_active",
+          "article_count",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "TagListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "TagListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/TagItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "list"
+        ],
+        "type": "object"
+      },
+      "TagUpdateReq": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "TestTokenResp": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "TrashEntityReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "TrashItem": {
+        "properties": {
+          "deleted_at": {
+            "type": "string"
+          },
+          "entity_type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "entity_type",
+          "title",
+          "slug",
+          "deleted_at"
+        ],
+        "type": "object"
+      },
+      "TrashListReq": {
+        "properties": {},
+        "type": "object"
+      },
+      "TrashListResp": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/TrashItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "list",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "UpdateAdminReq": {
+        "properties": {
+          "email": {
+            "nullable": true,
+            "type": "string"
+          },
+          "is_active": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "phone": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateProfileReq": {
+        "properties": {
+          "avatar": {
+            "nullable": true,
+            "type": "string"
+          },
+          "email": {
+            "nullable": true,
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "phone": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UploadFileResp": {
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "filename",
+          "size"
+        ],
+        "type": "object"
+      }
+    }
   },
   "info": {
-    "description": "由 cms.api 自动生成的 OpenAPI 文档（make gen-doc）。所有接口统一响应结构为 { code:int, msg:string, data:any }，其中 data 即下方各接口标注的响应模型。",
+    "description": "由 cms.api 与 content.doc.api 自动生成的 OpenAPI 文档（make gen-doc）。除 RSS / sitemap / robots 等纯文本输出外，所有接口统一响应结构为 { code:int, msg:string, data:any }，其中 data 即各接口标注的响应模型；query / path 参数已在 parameters 中标注。",
     "title": "Go Meteor CMS API",
     "version": "v1"
   },
@@ -12,15 +2496,40 @@
     "/admin/admin-users": {
       "get": {
         "operationId": "adminList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminListReq"
-              }
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "active",
+            "required": false,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -33,7 +2542,10 @@
             "description": "成功"
           }
         },
-        "summary": "adminList"
+        "summary": "adminList",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/create": {
@@ -60,7 +2572,10 @@
             "description": "成功"
           }
         },
-        "summary": "adminCreate"
+        "summary": "adminCreate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/me/change-password": {
@@ -87,7 +2602,10 @@
             "description": "成功"
           }
         },
-        "summary": "changeMyPassword"
+        "summary": "changeMyPassword",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/reset-password": {
@@ -114,21 +2632,25 @@
             "description": "成功"
           }
         },
-        "summary": "resetAdminPassword"
+        "summary": "resetAdminPassword",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/{id}": {
       "delete": {
         "operationId": "adminDelete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteAdminReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -141,19 +2663,23 @@
             "description": "成功"
           }
         },
-        "summary": "adminDelete"
+        "summary": "adminDelete",
+        "tags": [
+          "系统管理"
+        ]
       },
       "get": {
         "operationId": "adminDetail",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -166,10 +2692,23 @@
             "description": "成功"
           }
         },
-        "summary": "adminDetail"
+        "summary": "adminDetail",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "adminUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -191,12 +2730,25 @@
             "description": "成功"
           }
         },
-        "summary": "adminUpdate"
+        "summary": "adminUpdate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/{id}/bind-department": {
       "put": {
         "operationId": "adminBindDepartment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -218,21 +2770,25 @@
             "description": "成功"
           }
         },
-        "summary": "adminBindDepartment"
+        "summary": "adminBindDepartment",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/{id}/disable": {
       "put": {
         "operationId": "disableAdmin",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DisableAdminReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -245,21 +2801,25 @@
             "description": "成功"
           }
         },
-        "summary": "disableAdmin"
+        "summary": "disableAdmin",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/{id}/enable": {
       "put": {
         "operationId": "enableAdmin",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EnableAdminReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -272,21 +2832,25 @@
             "description": "成功"
           }
         },
-        "summary": "enableAdmin"
+        "summary": "enableAdmin",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/admin-users/{id}/roles": {
       "get": {
         "operationId": "adminRoleList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -299,10 +2863,23 @@
             "description": "成功"
           }
         },
-        "summary": "adminRoleList"
+        "summary": "adminRoleList",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "adminRoleAssign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -324,17 +2901,145 @@
             "description": "成功"
           }
         },
-        "summary": "adminRoleAssign"
+        "summary": "adminRoleAssign",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
-    "/admin/admin-users/{id}/roles/:role_id": {
+    "/admin/admin-users/{id}/roles/{role_id}": {
       "delete": {
         "operationId": "adminRoleRemove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "role_id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "adminRoleRemove",
+        "tags": [
+          "系统管理"
+        ]
+      }
+    },
+    "/admin/articles": {
+      "get": {
+        "operationId": "articleList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "nullable": true,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category_id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tag_id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleList",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "post": {
+        "operationId": "articleCreate",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AdminRoleRemoveReq"
+                "$ref": "#/components/schemas/ArticleCreateReq"
               }
             }
           }
@@ -351,12 +3056,85 @@
             "description": "成功"
           }
         },
-        "summary": "adminRoleRemove"
+        "summary": "articleCreate",
+        "tags": [
+          "内容管理"
+        ]
       }
     },
-    "/admin/dashboard/stats": {
-      "get": {
-        "operationId": "dashboardStats",
+    "/admin/articles/batch-delete": {
+      "post": {
+        "operationId": "articleBatchDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleBatchReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleBatchResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleBatchDelete",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/batch-offline": {
+      "post": {
+        "operationId": "articleBatchOffline",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleBatchReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleBatchResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleBatchOffline",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}": {
+      "delete": {
+        "operationId": "articleDelete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -369,7 +3147,588 @@
             "description": "成功"
           }
         },
-        "summary": "dashboardStats"
+        "summary": "articleDelete",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "get": {
+        "operationId": "articleDetail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleDetail",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "put": {
+        "operationId": "articleUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleUpdateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleUpdate",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/approve": {
+      "post": {
+        "operationId": "articleApprove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticlePublishReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleApprove",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/publish": {
+      "post": {
+        "operationId": "articlePublish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticlePublishReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articlePublish",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/reject": {
+      "post": {
+        "operationId": "articleReject",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleRejectReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleReject",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/reviews": {
+      "get": {
+        "operationId": "articleReviewList",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleReviewListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleReviewList",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/revisions": {
+      "get": {
+        "operationId": "articleRevisionList",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleRevisionListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleRevisionList",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/revisions/{rid}": {
+      "get": {
+        "operationId": "articleRevisionDetail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "rid",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleRevisionDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleRevisionDetail",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/revisions/{rid}/restore": {
+      "post": {
+        "operationId": "articleRevisionRestore",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "rid",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleRevisionRestore",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/submit": {
+      "post": {
+        "operationId": "articleSubmit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleSubmit",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/toggle-top": {
+      "post": {
+        "operationId": "articleToggleTop",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleToggleTop",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/articles/{id}/withdraw": {
+      "post": {
+        "operationId": "articleWithdraw",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "articleWithdraw",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/categories": {
+      "get": {
+        "operationId": "categoryList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "is_active",
+            "required": false,
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "categoryList",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "post": {
+        "operationId": "categoryCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryCreateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "categoryCreate",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/categories/{id}": {
+      "delete": {
+        "operationId": "categoryDelete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "categoryDelete",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "put": {
+        "operationId": "categoryUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryUpdateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "categoryUpdate",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/dashboard/stats": {
+      "get": {
+        "operationId": "dashboardStats",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "dashboardStats",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/departments": {
@@ -396,7 +3755,10 @@
             "description": "成功"
           }
         },
-        "summary": "departmentCreate"
+        "summary": "departmentCreate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/departments/tree": {
@@ -414,21 +3776,25 @@
             "description": "成功"
           }
         },
-        "summary": "departmentTree"
+        "summary": "departmentTree",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/departments/{id}": {
       "delete": {
         "operationId": "departmentDelete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DepartmentDeleteReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -441,19 +3807,23 @@
             "description": "成功"
           }
         },
-        "summary": "departmentDelete"
+        "summary": "departmentDelete",
+        "tags": [
+          "系统管理"
+        ]
       },
       "get": {
         "operationId": "departmentDetail",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DepartmentDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -466,10 +3836,23 @@
             "description": "成功"
           }
         },
-        "summary": "departmentDetail"
+        "summary": "departmentDetail",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "departmentUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -491,7 +3874,10 @@
             "description": "成功"
           }
         },
-        "summary": "departmentUpdate"
+        "summary": "departmentUpdate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/files": {
@@ -518,7 +3904,10 @@
             "description": "成功"
           }
         },
-        "summary": "fileList"
+        "summary": "fileList",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/files/delete": {
@@ -545,7 +3934,10 @@
             "description": "成功"
           }
         },
-        "summary": "fileDelete"
+        "summary": "fileDelete",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/files/rename": {
@@ -572,7 +3964,10 @@
             "description": "成功"
           }
         },
-        "summary": "fileRename"
+        "summary": "fileRename",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/forgot-password": {
@@ -599,7 +3994,10 @@
             "description": "成功"
           }
         },
-        "summary": "forgotPassword"
+        "summary": "forgotPassword",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/login": {
@@ -626,7 +4024,10 @@
             "description": "成功"
           }
         },
-        "summary": "Login"
+        "summary": "Login",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/logout": {
@@ -637,28 +4038,80 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/CommonResp"
                 }
               }
             },
             "description": "成功"
           }
         },
-        "summary": "adminLogout"
+        "summary": "adminLogout",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/logs/logins": {
       "get": {
         "operationId": "loginLogList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginLogListReq"
-              }
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "username",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_time",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_time",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -671,21 +4124,89 @@
             "description": "成功"
           }
         },
-        "summary": "loginLogList"
+        "summary": "loginLogList",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/logs/operations": {
       "get": {
         "operationId": "operationLogList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OperationLogListReq"
-              }
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "username",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "module",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_time",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_time",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -698,21 +4219,58 @@
             "description": "成功"
           }
         },
-        "summary": "operationLogList"
+        "summary": "operationLogList",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/permissions": {
       "get": {
         "operationId": "permissionList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PermissionListReq"
-              }
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "is_active",
+            "required": false,
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -725,7 +4283,10 @@
             "description": "成功"
           }
         },
-        "summary": "permissionList"
+        "summary": "permissionList",
+        "tags": [
+          "系统管理"
+        ]
       },
       "post": {
         "operationId": "permissionCreate",
@@ -750,7 +4311,10 @@
             "description": "成功"
           }
         },
-        "summary": "permissionCreate"
+        "summary": "permissionCreate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/permissions/tree": {
@@ -768,21 +4332,25 @@
             "description": "成功"
           }
         },
-        "summary": "permissionTree"
+        "summary": "permissionTree",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/permissions/{id}": {
       "delete": {
         "operationId": "permissionDelete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PermissionDeleteReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -795,19 +4363,23 @@
             "description": "成功"
           }
         },
-        "summary": "permissionDelete"
+        "summary": "permissionDelete",
+        "tags": [
+          "系统管理"
+        ]
       },
       "get": {
         "operationId": "permissionDetail",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PermissionDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -820,10 +4392,23 @@
             "description": "成功"
           }
         },
-        "summary": "permissionDetail"
+        "summary": "permissionDetail",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "permissionUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -845,7 +4430,10 @@
             "description": "成功"
           }
         },
-        "summary": "permissionUpdate"
+        "summary": "permissionUpdate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/profile": {
@@ -856,14 +4444,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/AdminProfileResp"
                 }
               }
             },
             "description": "成功"
           }
         },
-        "summary": "myProfile"
+        "summary": "myProfile",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "updateMyProfile",
@@ -888,7 +4479,10 @@
             "description": "成功"
           }
         },
-        "summary": "updateMyProfile"
+        "summary": "updateMyProfile",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/profile/permissions": {
@@ -899,14 +4493,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/MyPermissionResp"
                 }
               }
             },
             "description": "成功"
           }
         },
-        "summary": "myPermissions"
+        "summary": "myPermissions",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/refresh": {
@@ -933,7 +4530,10 @@
             "description": "成功"
           }
         },
-        "summary": "refreshToken"
+        "summary": "refreshToken",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/register": {
@@ -960,7 +4560,10 @@
             "description": "成功"
           }
         },
-        "summary": "registerAdmin"
+        "summary": "registerAdmin",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/reset-password": {
@@ -987,21 +4590,50 @@
             "description": "成功"
           }
         },
-        "summary": "resetPasswordByToken"
+        "summary": "resetPasswordByToken",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/roles": {
       "get": {
         "operationId": "roleList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoleListReq"
-              }
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "is_active",
+            "required": false,
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1014,7 +4646,10 @@
             "description": "成功"
           }
         },
-        "summary": "roleList"
+        "summary": "roleList",
+        "tags": [
+          "系统管理"
+        ]
       },
       "post": {
         "operationId": "roleCreate",
@@ -1039,21 +4674,25 @@
             "description": "成功"
           }
         },
-        "summary": "roleCreate"
+        "summary": "roleCreate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/roles/{id}": {
       "delete": {
         "operationId": "roleDelete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoleDeleteReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1066,19 +4705,23 @@
             "description": "成功"
           }
         },
-        "summary": "roleDelete"
+        "summary": "roleDelete",
+        "tags": [
+          "系统管理"
+        ]
       },
       "get": {
         "operationId": "roleDetail",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoleDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1091,10 +4734,23 @@
             "description": "成功"
           }
         },
-        "summary": "roleDetail"
+        "summary": "roleDetail",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "roleUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1116,21 +4772,25 @@
             "description": "成功"
           }
         },
-        "summary": "roleUpdate"
+        "summary": "roleUpdate",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/roles/{id}/departments": {
       "get": {
         "operationId": "roleDeptList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoleDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1143,10 +4803,23 @@
             "description": "成功"
           }
         },
-        "summary": "roleDeptList"
+        "summary": "roleDeptList",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "roleDeptAssign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1168,21 +4841,25 @@
             "description": "成功"
           }
         },
-        "summary": "roleDeptAssign"
+        "summary": "roleDeptAssign",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/roles/{id}/permissions": {
       "get": {
         "operationId": "rolePermissionList",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoleDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1195,10 +4872,23 @@
             "description": "成功"
           }
         },
-        "summary": "rolePermissionList"
+        "summary": "rolePermissionList",
+        "tags": [
+          "系统管理"
+        ]
       },
       "put": {
         "operationId": "rolePermissionAssign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1220,21 +4910,25 @@
             "description": "成功"
           }
         },
-        "summary": "rolePermissionAssign"
+        "summary": "rolePermissionAssign",
+        "tags": [
+          "系统管理"
+        ]
       }
     },
     "/admin/roles/{id}/permissions-with-names": {
       "get": {
         "operationId": "rolePermissionListWithNames",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoleDetailReq"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -1247,7 +4941,147 @@
             "description": "成功"
           }
         },
-        "summary": "rolePermissionListWithNames"
+        "summary": "rolePermissionListWithNames",
+        "tags": [
+          "系统管理"
+        ]
+      }
+    },
+    "/admin/tags": {
+      "get": {
+        "operationId": "tagList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "is_active",
+            "required": false,
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "tagList",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "post": {
+        "operationId": "tagCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagCreateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "tagCreate",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/tags/{id}": {
+      "delete": {
+        "operationId": "tagDelete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "tagDelete",
+        "tags": [
+          "内容管理"
+        ]
+      },
+      "put": {
+        "operationId": "tagUpdate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagUpdateReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "tagUpdate",
+        "tags": [
+          "内容管理"
+        ]
       }
     },
     "/admin/test-token": {
@@ -1258,6 +5092,92 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "$ref": "#/components/schemas/TestTokenResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "testToken",
+        "tags": [
+          "系统管理"
+        ]
+      }
+    },
+    "/admin/trash": {
+      "get": {
+        "operationId": "trashList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "trashList",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/trash/{type}/{id}/purge": {
+      "delete": {
+        "operationId": "trashPurge",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
                   "type": "object"
                 }
               }
@@ -1265,7 +5185,49 @@
             "description": "成功"
           }
         },
-        "summary": "testToken"
+        "summary": "trashPurge",
+        "tags": [
+          "内容管理"
+        ]
+      }
+    },
+    "/admin/trash/{type}/{id}/restore": {
+      "post": {
+        "operationId": "trashRestore",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "trashRestore",
+        "tags": [
+          "内容管理"
+        ]
       }
     },
     "/admin/upload": {
@@ -1276,14 +5238,111 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/UploadFileResp"
                 }
               }
             },
             "description": "成功"
           }
         },
-        "summary": "uploadFile"
+        "summary": "uploadFile",
+        "tags": [
+          "系统管理"
+        ]
+      }
+    },
+    "/api/articles": {
+      "get": {
+        "operationId": "publicArticleList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tag",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicArticleListResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "publicArticleList",
+        "tags": [
+          "公开阅读"
+        ]
+      }
+    },
+    "/api/articles/{slug}": {
+      "get": {
+        "operationId": "publicArticleDetail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicArticleDetailResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "publicArticleDetail",
+        "tags": [
+          "公开阅读"
+        ]
       }
     },
     "/api/captcha": {
@@ -1294,14 +5353,122 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/CaptchaResp"
                 }
               }
             },
             "description": "成功"
           }
         },
-        "summary": "GetCaptcha"
+        "summary": "GetCaptcha",
+        "tags": [
+          "公开阅读"
+        ]
+      }
+    },
+    "/api/rss": {
+      "get": {
+        "operationId": "publicRss",
+        "responses": {
+          "200": {
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "publicRss",
+        "tags": [
+          "公开阅读"
+        ]
+      }
+    },
+    "/api/taxonomy": {
+      "get": {
+        "operationId": "publicTaxonomy",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTaxonomyResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "publicTaxonomy",
+        "tags": [
+          "公开阅读"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResp"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "health",
+        "tags": [
+          "系统管理"
+        ]
+      }
+    },
+    "/robots.txt": {
+      "get": {
+        "operationId": "publicRobots",
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "publicRobots",
+        "tags": [
+          "公开阅读"
+        ]
+      }
+    },
+    "/sitemap.xml": {
+      "get": {
+        "operationId": "publicSitemap",
+        "responses": {
+          "200": {
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "成功"
+          }
+        },
+        "summary": "publicSitemap",
+        "tags": [
+          "公开阅读"
+        ]
       }
     }
   },
